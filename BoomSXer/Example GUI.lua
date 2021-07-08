@@ -6,10 +6,9 @@ local Gui = Library:AddGui({
 	ToggleKey = Enum.KeyCode.RightShift,
 })
 
-local Tab1 = Gui:AddTab("Test Tab 1")
-local Tab2 = Gui:AddTab("Test Tab 2")
+local Tab = Gui:AddTab("Test Tab")
 
-local Category = Tab1:AddCategory("Category")
+local Category = Tab:AddCategory("Category")
 
 local Button = Category:AddButton("Button", function()
 	Library:Notify("You pressed Button, are you proud?", function(yesno)
@@ -17,11 +16,7 @@ local Button = Category:AddButton("Button", function()
 	end)
 end)
 
-local Toggle1 = Category:AddToggle("Toggle 1", false, function(toggle)
-	(toggle and print or warn)(toggle)
-end)
-
-local Toggle2 = Category:AddToggle("Toggle 2", true, function(toggle)
+local Toggle = Category:AddToggle("Toggle", false, function(toggle)
 	(toggle and print or warn)(toggle)
 end)
 
