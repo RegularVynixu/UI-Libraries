@@ -14,7 +14,8 @@
 
     [ What's new? ]
 
-    [+] Initial release
+    [+] Added (Toggle-)Slider:SetMin(<num> min)
+    [+] Added (Toggle-)Slider:SetMax(<num> max)
 
 ]]--
 
