@@ -87,6 +87,7 @@ function Utility:FixSettings(...)
         data[3] = data[2]
     end
     data[2] = {}
+    return unpack(data)
 end
 
 -- Library
@@ -441,7 +442,7 @@ function Library:AddWindow(settings)
     end)
 
     function Window:AddTab(name, settings)
-        Utility:FixSettings(name, settings)
+        name, settings = Utility:FixSettings(name, settings)
 
         local Tab = {
             Name = name,
@@ -579,7 +580,7 @@ function Library:AddWindow(settings)
         end)
 
         function Tab:AddSection(name, settings)
-            Utility:FixSettings(name, settings)
+            name, settings = Utility:FixSettings(name, settings)
 
             local Section = {
                 Name = name,
@@ -794,7 +795,7 @@ function Library:AddWindow(settings)
 
             function Section:AddToggle(name, settings, callback)
                 assert(not Tab.Toggles[settings.flag or name], "Duplicate flag '".. (settings.flag or name).. "'")
-                Utility:FixSettings(name, settings, callback)
+                name, settings, callback = Utility:FixSettings(name, settings, callback)
 
                 local Toggle = {
                     Name = name,
@@ -882,7 +883,7 @@ function Library:AddWindow(settings)
             -- Label
 
             function Section:AddLabel(name, settings)
-                Utility:FixSettings(name, settings)
+                name, settings = Utility:FixSettings(name, settings)
 
                 local Label = {
                     Name = name,
@@ -972,7 +973,7 @@ function Library:AddWindow(settings)
             -- ClipboardLabel
 
             function Section:AddClipboardLabel(name, settings)
-                Utility:FixSettings(name, settings)
+                name, settings = Utility:FixSettings(name, settings)
 
                 local ClipboardLabel = {
                     Name = name,
@@ -1065,7 +1066,7 @@ function Library:AddWindow(settings)
             -- Box
 
             function Section:AddBox(name, settings, callback)
-                Utility:FixSettings(name, settings, callback)
+                name, settings, callback = Utility:FixSettings(name, settings, callback)
 
                 local Box = {
                     Name = name,
@@ -1172,7 +1173,7 @@ function Library:AddWindow(settings)
             -- NumBox
 
             function Section:AddNumBox(name, settings, callback)
-                Utility:FixSettings(name, settings, callback)
+                name, settings, callback = Utility:FixSettings(name, settings, callback)
 
                 local NumBox = {
                     Name = name,
@@ -1277,7 +1278,7 @@ function Library:AddWindow(settings)
             -- PlayerBox
 
             function Section:AddPlayerBox(name, settings, callback)
-                Utility:FixSettings(name, settings, callback)
+                name, settings, callback = Utility:FixSettings(name, settings, callback)
 
                 local PlayerBox = {
                     Name = name,
@@ -1394,7 +1395,7 @@ function Library:AddWindow(settings)
             -- Bind
 
             function Section:AddBind(name, bind, settings, callback)
-                Utility:FixSettings(name, settings, callback)
+                name, settings, callback = Utility:FixSettings(name, settings, callback)
 
                 local Bind = {
                     Name = name,
@@ -1516,7 +1517,7 @@ function Library:AddWindow(settings)
             -- Slider
 
             function Section:AddSlider(name, settings, callback)
-                Utility:FixSettings(name, settings, callback)
+                name, settings, callback = Utility:FixSettings(name, settings, callback)
 
                 local Slider = {
                     Name = name,
