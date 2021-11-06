@@ -77,7 +77,6 @@ function Utility:Create(class, properties, radius)
         local uicorner = Instance.new("UICorner", instance)
         uicorner.CornerRadius = radius
     end
-
     return instance
 end
 
@@ -796,8 +795,8 @@ function Library:AddWindow(settings)
             -- Toggle
 
             function Section:AddToggle(name, settings, callback)
-                assert(not Tab.Toggles[settings.flag or name], "Duplicate flag '".. (settings.flag or name).. "'")
                 name, settings, callback = Utility:FixSettings(name, settings, callback)
+                assert(not Tab.Toggles[settings.flag or name], "Duplicate flag '".. (settings.flag or name).. "'")
 
                 local Toggle = {
                     Name = name,
