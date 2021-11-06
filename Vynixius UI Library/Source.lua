@@ -83,12 +83,10 @@ end
 
 function Utility:FixSettings(...)
     local data = {...}
-    if not data[2] or typeof(data[2]) ~= "table" then
-        if data[2] == "function" then
-            data[3] = data[2]
-        end
-        data[2] = {}
+    if data[2] == "function" then
+        data[3] = data[2]
     end
+    data[2] = {}
 end
 
 -- Library
