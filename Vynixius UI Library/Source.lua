@@ -1,3 +1,24 @@
+--[[
+    __      __          _      _             _    _ _____   _      _ _                          
+    \ \    / /         (_)    (_)           | |  | |_   _| | |    (_) |                         
+     \ \  / /   _ _ __  ___  ___ _   _ ___  | |  | | | |   | |     _| |__  _ __ __ _ _ __ _   _ 
+      \ \/ / | | | '_ \| \ \/ / | | | / __| | |  | | | |   | |    | | '_ \| '__/ _` | '__| | | |
+       \  /| |_| | | | | |>  <| | |_| \__ \ | |__| |_| |_  | |____| | |_) | | | (_| | |  | |_| |
+        \/  \__, |_| |_|_/_/\_\_|\__,_|___/  \____/|_____| |______|_|_.__/|_|  \__,_|_|   \__, |
+             __/ |                                                                         __/ |
+            |___/                                                                         |___/ 
+
+    Vynixius UI Library v1.0.1b
+
+    UI - Vynixu
+    Scripting - Vynixu
+
+    [ What's new? ]
+
+    [*] Fixed some colouring issues
+
+]]--
+
 -- Services
 
 local Players = game:GetService("Players")
@@ -73,9 +94,9 @@ local Library = {
     },
 }
 
--- :Notify --
-
 function Library:AddWindow(settings)
+    assert(not Library.Window, "Library already has a window.")
+
     local Window = {
         Tabs = {},
         Sidebar = {
@@ -88,6 +109,8 @@ function Library:AddWindow(settings)
             Objects = {},
         },
     }
+
+    Library.Window = Window
 
     if settings.theme then
         for i, v in next, settings.theme do
@@ -130,8 +153,8 @@ function Library:AddWindow(settings)
                     Utility:Create("Frame", {
                         Name = "Holder",
                         BackgroundTransparency = 1,
-                        Position = UDim2.new(0, 0, 0.5, -10),
-                        Size = UDim2.new(0, 133, 0, 20),
+                        Position = UDim2.new(0, 5, 0.5, -10),
+                        Size = UDim2.new(1, -10, 0, 20),
 
                         Utility:Create("TextLabel", {
                             Name = "Title1",
@@ -205,7 +228,8 @@ function Library:AddWindow(settings)
                         Position = UDim2.new(0, 5, 0, 35),
                         Size = UDim2.new(0, 110, 1, -40),
                         CanvasSize = UDim2.new(0, 0, 0, 0),
-                        ScrollBarImageColor3 = Color3.fromRGB(0, 0, 0),
+                        ScrollingDirection = Enum.ScrollingDirection.Y,
+                        ScrollBarImageColor3 = Utility.Colors.Add(Library.Theme.SidebarColor, Color3.fromRGB(10, 10, 10)),
                         ScrollBarThickness = 5,
 
                         Utility:Create("UIListLayout", {
@@ -422,12 +446,14 @@ function Library:AddWindow(settings)
 
         Tab.Frame = Utility:Create("ScrollingFrame", {
             Name = name,
+            Active = true,
             BackgroundTransparency = 1,
             BorderSizePixel = 0,
             Position = UDim2.new(0, 5, 0, 5),
             Size = UDim2.new(1, -10, 1, -10),
             CanvasSize = UDim2.new(0, 0, 0, 0),
-            ScrollBarImageColor3 = Color3.fromRGB(25, 25, 25),
+            ScrollingDirection = Enum.ScrollingDirection.Y,
+            ScrollBarImageColor3 = Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
             ScrollBarThickness = 5,
             Visible = false,
 
@@ -1694,8 +1720,10 @@ function Library:AddWindow(settings)
                     Position = UDim2.new(0, 0, 0, 40),
                     Size = UDim2.new(1, 0, 1, -40),
                     CanvasSize = UDim2.new(0, 0, 0, 0),
-                    ScrollBarThickness = 5,
+                    ClipsDescendants = true,
                     ScrollingDirection = Enum.ScrollingDirection.Y,
+                    ScrollBarImageColor3 = Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
+                    ScrollBarThickness = 5,
 
                     Utility:Create("UIListLayout", {
                         SortOrder = Enum.SortOrder.LayoutOrder,
@@ -1728,6 +1756,8 @@ function Library:AddWindow(settings)
                     local MaxHeight = 40 + 10 * 25
                     Dropdown.Holder.Size = UDim2.new(1, 0, 0, math.min(Dropdown:GetHeight(), MaxVisibleItems))
                     Dropdown:UpdateList()
+                    Section:UpdateHeight()
+                    Tab:UpdateHeight()
                     
                     TS:Create(Dropdown.Holder.Holder.Indicator, TweenInfo.new(.5, Enum.EasingStyle.Quint), {
                         Rotation = #Dropdown.Items > 0 and 45 or 0,
@@ -1844,7 +1874,7 @@ function Library:AddWindow(settings)
                 return Dropdown
             end
 
-            -- Colorpicker W.I.P.
+            -- Colorpicker
 
             return Section
         end
