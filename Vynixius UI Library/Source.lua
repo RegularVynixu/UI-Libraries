@@ -83,7 +83,7 @@ end
 
 function Utility:FixSettings(...)
     local data = {...}
-    if data[2] == "function" then
+    if typeof(data[2]) == "function" then
         data[3] = data[2]
     end
     data[2] = {}
