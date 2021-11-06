@@ -83,9 +83,7 @@ end
 
 function Utility:FixSettings(...)
     local data = {...}
-    if #data == 1 and typeof(data[1]) ~= "table" then
-        data[1] = {}
-    elseif #data >= 2 and typeof(data[2]) ~= "table" then
+    if not data[2] or typeof(data[2]) ~= "table" then
         if typeof(data[2]) == "function" then
             data[3] = data[2]
         end
