@@ -15,7 +15,7 @@
 
     [ What's new? ]
 
-    [*] You no longer have to set an empty settings table
+    [*] You no longer have to assign empty settings tables
 
 ]]--
 
@@ -81,12 +81,16 @@ function Utility:Create(class, properties, radius)
     return instance
 end
 
-function Utility:FixSettings(...)
+function FixSettings(...)
     local data = {...}
-    if typeof(data[2]) == "function" then
-        data[3] = data[2]
+    if #data == 1 and typeof(data[1]) ~= "table" then
+        data[1] = {}
+    elseif #data >= 2 and typeof(data[2]) ~= "table" then
+        if typeof(data[2]) == "function" then
+            data[3] = data[2]
+        end
+        data[2] = {}
     end
-    data[2] = {}
     return unpack(data)
 end
 
