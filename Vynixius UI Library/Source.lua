@@ -81,7 +81,7 @@ function Utility:Create(class, properties, radius)
     return instance
 end
 
-function FixSettings(...)
+function Utility:FixSettings(...)
     local data = {...}
     if #data == 1 and typeof(data[1]) ~= "table" then
         data[1] = {}
