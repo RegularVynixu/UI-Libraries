@@ -8,14 +8,14 @@
              __/ |                                                                         __/ |
             |___/                                                                         |___/ 
 
-    Vynixius UI Library v1.0.0c
+    Vynixius UI Library v1.0.0d
 
     UI - Vynixu
     Scripting - Vynixu
 
     [ What's new? ]
 
-    [*] Fixed more visual stuff
+    [*] You no longer have to set an empty settings table
 
 ]]--
 
@@ -79,6 +79,16 @@ function Utility:Create(class, properties, radius)
     end
 
     return instance
+end
+
+function Utility:FixSettings(...)
+    local data = {...}
+    if not data[2] or typeof(data[2]) ~= "table" then
+        if data[2] == "function" then
+            data[3] = data[2]
+        end
+        data[2] = {}
+    end
 end
 
 -- Library
@@ -181,7 +191,7 @@ function Library:AddWindow(settings)
                 -- Sidebar
                 Utility:Create("Frame", {
                     Name = "Sidebar",
-                    Active = true
+                    Active = true,
                     BackgroundColor3 = Library.Theme.SidebarColor,
                     ClipsDescendants = true,
                     Position = UDim2.new(0, 0, 0, 40),
@@ -433,7 +443,7 @@ function Library:AddWindow(settings)
     end)
 
     function Window:AddTab(name, settings)
-        settings = settings or {}
+        Utility:FixSettings(name, settings)
 
         local Tab = {
             Name = name,
@@ -571,7 +581,7 @@ function Library:AddWindow(settings)
         end)
 
         function Tab:AddSection(name, settings)
-            settings = settings or {}
+            Utility:FixSettings(name, settings)
 
             local Section = {
                 Name = name,
@@ -786,6 +796,7 @@ function Library:AddWindow(settings)
 
             function Section:AddToggle(name, settings, callback)
                 assert(not Tab.Toggles[settings.flag or name], "Duplicate flag '".. (settings.flag or name).. "'")
+                Utility:FixSettings(name, settings, callback)
 
                 local Toggle = {
                     Name = name,
@@ -873,7 +884,7 @@ function Library:AddWindow(settings)
             -- Label
 
             function Section:AddLabel(name, settings)
-                settings = settings or {}
+                Utility:FixSettings(name, settings)
 
                 local Label = {
                     Name = name,
@@ -963,7 +974,7 @@ function Library:AddWindow(settings)
             -- ClipboardLabel
 
             function Section:AddClipboardLabel(name, settings)
-                settings = settings or {}
+                Utility:FixSettings(name, settings)
 
                 local ClipboardLabel = {
                     Name = name,
@@ -1056,6 +1067,8 @@ function Library:AddWindow(settings)
             -- Box
 
             function Section:AddBox(name, settings, callback)
+                Utility:FixSettings(name, settings, callback)
+
                 local Box = {
                     Name = name,
                     Type = "Box",
@@ -1161,6 +1174,8 @@ function Library:AddWindow(settings)
             -- NumBox
 
             function Section:AddNumBox(name, settings, callback)
+                Utility:FixSettings(name, settings, callback)
+
                 local NumBox = {
                     Name = name,
                     Type = "NumBox",
@@ -1264,6 +1279,8 @@ function Library:AddWindow(settings)
             -- PlayerBox
 
             function Section:AddPlayerBox(name, settings, callback)
+                Utility:FixSettings(name, settings, callback)
+
                 local PlayerBox = {
                     Name = name,
                     Type = "PlayerBox",
@@ -1379,6 +1396,8 @@ function Library:AddWindow(settings)
             -- Bind
 
             function Section:AddBind(name, bind, settings, callback)
+                Utility:FixSettings(name, settings, callback)
+
                 local Bind = {
                     Name = name,
                     Type = "Bind",
@@ -1499,6 +1518,8 @@ function Library:AddWindow(settings)
             -- Slider
 
             function Section:AddSlider(name, settings, callback)
+                Utility:FixSettings(name, settings, callback)
+
                 local Slider = {
                     Name = name,
                     Type = "Slider",
