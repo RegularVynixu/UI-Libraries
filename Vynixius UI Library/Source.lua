@@ -8,14 +8,14 @@
              __/ |                                                                         __/ |
             |___/                                                                         |___/ 
 
-    Vynixius UI Library v1.0.1b
+    Vynixius UI Library v1.0.2b
 
     UI - Vynixu
     Scripting - Vynixu
 
     [ What's new? ]
 
-    [*] Fixed some colouring issues
+    [*] Fixed more visual stuff
 
 ]]--
 
@@ -181,6 +181,7 @@ function Library:AddWindow(settings)
                 -- Sidebar
                 Utility:Create("Frame", {
                     Name = "Sidebar",
+                    Active = true
                     BackgroundColor3 = Library.Theme.SidebarColor,
                     ClipsDescendants = true,
                     Position = UDim2.new(0, 0, 0, 40),
@@ -476,6 +477,7 @@ function Library:AddWindow(settings)
             Font = Enum.Font.SourceSans,
             Text = name,
             TextColor3 = Utility.Colors.Sub(Library.Theme.TextColor, Color3.fromRGB(100, 100, 100)),
+            TextTransparency = Window.Sidebar.Toggled and 0 or 1,
             TextSize = 14,
             TextWrapped = true,
         })
