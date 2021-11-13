@@ -433,6 +433,8 @@ function Library:AddWindow(settings)
     end)
 
     function Window:AddTab(name, settings)
+        settings = settings or {}
+
         local Tab = {
             Name = name,
             Sections = {},
@@ -569,6 +571,8 @@ function Library:AddWindow(settings)
         end)
 
         function Tab:AddSection(name, settings)
+            settings = settings or {}
+        
             local Section = {
                 Name = name,
                 Toggled = settings.default or false,
@@ -869,6 +873,8 @@ function Library:AddWindow(settings)
             -- Label
 
             function Section:AddLabel(name, settings)
+                settings = settings or {}
+                
                 local Label = {
                     Name = name,
                     Type = "Label",
@@ -957,6 +963,8 @@ function Library:AddWindow(settings)
             -- ClipboardLabel
 
             function Section:AddClipboardLabel(name, settings)
+                settings = settings or {}
+                
                 local ClipboardLabel = {
                     Name = name,
                     Type = "ClipboardLabel",
