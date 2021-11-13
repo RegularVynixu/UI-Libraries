@@ -8,6 +8,28 @@
              __/ |                                                                         __/ |
             |___/                                                                         |___/ 
 
+    Vynixius UI Library v1.0.0c
+
+    UI - Vynixu
+    Scripting - Vynixu
+
+    [ What's new? ]
+
+    [*] Fixed more visual stuff
+    [!] Reverted back to v1.0.0c
+
+]]--
+
+--[[
+    __      __          _      _             _    _ _____   _      _ _                          
+    \ \    / /         (_)    (_)           | |  | |_   _| | |    (_) |                         
+     \ \  / /   _ _ __  ___  ___ _   _ ___  | |  | | | |   | |     _| |__  _ __ __ _ _ __ _   _ 
+      \ \/ / | | | '_ \| \ \/ / | | | / __| | |  | | | |   | |    | | '_ \| '__/ _` | '__| | | |
+       \  /| |_| | | | | |>  <| | |_| \__ \ | |__| |_| |_  | |____| | |_) | | | (_| | |  | |_| |
+        \/  \__, |_| |_|_/_/\_\_|\__,_|___/  \____/|_____| |______|_|_.__/|_|  \__,_|_|   \__, |
+             __/ |                                                                         __/ |
+            |___/                                                                         |___/ 
+
     Vynixius UI Library v1.0.0d
 
     UI - Vynixu
@@ -78,17 +100,6 @@ function Utility:Create(class, properties, radius)
         uicorner.CornerRadius = radius
     end
     return instance
-end
-
-function Utility:FixSettings(...)
-    local data = {...}
-    if not data[2] or typeof(data[2]) ~= "table" then
-        if typeof(data[2]) == "function" then
-            data[3] = data[2]
-        end
-        data[2] = {}
-    end
-    return unpack(data)
 end
 
 -- Library
@@ -443,8 +454,6 @@ function Library:AddWindow(settings)
     end)
 
     function Window:AddTab(name, settings)
-        name, settings = Utility:FixSettings(name, settings)
-
         local Tab = {
             Name = name,
             Sections = {},
@@ -581,8 +590,6 @@ function Library:AddWindow(settings)
         end)
 
         function Tab:AddSection(name, settings)
-            name, settings = Utility:FixSettings(name, settings)
-
             local Section = {
                 Name = name,
                 Toggled = settings.default or false,
@@ -795,7 +802,6 @@ function Library:AddWindow(settings)
             -- Toggle
 
             function Section:AddToggle(name, settings, callback)
-                name, settings, callback = Utility:FixSettings(name, settings, callback)
                 assert(not Tab.Toggles[settings.flag or name], "Duplicate flag '".. (settings.flag or name).. "'")
 
                 local Toggle = {
@@ -884,8 +890,6 @@ function Library:AddWindow(settings)
             -- Label
 
             function Section:AddLabel(name, settings)
-                name, settings = Utility:FixSettings(name, settings)
-
                 local Label = {
                     Name = name,
                     Type = "Label",
@@ -974,8 +978,6 @@ function Library:AddWindow(settings)
             -- ClipboardLabel
 
             function Section:AddClipboardLabel(name, settings)
-                name, settings = Utility:FixSettings(name, settings)
-
                 local ClipboardLabel = {
                     Name = name,
                     Type = "ClipboardLabel",
@@ -1067,8 +1069,6 @@ function Library:AddWindow(settings)
             -- Box
 
             function Section:AddBox(name, settings, callback)
-                name, settings, callback = Utility:FixSettings(name, settings, callback)
-
                 local Box = {
                     Name = name,
                     Type = "Box",
@@ -1174,8 +1174,6 @@ function Library:AddWindow(settings)
             -- NumBox
 
             function Section:AddNumBox(name, settings, callback)
-                name, settings, callback = Utility:FixSettings(name, settings, callback)
-
                 local NumBox = {
                     Name = name,
                     Type = "NumBox",
@@ -1279,8 +1277,6 @@ function Library:AddWindow(settings)
             -- PlayerBox
 
             function Section:AddPlayerBox(name, settings, callback)
-                name, settings, callback = Utility:FixSettings(name, settings, callback)
-
                 local PlayerBox = {
                     Name = name,
                     Type = "PlayerBox",
@@ -1396,8 +1392,6 @@ function Library:AddWindow(settings)
             -- Bind
 
             function Section:AddBind(name, bind, settings, callback)
-                name, settings, callback = Utility:FixSettings(name, settings, callback)
-
                 local Bind = {
                     Name = name,
                     Type = "Bind",
@@ -1518,8 +1512,6 @@ function Library:AddWindow(settings)
             -- Slider
 
             function Section:AddSlider(name, settings, callback)
-                name, settings, callback = Utility:FixSettings(name, settings, callback)
-
                 local Slider = {
                     Name = name,
                     Type = "Slider",
