@@ -8,15 +8,14 @@
              __/ |                                                                         __/ |
             |___/                                                                         |___/ 
 
-    Vynixius UI Library v1.0.0c
+    Vynixius UI Library v1.0.0d
 
     UI - Vynixu
     Scripting - Vynixu
 
     [ What's new? ]
 
-    [*] Fixed more visual stuff
-    [!] Reverted back to v1.0.0c
+    [*] Minor changes made to dropdown
 
 ]]--
 
@@ -1836,6 +1835,7 @@ function Library:AddWindow(settings)
 
                     table.insert(Dropdown.Items, Item)
                     Item.Button.Parent = Dropdown.List
+                    Dropdown:UpdateList()
                 end
 
                 function Dropdown:Remove(name)
@@ -1867,10 +1867,6 @@ function Library:AddWindow(settings)
                     if not processed and input.UserInputType == Enum.UserInputType.MouseButton1 and #Dropdown.Items > 0 and Mouse.Y - Dropdown.Holder.AbsolutePosition.Y <= 30 then
                         Dropdown:Toggle(not Dropdown.Toggled)
                     end
-                end)
-
-                Dropdown.List.ChildAdded:Connect(function()
-                    Dropdown:UpdateList()
                 end)
 
                 return Dropdown
