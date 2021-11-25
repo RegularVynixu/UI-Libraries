@@ -8,14 +8,14 @@
              __/ |                                                                         __/ |
             |___/                                                                         |___/ 
 
-    Vynixius UI Library v1.0.0d
+    Vynixius UI Library v1.0.0e
 
     UI - Vynixu
     Scripting - Vynixu
 
     [ What's new? ]
 
-    [*] Minor changes made to dropdown
+    [*] Fixed DualLabel returning nil
 
 ]]--
 
@@ -957,6 +957,8 @@ function Library:AddWindow(settings)
                 DualLabel.Holder.Parent = Section.List
                 DualLabel.Label1.Parent = DualLabel.Holder
                 DualLabel.Label2.Parent = DualLabel.Holder
+
+                return DualLabel
             end
 
             -- ClipboardLabel
