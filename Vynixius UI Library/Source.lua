@@ -8,14 +8,14 @@
              __/ |                                                                         __/ |
             |___/                                                                         |___/ 
 
-    Vynixius UI Library v1.0.0e
+    Vynixius UI Library v1.0.0f
 
     UI - Vynixu
     Scripting - Vynixu
 
     [ What's new? ]
 
-    [*] Fixed DualLabel returning nil
+    [*] Dropdowns now close on selection
 
 ]]--
 
@@ -1794,6 +1794,10 @@ function Library:AddWindow(settings)
                 function Dropdown:Select(item)
                     Dropdown.Selected = item
                     Dropdown.Holder.Holder.Selected.Text = item.Name
+                    
+                    if Dropdown.Toggled then
+                        Dropdown:Toggle(false)
+                    end
 
                     if item.Callback then
                         item.Callback()
