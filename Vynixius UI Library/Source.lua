@@ -8,14 +8,14 @@
              __/ |                                                                         __/ |
             |___/                                                                         |___/ 
 
-    Vynixius UI Library v1.0.0f
+    Vynixius UI Library v1.0.0g
 
     UI - Vynixu
     Scripting - Vynixu
 
     [ What's new? ]
 
-    [*] Dropdowns now close on selection
+    [*] Added seasonal themes [toggleable setting]
 
 ]]--
 
@@ -78,6 +78,10 @@ function Utility:Create(class, properties, radius)
         uicorner.CornerRadius = radius
     end
     return instance
+end
+
+function Utility:GetDate()
+    return os.date("*t")
 end
 
 -- Library
@@ -154,6 +158,7 @@ function Library:AddWindow(settings)
                         BackgroundTransparency = 1,
                         Position = UDim2.new(0, 5, 0.5, -10),
                         Size = UDim2.new(1, -10, 0, 20),
+                        ZIndex = 2,
 
                         Utility:Create("TextLabel", {
                             Name = "Title1",
@@ -281,6 +286,24 @@ function Library:AddWindow(settings)
             }),
         }),
     })
+
+    if settings.seasonalThemes then
+        Window.Gui.Window.Holder.Topbar.Theme = Utility:Create("ImageLabel", {
+            Name = "Theme",
+            BackgroundTransparency = 1,
+            Size = UDim2.new(1, 0, 1, 0),
+        })
+        local themeAssets = {
+            Halloween = "http://www.roblox.com/asset/?id=8213343470",
+            Winter = "http://www.roblox.com/asset/?id=8213130815",
+        }        
+        local date = os.date("*t")
+        if date.month == 10 and Data.day >= 21 then
+            Window.Gui.Window.Holder.Topbar.Theme.Image = themeAssets.Winter
+        elseif date.month == 12 and date.month >= 15 then
+            Window.Gui.Window.Holder.Topbar.Theme.Image = themeAssets.Winter
+        end
+    end
 
     -- Variables
 
