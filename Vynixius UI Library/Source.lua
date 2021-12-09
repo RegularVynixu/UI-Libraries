@@ -288,20 +288,23 @@ function Library:AddWindow(settings)
     })
 
     if settings.seasonalThemes then
-        Window.Gui.Window.Holder.Topbar.Theme = Utility:Create("ImageLabel", {
+        local Theme = Utility:Create("ImageLabel", {
             Name = "Theme",
             BackgroundTransparency = 1,
             Size = UDim2.new(1, 0, 1, 0),
         })
+        Theme.Parent = Window.Gui.Window.Holder.Topbar
+        
         local themeAssets = {
             Halloween = "http://www.roblox.com/asset/?id=8213343470",
             Winter = "http://www.roblox.com/asset/?id=8213130815",
-        }        
+        }
+        
         local date = os.date("*t")
         if date.month == 10 and Data.day >= 21 then
-            Window.Gui.Window.Holder.Topbar.Theme.Image = themeAssets.Winter
+            Theme.Image = themeAssets.Winter
         elseif date.month == 12 and date.month >= 15 then
-            Window.Gui.Window.Holder.Topbar.Theme.Image = themeAssets.Winter
+            Theme.Image = themeAssets.Winter
         end
     end
 
