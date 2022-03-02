@@ -1343,7 +1343,8 @@ function Library:AddWindow(settings)
 
                 function PlayerBox:GetPlayer()
                     for i, v in next, Players:GetPlayers() do
-                        if v.DisplayName:lower():find(PlayerBox.Box.Text:lower()) then
+                        local toFind = PlayerBox.Box.Text:lower()
+                        if v.Name:lower():find(toFind) or v.DisplayName:lower():find(toFind) then
                             if v == Player and settings.excludeLocal then
                                 return
                             end
