@@ -8,14 +8,14 @@
              __/ |                                                                         __/ |
             |___/                                                                         |___/ 
 
-    Vynixius UI Library v1.0.0f
+    Vynixius UI Library v1.0.0g
 
     UI - Vynixu
     Scripting - Vynixu
 
     [ What's new? ]
 
-    [*] Reverted back to v1.0.0f
+    [*] PlayerBoxes are now compatible with DisplayNames
 
 ]]--
 
@@ -1343,7 +1343,7 @@ function Library:AddWindow(settings)
 
                 function PlayerBox:GetPlayer()
                     for i, v in next, Players:GetPlayers() do
-                        if v.Name:lower():find(PlayerBox.Box.Text:lower()) then
+                        if v.DisplayName:lower():find(PlayerBox.Box.Text:lower()) then
                             if v == Player and settings.excludeLocal then
                                 return
                             end
