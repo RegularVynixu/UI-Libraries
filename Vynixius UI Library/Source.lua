@@ -2134,13 +2134,9 @@ function Library:AddWindow(settings)
                 Dropdown.Holder.Parent = Section.List
                 Dropdown.List.Parent = Dropdown.Holder
 
-                if #items > 0 then
-                    for i, v in next, items do
-                        Dropdown:Add(v)
-                    end
-
-                    Dropdown:Select(Dropdown.Items[1])
-                end
+                for i, v in next, items do
+		    Dropdown:Add(v)
+	        end
 
                 Dropdown.Holder.InputBegan:Connect(function(input, processed)
                     if not processed and input.UserInputType == Enum.UserInputType.MouseButton1 and #Dropdown.Items > 0 and Mouse.Y - Dropdown.Holder.AbsolutePosition.Y <= 30 then
@@ -3459,13 +3455,9 @@ function Library:AddWindow(settings)
                     Dropdown.Holder.Parent = SubSection.List
                     Dropdown.List.Parent = Dropdown.Holder
     
-                    if #items > 0 then
-                        for i, v in next, items do
-                            Dropdown:Add(v)
-                        end
-
-                        Dropdown:Select(Dropdown.Items[1])
-                    end
+                    for i, v in next, items do
+		        Dropdown:Add(v)
+	            end
 
                     Dropdown.Holder.InputBegan:Connect(function(input, processed)
                         if not processed and input.UserInputType == Enum.UserInputType.MouseButton1 and #Dropdown.Items > 0 and Mouse.Y - Dropdown.Holder.AbsolutePosition.Y <= 30 then
