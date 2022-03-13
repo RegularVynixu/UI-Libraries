@@ -8,14 +8,14 @@
              __/ |                                                                         __/ |
             |___/                                                                         |___/ 
 
-    Vynixius UI Library v1.0.2a
+    Vynixius UI Library v1.0.2b
 
     UI - Vynixu
     Scripting - Vynixu
 
     [ What's new? ]
 
-    [+] Added SubSections, use them within Sections
+    [*] Notifications now allow colour-coordinated indicators
 
 ]]--
 
@@ -111,8 +111,8 @@ function Library:Notify(settings, callback)
 	
 	if Library.Notification.Config.IsBusy then
         local notification = {
-			settings = settings,
-			callback = callback,
+			Settings = settings,
+			Callback = callback,
 		}
 		table.insert(Library.Notification.Queue, notification)
 		return notification
@@ -131,11 +131,14 @@ function Library:Notify(settings, callback)
 	}
 
     if not Library.Notification.Gui then
+        print("No notifications gui")
+
 		Library.Notification.Gui = Utility:Create("ScreenGui", {
             Name = "Notifications",
             Parent = CG,
             ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
         })
+        
         Library.Notification.Gui.Parent = CG
 	end
     
@@ -177,8 +180,8 @@ function Library:Notify(settings, callback)
     Notification.Title = Utility:Create("TextLabel", {
         Name = "Title",
         BackgroundTransparency = 1,
-        Position = UDim2.new(0, 7, 0.5, -8),
-        Size = UDim2.new(1, -58, 0, 16),
+        Position = UDim2.new(0, 11, 0.5, -8),
+        Size = UDim2.new(1, -62, 0, 16),
         Font = Enum.Font.SourceSans,
         Text = Notification.Title,
         TextColor3 = Color3.fromRGB(255, 255, 255),
@@ -189,8 +192,8 @@ function Library:Notify(settings, callback)
     Notification.Description = Utility:Create("TextLabel", {
         Name = "Desc",
         BackgroundTransparency = 1,
-        Position = UDim2.new(0, 7, 0, 7),
-        Size = UDim2.new(1, -14, 1, -14),
+        Position = UDim2.new(0, 11, 0, 7),
+        Size = UDim2.new(1, -18, 1, -14),
         Font = Enum.Font.SourceSans,
         TextColor3 = Color3.fromRGB(255, 255, 255),
         Text = "",
@@ -215,6 +218,19 @@ function Library:Notify(settings, callback)
         Size = UDim2.new(0, 20, 0, 20),
         Image = "http://www.roblox.com/asset/?id=7919583990",
     })
+
+    Notification.Indicator = Utility:Create("Frame", {
+        Name = "Indicator",
+        BackgroundColor3 = settings.Color or Library.Theme.ThemeColor,
+        Size = UDim2.new(0, 4, 1, 0),
+        Utility:Create("Frame", {
+            Name = "Filling",
+            BackgroundColor3 = settings.Color or Library.Theme.ThemeColor,
+            BorderSizePixel = 0,
+            Position = UDim2.new(0.5, 0, 0, 0),
+            Size = UDim2.new(0.5, 0, 1, 0),
+        }),
+    }, UDim.new(0, 3))
 
 	-- Functions
 	
@@ -271,6 +287,7 @@ function Library:Notify(settings, callback)
     Notification.Description.Parent = Notification.Holder.Background
     Notification.Buttons.Yes.Parent = Notification.Holder.Topbar
     Notification.Buttons.No.Parent = Notification.Holder.Topbar
+    Notification.Indicator.Parent = Notification.Holder    
 
 	Notification.Description.Text = settings.Text
 	local holderSizeY = math.floor(42 + Notification.Description.TextBounds.Y + 1)
@@ -310,7 +327,7 @@ function Library:Notify(settings, callback)
 		if #Library.Notification.Queue > 0 then
 			local notification = Library.Notification.Queue[1]
 			table.remove(Library.Notification.Queue, 1)
-			Library:Notify(notification.settings, notification.callback)
+			Library:Notify(notification.Settings, notification.Callback)
 		end
 		
 		-- Button Events
@@ -2135,8 +2152,8 @@ function Library:AddWindow(settings)
                 Dropdown.List.Parent = Dropdown.Holder
 
                 for i, v in next, items do
-		    Dropdown:Add(v)
-	        end
+                    Dropdown:Add(v)
+                end
 
                 Dropdown.Holder.InputBegan:Connect(function(input, processed)
                     if not processed and input.UserInputType == Enum.UserInputType.MouseButton1 and #Dropdown.Items > 0 and Mouse.Y - Dropdown.Holder.AbsolutePosition.Y <= 30 then
@@ -3456,8 +3473,8 @@ function Library:AddWindow(settings)
                     Dropdown.List.Parent = Dropdown.Holder
     
                     for i, v in next, items do
-		        Dropdown:Add(v)
-	            end
+                        Dropdown:Add(v)
+                    end
 
                     Dropdown.Holder.InputBegan:Connect(function(input, processed)
                         if not processed and input.UserInputType == Enum.UserInputType.MouseButton1 and #Dropdown.Items > 0 and Mouse.Y - Dropdown.Holder.AbsolutePosition.Y <= 30 then
