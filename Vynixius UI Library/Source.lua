@@ -296,7 +296,7 @@ function Library:Notify(settings, callback)
 
 	-- Scripts
 	
-	local sound = Instance.new("Sound")
+	local sound = Instance.new("Sound", Library.Notification.Gui)
 	sound.SoundId, sound.PlayOnRemove = "rbxassetid://700153902", true
 	sound:Destroy()
 	
