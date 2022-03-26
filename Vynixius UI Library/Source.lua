@@ -8,14 +8,14 @@
              __/ |                                                                         __/ |
             |___/                                                                         |___/ 
 
-    Vynixius UI Library v1.0.2b
+    Vynixius UI Library v1.0.2c
 
     UI - Vynixu
     Scripting - Vynixu
 
     [ What's new? ]
 
-    [*] Notifications now allow colour-coordinated indicators
+    [+] Added 'fireOnUnfocus' option to Sliders (disabled by default)
 
 ]]--
 
@@ -251,10 +251,8 @@ function Library:Notify(settings, callback)
 	end
 	
 	function Notification:Select(bool, forced)
-		if not forced then
-			if Library.Notification.Config.IsBusy or Notification.Dismissed then
-				return
-			end
+		if not forced and (Library.Notification.Config.IsBusy or Notification.Dismissed) then
+            return
 		end
 		
 		Notification.Dismissed = true
@@ -1858,47 +1856,50 @@ function Library:AddWindow(settings)
 
                 -- Functions
 
-                function Slider:GetValidValue(val)
-                    val = math.min(val, Slider.Max)
-                    val = math.max(val, -Slider.Min)
+                local function getValidValue(val)
+                    val = math.clamp(val, Slider.Min, Slider.Max)
 
                     if settings.rounded then
-                        val = math.floor(val + .5)
+                        val = math.round(val)
                     end
 
                     return val
                 end
 
-                function Slider:Set(val, forced)
-                    val = Slider:GetValidValue(val)
+                local function updateVisual(val)
+                    val = getValidValue(val)
+                    Slider.Holder.Value.Text = val
 
-                    if val ~= Slider.Value or forced then
+                    local percent = 1 - ((Slider.Max - val) / (Slider.Max - Slider.Min))
+                    TS:Create(Slider.Slider.Bar, TweenInfo.new(.25, Enum.EasingStyle.Quint), {
+                        Position = UDim2.new(0, 0, 0, 0),
+                        Size = UDim2.new(percent, 0, 1, 0),
+                    }):Play()
+                    
+                    local pointPadding = 1 / Slider.Slider.Holder.AbsoluteSize.X * 5
+                    TS:Create(Slider.Slider.Point, TweenInfo.new(.25, Enum.EasingStyle.Quint), {
+                        Position = UDim2.new(math.clamp(percent, pointPadding, 1 - pointPadding), 0, .5, 0),
+                    }):Play()
+                end
+
+                function Slider:Set(val)
+                    val = getValidValue(val)
+                    updateVisual(val)
+
+                    if val ~= Slider.Value then
                         Slider.Value = val
-                        Slider.Holder.Value.Text = tostring(val)
-
-                        local Percent = 1 - ((Slider.Max - val) / (Slider.Max - Slider.Min))
-                        TS:Create(Slider.Slider.Bar, TweenInfo.new(.25, Enum.EasingStyle.Quint), {
-                            Position = UDim2.new(0, 0, 0, 0),
-                            Size = UDim2.new(Percent, 0, 1, 0),
-                        }):Play()
-                        
-                        local pointPadding = 1 / Slider.Slider.Holder.AbsoluteSize.X * 5
-                        TS:Create(Slider.Slider.Point, TweenInfo.new(.25, Enum.EasingStyle.Quint), {
-                            Position = UDim2.new(math.clamp(Percent, pointPadding, 1 - pointPadding), 0, .5, 0),
-                        }):Play()
-
                         Slider.Callback(val)
                     end
                 end
 
                 function Slider:SetMin(val)
                     Slider.Min = math.max(val, Slider.Max)
-                    Slider:Set(Slider.Value, true)
+                    updateVisual(Slider.Value)
                 end
 
                 function Slider:SetMax(val)
                     Slider.Min = math.min(val, Slider.Min)
-                    Slider:Set(Slider.Value, true)
+                    updateVisual(Slider.Value)
                 end
 
                 -- Scripts
@@ -1909,22 +1910,35 @@ function Library:AddWindow(settings)
                 Slider.Slider.Background.Parent = Slider.Slider.Holder
                 Slider.Slider.Bar.Parent = Slider.Slider.Background
                 Slider.Slider.Point.Parent = Slider.Slider.Holder
-                Slider:Set(Slider.Value, true)
+                Slider:Set(Slider.Value)
 
                 Slider.Slider.Holder.InputBegan:Connect(function(input, processed)
                     if not processed and input.UserInputType == Enum.UserInputType.MouseButton1 then
-                        repeat wait()
-                            local Percent = math.clamp((Mouse.X - Slider.Slider.Holder.AbsolutePosition.X) / Slider.Slider.Holder.AbsoluteSize.X, 0, 1)
-                            Slider:Set(math.floor((Slider.Min + (Percent * (Slider.Max - Slider.Min))) * 10) / 10)
+                        repeat
+                            local percent = math.clamp((Mouse.X - Slider.Slider.Holder.AbsolutePosition.X) / Slider.Slider.Holder.AbsoluteSize.X, 0, 1)
+                            local sliderValue = math.floor((Slider.Min + (percent * (Slider.Max - Slider.Min))) * 10) / 10
+                            if settings.fireOnUnfocus then
+                                updateVisual(sliderValue)
+                            else
+                                Slider:Set(sliderValue)
+                            end
+                            RS.Stepped:Wait()
                         until not UIS:IsMouseButtonPressed(Enum.UserInputType.MouseButton1)
+                    end
+                end)
+
+                Slider.Slider.Holder.InputEnded:Connect(function(input, processed)
+                    if not processed and input.UserInputType == Enum.UserInputType.MouseButton1 and settings.fireOnUnfocus then
+                        local percent = math.clamp((Mouse.X - Slider.Slider.Holder.AbsolutePosition.X) / Slider.Slider.Holder.AbsoluteSize.X, 0, 1)
+                        Slider:Set(math.floor((Slider.Min + (percent * (Slider.Max - Slider.Min))) * 10) / 10)
                     end
                 end)
 
                 Slider.Holder.Value.FocusLost:Connect(function()
                     if Slider.Holder.Value.Text == "" then
-                        Slider:Set(Slider.Value, true)
+                        Slider:Set(Slider.Value)
                     elseif tonumber(Slider.Holder.Value.Text) then
-                        Slider:Set(tonumber(Slider.Holder.Value.Text), true)
+                        Slider:Set(tonumber(Slider.Holder.Value.Text))
                     end
                 end)
 
@@ -3174,48 +3188,51 @@ function Library:AddWindow(settings)
                     }, UDim.new(0, 5))
     
                     -- Functions
-    
-                    function Slider:GetValidValue(val)
-                        val = math.min(val, Slider.Max)
-                        val = math.max(val, -Slider.Min)
-    
+
+                    local function getValidValue(val)
+                        val = math.clamp(val, Slider.Min, Slider.Max)
+
                         if settings.rounded then
-                            val = math.floor(val + .5)
+                            val = math.round(val)
                         end
-    
+
                         return val
                     end
-    
-                    function Slider:Set(val, forced)
-                        val = Slider:GetValidValue(val)
-    
-                        if val ~= Slider.Value or forced then
+
+                    local function updateVisual(val)
+                        val = getValidValue(val)
+                        Slider.Holder.Value.Text = val
+
+                        local percent = 1 - ((Slider.Max - val) / (Slider.Max - Slider.Min))
+                        TS:Create(Slider.Slider.Bar, TweenInfo.new(.25, Enum.EasingStyle.Quint), {
+                            Position = UDim2.new(0, 0, 0, 0),
+                            Size = UDim2.new(percent, 0, 1, 0),
+                        }):Play()
+                        
+                        local pointPadding = 1 / Slider.Slider.Holder.AbsoluteSize.X * 5
+                        TS:Create(Slider.Slider.Point, TweenInfo.new(.25, Enum.EasingStyle.Quint), {
+                            Position = UDim2.new(math.clamp(percent, pointPadding, 1 - pointPadding), 0, .5, 0),
+                        }):Play()
+                    end
+
+                    function Slider:Set(val)
+                        val = getValidValue(val)
+                        updateVisual(val)
+
+                        if val ~= Slider.Value then
                             Slider.Value = val
-                            Slider.Holder.Value.Text = tostring(val)
-    
-                            local Percent = 1 - ((Slider.Max - val) / (Slider.Max - Slider.Min))
-                            TS:Create(Slider.Slider.Bar, TweenInfo.new(.25, Enum.EasingStyle.Quint), {
-                                Position = UDim2.new(0, 0, 0, 0),
-                                Size = UDim2.new(Percent, 0, 1, 0),
-                            }):Play()
-                            
-                            local pointPadding = 1 / Slider.Slider.Holder.AbsoluteSize.X * 5
-                            TS:Create(Slider.Slider.Point, TweenInfo.new(.25, Enum.EasingStyle.Quint), {
-                                Position = UDim2.new(math.clamp(Percent, pointPadding, 1 - pointPadding), 0, .5, 0),
-                            }):Play()
-    
                             Slider.Callback(val)
                         end
                     end
-    
+
                     function Slider:SetMin(val)
                         Slider.Min = math.max(val, Slider.Max)
-                        Slider:Set(Slider.Value, true)
+                        updateVisual(Slider.Value)
                     end
-    
+
                     function Slider:SetMax(val)
                         Slider.Min = math.min(val, Slider.Min)
-                        Slider:Set(Slider.Value, true)
+                        updateVisual(Slider.Value)
                     end
     
                     -- Scripts
@@ -3226,22 +3243,35 @@ function Library:AddWindow(settings)
                     Slider.Slider.Background.Parent = Slider.Slider.Holder
                     Slider.Slider.Bar.Parent = Slider.Slider.Background
                     Slider.Slider.Point.Parent = Slider.Slider.Holder
-                    Slider:Set(Slider.Value, true)
+                    Slider:Set(Slider.Value)
     
                     Slider.Slider.Holder.InputBegan:Connect(function(input, processed)
                         if not processed and input.UserInputType == Enum.UserInputType.MouseButton1 then
-                            repeat wait()
-                                local Percent = math.clamp((Mouse.X - Slider.Slider.Holder.AbsolutePosition.X) / Slider.Slider.Holder.AbsoluteSize.X, 0, 1)
-                                Slider:Set(math.floor((Slider.Min + (Percent * (Slider.Max - Slider.Min))) * 10) / 10)
+                            repeat
+                                local percent = math.clamp((Mouse.X - Slider.Slider.Holder.AbsolutePosition.X) / Slider.Slider.Holder.AbsoluteSize.X, 0, 1)
+                                local sliderValue = math.floor((Slider.Min + (percent * (Slider.Max - Slider.Min))) * 10) / 10
+                                if settings.fireOnUnfocus then
+                                    updateVisual(sliderValue)
+                                else
+                                    Slider:Set(sliderValue)
+                                end
+                                RS.Stepped:Wait()
                             until not UIS:IsMouseButtonPressed(Enum.UserInputType.MouseButton1)
+                        end
+                    end)
+    
+                    Slider.Slider.Holder.InputEnded:Connect(function(input, processed)
+                        if not processed and input.UserInputType == Enum.UserInputType.MouseButton1 and settings.fireOnUnfocus then
+                            local percent = math.clamp((Mouse.X - Slider.Slider.Holder.AbsolutePosition.X) / Slider.Slider.Holder.AbsoluteSize.X, 0, 1)
+                            Slider:Set(math.floor((Slider.Min + (percent * (Slider.Max - Slider.Min))) * 10) / 10)
                         end
                     end)
     
                     Slider.Holder.Value.FocusLost:Connect(function()
                         if Slider.Holder.Value.Text == "" then
-                            Slider:Set(Slider.Value, true)
+                            Slider:Set(Slider.Value)
                         elseif tonumber(Slider.Holder.Value.Text) then
-                            Slider:Set(tonumber(Slider.Holder.Value.Text), true)
+                            Slider:Set(tonumber(Slider.Holder.Value.Text))
                         end
                     end)
     
