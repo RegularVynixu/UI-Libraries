@@ -587,38 +587,36 @@ function Library:AddWindow(settings)
     end
 
     function Window:SetThemeColor(color)
-        local function set(color)
-            for i, v in next, Window.Theme.Objects do
-                i[v] = color
-            end
+        for i, v in next, Window.Theme.Objects do
+            i[v] = color
+        end
 
-            local items = {}
-            for i, v in next, Window.Tabs do
-                for i2, v2 in next, v.Sections do
-                    for i3, v3 in next, v2.Items do
-                        
-                        if (v3.Type == "Toggle" and v.Toggles[v3.Flag]) or v3.Type == "Slider" then
-                            items[#items + 1] = v3
-                        elseif v3.Type == "SubSection" then
-                            for i4, v4 in next, v3.Items do
-                                
-                                if (v4.Type == "Toggle" and v.Toggles[v4.Flag]) or v4.Type == "Slider" then
-                                    items[#items + 1] = v4
-                                end
-
+        local items = {}
+        for i, v in next, Window.Tabs do
+            for i2, v2 in next, v.Sections do
+                for i3, v3 in next, v2.Items do
+                    
+                    if (v3.Type == "Toggle" and v.Toggles[v3.Flag]) or v3.Type == "Slider" then
+                        items[#items + 1] = v3
+                    elseif v3.Type == "SubSection" then
+                        for i4, v4 in next, v3.Items do
+                            
+                            if (v4.Type == "Toggle" and v.Toggles[v4.Flag]) or v4.Type == "Slider" then
+                                items[#items + 1] = v4
                             end
-                        end
 
+                        end
                     end
+
                 end
             end
-            for i, v in next, items do
-                if v.Type == "Toggle" then
-                    v.Indicator.Indicator.BackgroundColor3 = Utility.Colors.Add(Library.Theme.ThemeColor, Color3.fromRGB(50, 50, 50))
-                elseif v.Type == "Slider" then
-                    v.Slider.Bar.BackgroundColor3 = Utility.Colors.Sub(Library.Theme.ThemeColor, Color3.fromRGB(50, 50, 50))
-                    v.Slider.Point.BackgroundColor3 = Library.Theme.ThemeColor
-                end
+        end
+        for i, v in next, items do
+            if v.Type == "Toggle" then
+                v.Indicator.Indicator.BackgroundColor3 = Utility.Colors.Add(Library.Theme.ThemeColor, Color3.fromRGB(50, 50, 50))
+            elseif v.Type == "Slider" then
+                v.Slider.Bar.BackgroundColor3 = Utility.Colors.Sub(Library.Theme.ThemeColor, Color3.fromRGB(50, 50, 50))
+                v.Slider.Point.BackgroundColor3 = Library.Theme.ThemeColor
             end
         end
     end
