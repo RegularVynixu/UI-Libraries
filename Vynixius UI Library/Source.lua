@@ -8,14 +8,14 @@
              __/ |                                                                         __/ |
             |___/                                                                         |___/ 
 
-    Vynixius UI Library v1.0.2c
+    Vynixius UI Library v1.0.2d
 
     UI - Vynixu
     Scripting - Vynixu
 
     [ What's new? ]
 
-    [+] Added 'fireOnUnfocus' option to Sliders (disabled by default)
+    [*] Fixed setting Window's theme color for SubSection items
 
 ]]--
 
@@ -592,46 +592,40 @@ function Library:AddWindow(settings)
                 i[v] = color
             end
 
+            local items = {}
             for i, v in next, Window.Tabs do
                 for i2, v2 in next, v.Sections do
                     for i3, v3 in next, v2.Items do
-                        if v3.Type == "Toggle" and v.Toggles[v3.Flag] then
-                            v3.Indicator.Indicator.BackgroundColor3 = Utility.Colors.Add(Library.Theme.ThemeColor, Color3.fromRGB(50, 50, 50))
+                        
+                        if (v3.Type == "Toggle" and v.Toggles[v3.Flag]) or v3.Type == "Slider" then
+                            items[#items + 1] = v3
+                        elseif v3.Type == "SubSection" then
+                            for i4, v4 in next, v3.Items do
+                                
+                                if (v4.Type == "Toggle" and v.Toggles[v4.Flag]) or v4.Type == "Slider" then
+                                    items[#items + 1] = v4
+                                end
 
-                        elseif v3.Type == "Slider" then
-                            v3.Slider.Bar.BackgroundColor3 = Utility.Colors.Sub(Library.Theme.ThemeColor, Color3.fromRGB(50, 50, 50))
-                            v3.Slider.Point.BackgroundColor3 = Library.Theme.ThemeColor
+                            end
                         end
+
                     end
                 end
             end
-        end
-        
-        Library.Theme.ThemeColor = color
-        if typeof(color) == "string" then
-            color = color:lower()
-            if color == "rainbow" then
-                Window.Theme.Rainbow = RS.Stepped:Connect(function()
-                    set(Color3.fromHSV(tick() % 5 / 5, 1, 1))
-                end)
+            for i, v in next, items do
+                if v.Type == "Toggle" then
+                    v.Indicator.Indicator.BackgroundColor3 = Utility.Colors.Add(Library.Theme.ThemeColor, Color3.fromRGB(50, 50, 50))
+                elseif v.Type == "Slider" then
+                    v.Slider.Bar.BackgroundColor3 = Utility.Colors.Sub(Library.Theme.ThemeColor, Color3.fromRGB(50, 50, 50))
+                    v.Slider.Point.BackgroundColor3 = Library.Theme.ThemeColor
+                end
             end
-
-            return
         end
-
-        if Window.Theme.Rainbow then
-            Window.Theme.Rainbow:Disconnect()
-        end
-        set(color)
     end
 
     function Window:ChangeKey(input)
         assert(typeof(input) == Enum.KeyCode)
         Window.Key = input
-    end
-
-    function Window:SelectTab(tab)
-        tab:Show()
     end
 
     function Window:Toggle(bool)
@@ -1719,6 +1713,10 @@ function Library:AddWindow(settings)
                     TextSize = 14,
                 })
 
+                -- Variables
+
+                local isBinding = false
+
                 -- Functions
 
                 local function UpdateBox(text)
@@ -1736,15 +1734,19 @@ function Library:AddWindow(settings)
                 end
 
                 function Bind:BindInput()
-                    UpdateBox("...")
-                    
-                    local Connection
-                    Connection = UIS.InputBegan:Connect(function(input, processed)
-                        if not processed and not tostring(input.UserInputType):find("Mouse") then
-                            Connection:Disconnect()
-                            Bind:Set(input.KeyCode)
-                        end
-                    end)
+                    if not isBinding then
+                        isBinding = true
+                        UpdateBox("...")
+                        
+                        local Connection
+                        Connection = UIS.InputBegan:Connect(function(input, processed)
+                            if not processed and input.UserInputType == Enum.UserInputType.Keyboard then
+                                Connection:Disconnect()
+                                Bind:Set(input.KeyCode)
+                                isBinding = false
+                            end
+                        end)
+                    end
                 end
 
                 function Bind:Set(bind)
@@ -1767,7 +1769,7 @@ function Library:AddWindow(settings)
                 end
 
                 UIS.InputBegan:Connect(function(input, processed)
-                    if not processed and input.KeyCode == Bind.Bind then
+                    if not processed and input.KeyCode == Bind.Bind and not isBinding then
                         Bind.Callback()
                     end
                 end)
@@ -3529,4 +3531,4 @@ function Library:AddWindow(settings)
     return Window
 end
 
-return Library
+return
