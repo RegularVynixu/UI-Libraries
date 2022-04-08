@@ -3531,4 +3531,4 @@ function Library:AddWindow(settings)
     return Window
 end
 
-return
+return Library
