@@ -8,7 +8,7 @@
              __/ |                                                                         __/ |
             |___/                                                                         |___/ 
 
-    Vynixius UI Library v1.0.3a
+    Vynixius UI Library v1.0.3b
 
     UI - Vynixu
     Scripting - Vynixu
@@ -16,6 +16,7 @@
     [ What's new? ]
 
     [*] Every Library item now has its own Id assigned, useful for custom configs
+    [*] Fixed Sections not having the Type property
 
 ]]--
 
@@ -859,6 +860,7 @@ function Library:AddWindow(settings)
         
             local Section = {
                 Name = name,
+                Type = "Section",
                 Toggled = settings.default or false,
                 Items = {},
             }
