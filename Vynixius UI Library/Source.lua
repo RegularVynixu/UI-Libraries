@@ -8,14 +8,14 @@
              __/ |                                                                         __/ |
             |___/                                                                         |___/ 
 
-    Vynixius UI Library v1.0.2d
+    Vynixius UI Library v1.0.3a
 
     UI - Vynixu
     Scripting - Vynixu
 
     [ What's new? ]
 
-    [*] Fixed setting Window's theme color for SubSection items
+    [*] Every Library item now has its own Id assigned, useful for custom configs
 
 ]]--
 
@@ -31,6 +31,8 @@ local UIS = game:GetService("UserInputService")
 
 local Player = Players.LocalPlayer
 local Mouse = Player:GetMouse()
+
+local ItemsData = {}
 
 -- Utility
 
@@ -79,6 +81,15 @@ function Utility:Create(class, properties, radius)
         uicorner.CornerRadius = radius
     end
     return instance
+end
+
+function Utility:GetItemTypeId(item)
+    if not ItemsData[item.Type] then
+        ItemsData[item.Type] = { Count = 0 }
+    end
+
+    ItemsData[item.Type].Count = ItemsData[item.Type].Count + 1
+    return ItemsData[item.Type].Count
 end
 
 -- Library
@@ -851,6 +862,7 @@ function Library:AddWindow(settings)
                 Toggled = settings.default or false,
                 Items = {},
             }
+            Section.Id = Utility:GetItemTypeId(Section)
 
             Section.Frame = Utility:Create("Frame", {
                 Name = name,
@@ -980,6 +992,7 @@ function Library:AddWindow(settings)
                     Type = "Button",
                     Callback = callback,
                 }
+                Button.Id = Utility:GetItemTypeId(Button)
 
                 Button.Holder = Utility:Create("Frame", {
                     Name = name,
@@ -1068,6 +1081,7 @@ function Library:AddWindow(settings)
                     Flag = settings.flag or name,
                     Callback = callback,
                 }
+                Toggle.Id = Utility:GetItemTypeId(Toggle)
 
                 Toggle.Holder = Utility:Create("Frame", {
                     Name = name,
@@ -1155,6 +1169,7 @@ function Library:AddWindow(settings)
                     Type = "Label",
                     Alignment = settings.alignment or Enum.TextXAlignment.Center,
                 }
+                Label.Id = Utility:GetItemTypeId(Label)
 
                 Label.Holder = Utility:Create("Frame", {
                     Name = name,
@@ -1188,12 +1203,10 @@ function Library:AddWindow(settings)
 
             function Section:AddDualLabel(name)
                 local DualLabel = {
-                    Names = {
-                        Label1 = name[1],
-                        Label2 = name[2],
-                    },
+                    Name = name[1].. " ".. name[2],
                     Type = "DualLabel",
                 }
+                DualLabel.Id = Utility:GetItemTypeId(DualLabel)
 
                 DualLabel.Holder = Utility:Create("Frame", {
                     Name = name[1].. " ".. name[2],
@@ -1250,6 +1263,7 @@ function Library:AddWindow(settings)
                         Mouse = false,
                     },
                 }
+                ClipboardLabel.Id = Utility:GetItemTypeId(ClipboardLabel)
 
                 ClipboardLabel.Holder = Utility:Create("Frame", {
                     Name = name,
@@ -1338,6 +1352,7 @@ function Library:AddWindow(settings)
                     Type = "Box",
                     Callback = callback,
                 }
+                Box.Id = Utility:GetItemTypeId(Box)
 
                 Box.Holder = Utility:Create("Frame", {
                     Name = name,
@@ -1443,6 +1458,7 @@ function Library:AddWindow(settings)
                     Type = "NumBox",
                     Callback = callback,
                 }
+                NumBox.Id = Utility:GetItemTypeId(NumBox)
 
                 NumBox.Holder = Utility:Create("Frame", {
                     Name = name,
@@ -1546,6 +1562,7 @@ function Library:AddWindow(settings)
                     Type = "PlayerBox",
                     Callback = callback,
                 }
+                PlayerBox.Id = Utility:GetItemTypeId(PlayerBox)
 
                 PlayerBox.Holder = Utility:Create("Frame", {
                     Name = name,
@@ -1662,6 +1679,7 @@ function Library:AddWindow(settings)
                     Bind = bind,
                     Callback = callback,
                 }
+                Bind.Id = Utility:GetItemTypeId(Bind)
 
                 Bind.Holder = Utility:Create("Frame", {
                     Name = name,
@@ -1793,6 +1811,7 @@ function Library:AddWindow(settings)
                     Callback = callback,
                     Slider = {},
                 }
+                Slider.Id = Utility:GetItemTypeId(Slider)
 
                 Slider.Holder = Utility:Create("Frame", {
                     Name = name,
@@ -1955,6 +1974,7 @@ function Library:AddWindow(settings)
                     Toggled = false,
                     Callback = callback,
                 }
+                Dropdown.Id = Utility:GetItemTypeId(Dropdown)
 
                 Dropdown.Holder = Utility:Create("Frame", {
                     Name = name,
@@ -2180,7 +2200,7 @@ function Library:AddWindow(settings)
 
             -- Colorpicker
 
-            function Section:AddSubSection(name, settings) -- SubSection
+            function Section:AddSubSection(name, settings)
                 settings = settings or {}
             
                 local SubSection = {
@@ -2189,6 +2209,7 @@ function Library:AddWindow(settings)
                     Toggled = settings.default or false,
                     Items = {},
                 }
+                SubSection.Id = Utility:GetItemTypeId(SubSection)
     
                 SubSection.Frame = Utility:Create("Frame", {
                     Name = name,
@@ -2321,6 +2342,7 @@ function Library:AddWindow(settings)
                         Type = "Button",
                         Callback = callback,
                     }
+                    Button.Id = Utility:GetItemTypeId(Button)
     
                     Button.Holder = Utility:Create("Frame", {
                         Name = name,
@@ -2409,6 +2431,7 @@ function Library:AddWindow(settings)
                         Flag = settings.flag or name,
                         Callback = callback,
                     }
+                    Toggle.Id = Utility:GetItemTypeId(Toggle)
     
                     Toggle.Holder = Utility:Create("Frame", {
                         Name = name,
@@ -2496,6 +2519,7 @@ function Library:AddWindow(settings)
                         Type = "Label",
                         Alignment = settings.alignment or Enum.TextXAlignment.Center,
                     }
+                    Label.Id = Utility:GetItemTypeId(Label)
     
                     Label.Holder = Utility:Create("Frame", {
                         Name = name,
@@ -2529,12 +2553,10 @@ function Library:AddWindow(settings)
     
                 function SubSection:AddDualLabel(name)
                     local DualLabel = {
-                        Names = {
-                            Label1 = name[1],
-                            Label2 = name[2],
-                        },
+                        Name = name[1].. " ".. name[2],
                         Type = "DualLabel",
                     }
+                    DualLabel.Id = Utility:GetItemTypeId(DualLabel)
     
                     DualLabel.Holder = Utility:Create("Frame", {
                         Name = name[1].. " ".. name[2],
@@ -2591,6 +2613,7 @@ function Library:AddWindow(settings)
                             Mouse = false,
                         },
                     }
+                    ClipboardLabel.Id = Utility:GetItemTypeId(ClipboardLabel)
     
                     ClipboardLabel.Holder = Utility:Create("Frame", {
                         Name = name,
@@ -2679,6 +2702,7 @@ function Library:AddWindow(settings)
                         Type = "Box",
                         Callback = callback,
                     }
+                    Box.Id = Utility:GetItemTypeId(Box)
     
                     Box.Holder = Utility:Create("Frame", {
                         Name = name,
@@ -2784,6 +2808,7 @@ function Library:AddWindow(settings)
                         Type = "NumBox",
                         Callback = callback,
                     }
+                    NumBox.Id = Utility:GetItemTypeId(NumBox)
     
                     NumBox.Holder = Utility:Create("Frame", {
                         Name = name,
@@ -2887,6 +2912,7 @@ function Library:AddWindow(settings)
                         Type = "PlayerBox",
                         Callback = callback,
                     }
+                    PlayerBox.Id = Utility:GetItemTypeId(PlayerBox)
     
                     PlayerBox.Holder = Utility:Create("Frame", {
                         Name = name,
@@ -3003,6 +3029,7 @@ function Library:AddWindow(settings)
                         Bind = bind,
                         Callback = callback,
                     }
+                    Bind.Id = Utility:GetItemTypeId(Bind)
     
                     Bind.Holder = Utility:Create("Frame", {
                         Name = name,
@@ -3126,6 +3153,7 @@ function Library:AddWindow(settings)
                         Callback = callback,
                         Slider = {},
                     }
+                    Slider.Id = Utility:GetItemTypeId(Slider)
     
                     Slider.Holder = Utility:Create("Frame", {
                         Name = name,
@@ -3288,6 +3316,7 @@ function Library:AddWindow(settings)
                         Toggled = false,
                         Callback = callback,
                     }
+                    Dropdown.Id = Utility:GetItemTypeId(Dropdown)
     
                     Dropdown.Holder = Utility:Create("Frame", {
                         Name = name,
