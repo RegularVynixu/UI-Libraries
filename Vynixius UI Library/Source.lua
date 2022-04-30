@@ -33,7 +33,7 @@ local UIS = game:GetService("UserInputService")
 local Player = Players.LocalPlayer
 local Mouse = Player:GetMouse()
 
-local ItemsData = {}
+local ItemsIdCount = 0
 
 -- Utility
 
@@ -84,13 +84,9 @@ function Utility:Create(class, properties, radius)
     return instance
 end
 
-function Utility:GetItemTypeId(item)
-    if not ItemsData[item.Type] then
-        ItemsData[item.Type] = { Count = 0 }
-    end
-
-    ItemsData[item.Type].Count = ItemsData[item.Type].Count + 1
-    return ItemsData[item.Type].Count
+function Utility:GetItemId()
+    ItemsIdCount = ItemsIdCount + 1
+    return ItemsIdCount
 end
 
 -- Library
@@ -864,7 +860,6 @@ function Library:AddWindow(settings)
                 Toggled = settings.default or false,
                 Items = {},
             }
-            Section.Id = Utility:GetItemTypeId(Section)
 
             Section.Frame = Utility:Create("Frame", {
                 Name = name,
@@ -992,9 +987,9 @@ function Library:AddWindow(settings)
                 local Button = {
                     Name = name,
                     Type = "Button",
+                    Id = Utility:GetItemId(),
                     Callback = callback,
                 }
-                Button.Id = Utility:GetItemTypeId(Button)
 
                 Button.Holder = Utility:Create("Frame", {
                     Name = name,
@@ -1080,10 +1075,10 @@ function Library:AddWindow(settings)
                 local Toggle = {
                     Name = name,
                     Type = "Toggle",
+                    Id = Utility:GetItemId(),
                     Flag = settings.flag or name,
                     Callback = callback,
                 }
-                Toggle.Id = Utility:GetItemTypeId(Toggle)
 
                 Toggle.Holder = Utility:Create("Frame", {
                     Name = name,
@@ -1169,9 +1164,9 @@ function Library:AddWindow(settings)
                 local Label = {
                     Name = name,
                     Type = "Label",
+                    Id = Utility:GetItemId(),
                     Alignment = settings.alignment or Enum.TextXAlignment.Center,
                 }
-                Label.Id = Utility:GetItemTypeId(Label)
 
                 Label.Holder = Utility:Create("Frame", {
                     Name = name,
@@ -1205,10 +1200,13 @@ function Library:AddWindow(settings)
 
             function Section:AddDualLabel(name)
                 local DualLabel = {
-                    Name = name[1].. " ".. name[2],
+                    Names = {
+                        Label1 = name[1],
+                        Label2 = name[2],
+                    },
                     Type = "DualLabel",
+                    Id = Utility:GetItemId(),
                 }
-                DualLabel.Id = Utility:GetItemTypeId(DualLabel)
 
                 DualLabel.Holder = Utility:Create("Frame", {
                     Name = name[1].. " ".. name[2],
@@ -1260,12 +1258,12 @@ function Library:AddWindow(settings)
                 local ClipboardLabel = {
                     Name = name,
                     Type = "ClipboardLabel",
+                    Id = Utility:GetItemId(),
                     Alignment = settings.alignment or Enum.TextXAlignment.Center,
                     Button = {
                         Mouse = false,
                     },
                 }
-                ClipboardLabel.Id = Utility:GetItemTypeId(ClipboardLabel)
 
                 ClipboardLabel.Holder = Utility:Create("Frame", {
                     Name = name,
@@ -1352,9 +1350,9 @@ function Library:AddWindow(settings)
                 local Box = {
                     Name = name,
                     Type = "Box",
+                    Id = Utility:GetItemId(),
                     Callback = callback,
                 }
-                Box.Id = Utility:GetItemTypeId(Box)
 
                 Box.Holder = Utility:Create("Frame", {
                     Name = name,
@@ -1458,9 +1456,9 @@ function Library:AddWindow(settings)
                 local NumBox = {
                     Name = name,
                     Type = "NumBox",
+                    Id = Utility:GetItemId(),
                     Callback = callback,
                 }
-                NumBox.Id = Utility:GetItemTypeId(NumBox)
 
                 NumBox.Holder = Utility:Create("Frame", {
                     Name = name,
@@ -1562,9 +1560,9 @@ function Library:AddWindow(settings)
                 local PlayerBox = {
                     Name = name,
                     Type = "PlayerBox",
+                    Id = Utility:GetItemId(),
                     Callback = callback,
                 }
-                PlayerBox.Id = Utility:GetItemTypeId(PlayerBox)
 
                 PlayerBox.Holder = Utility:Create("Frame", {
                     Name = name,
@@ -1678,10 +1676,10 @@ function Library:AddWindow(settings)
                 local Bind = {
                     Name = name,
                     Type = "Bind",
+                    Id = Utility:GetItemId(),
                     Bind = bind,
                     Callback = callback,
                 }
-                Bind.Id = Utility:GetItemTypeId(Bind)
 
                 Bind.Holder = Utility:Create("Frame", {
                     Name = name,
@@ -1807,13 +1805,13 @@ function Library:AddWindow(settings)
                 local Slider = {
                     Name = name,
                     Type = "Slider",
+                    Id = Utility:GetItemId(),
                     Min = settings.min,
                     Max = settings.max,
                     Value = settings.default or settings.min,
                     Callback = callback,
                     Slider = {},
                 }
-                Slider.Id = Utility:GetItemTypeId(Slider)
 
                 Slider.Holder = Utility:Create("Frame", {
                     Name = name,
@@ -1972,11 +1970,11 @@ function Library:AddWindow(settings)
                 local Dropdown = {
                     Name = name,
                     Type = "Dropdown",
+                    Id = Utility:GetItemId(),
                     Items = {},
                     Toggled = false,
                     Callback = callback,
                 }
-                Dropdown.Id = Utility:GetItemTypeId(Dropdown)
 
                 Dropdown.Holder = Utility:Create("Frame", {
                     Name = name,
@@ -2202,16 +2200,16 @@ function Library:AddWindow(settings)
 
             -- Colorpicker
 
-            function Section:AddSubSection(name, settings)
+            function Section:AddSubSection(name, settings) -- SubSection
                 settings = settings or {}
             
                 local SubSection = {
                     Name = name,
                     Type = "SubSection",
+                    Id = Utility:GetItemId(),
                     Toggled = settings.default or false,
                     Items = {},
                 }
-                SubSection.Id = Utility:GetItemTypeId(SubSection)
     
                 SubSection.Frame = Utility:Create("Frame", {
                     Name = name,
@@ -2342,9 +2340,9 @@ function Library:AddWindow(settings)
                     local Button = {
                         Name = name,
                         Type = "Button",
+                        Id = Utility:GetItemId(),
                         Callback = callback,
                     }
-                    Button.Id = Utility:GetItemTypeId(Button)
     
                     Button.Holder = Utility:Create("Frame", {
                         Name = name,
@@ -2430,10 +2428,10 @@ function Library:AddWindow(settings)
                     local Toggle = {
                         Name = name,
                         Type = "Toggle",
+                        Id = Utility:GetItemId(),
                         Flag = settings.flag or name,
                         Callback = callback,
                     }
-                    Toggle.Id = Utility:GetItemTypeId(Toggle)
     
                     Toggle.Holder = Utility:Create("Frame", {
                         Name = name,
@@ -2519,9 +2517,9 @@ function Library:AddWindow(settings)
                     local Label = {
                         Name = name,
                         Type = "Label",
+                        Id = Utility:GetItemId(),
                         Alignment = settings.alignment or Enum.TextXAlignment.Center,
                     }
-                    Label.Id = Utility:GetItemTypeId(Label)
     
                     Label.Holder = Utility:Create("Frame", {
                         Name = name,
@@ -2555,10 +2553,13 @@ function Library:AddWindow(settings)
     
                 function SubSection:AddDualLabel(name)
                     local DualLabel = {
-                        Name = name[1].. " ".. name[2],
+                        Names = {
+                            Label1 = name[1],
+                            Label2 = name[2],
+                        },
                         Type = "DualLabel",
+                        Id = Utility:GetItemId(),
                     }
-                    DualLabel.Id = Utility:GetItemTypeId(DualLabel)
     
                     DualLabel.Holder = Utility:Create("Frame", {
                         Name = name[1].. " ".. name[2],
@@ -2610,12 +2611,12 @@ function Library:AddWindow(settings)
                     local ClipboardLabel = {
                         Name = name,
                         Type = "ClipboardLabel",
+                        Id = Utility:GetItemId(),
                         Alignment = settings.alignment or Enum.TextXAlignment.Center,
                         Button = {
                             Mouse = false,
                         },
                     }
-                    ClipboardLabel.Id = Utility:GetItemTypeId(ClipboardLabel)
     
                     ClipboardLabel.Holder = Utility:Create("Frame", {
                         Name = name,
@@ -2702,9 +2703,9 @@ function Library:AddWindow(settings)
                     local Box = {
                         Name = name,
                         Type = "Box",
+                        Id = Utility:GetItemId(),
                         Callback = callback,
                     }
-                    Box.Id = Utility:GetItemTypeId(Box)
     
                     Box.Holder = Utility:Create("Frame", {
                         Name = name,
@@ -2808,9 +2809,9 @@ function Library:AddWindow(settings)
                     local NumBox = {
                         Name = name,
                         Type = "NumBox",
+                        Id = Utility:GetItemId(),
                         Callback = callback,
                     }
-                    NumBox.Id = Utility:GetItemTypeId(NumBox)
     
                     NumBox.Holder = Utility:Create("Frame", {
                         Name = name,
@@ -2912,9 +2913,9 @@ function Library:AddWindow(settings)
                     local PlayerBox = {
                         Name = name,
                         Type = "PlayerBox",
+                        Id = Utility:GetItemId(),
                         Callback = callback,
                     }
-                    PlayerBox.Id = Utility:GetItemTypeId(PlayerBox)
     
                     PlayerBox.Holder = Utility:Create("Frame", {
                         Name = name,
@@ -3028,10 +3029,10 @@ function Library:AddWindow(settings)
                     local Bind = {
                         Name = name,
                         Type = "Bind",
+                        Id = Utility:GetItemId(),
                         Bind = bind,
                         Callback = callback,
                     }
-                    Bind.Id = Utility:GetItemTypeId(Bind)
     
                     Bind.Holder = Utility:Create("Frame", {
                         Name = name,
@@ -3149,13 +3150,13 @@ function Library:AddWindow(settings)
                     local Slider = {
                         Name = name,
                         Type = "Slider",
+                        Id = Utility:GetItemId(),
                         Min = settings.min,
                         Max = settings.max,
                         Value = settings.default or settings.min,
                         Callback = callback,
                         Slider = {},
                     }
-                    Slider.Id = Utility:GetItemTypeId(Slider)
     
                     Slider.Holder = Utility:Create("Frame", {
                         Name = name,
@@ -3314,11 +3315,11 @@ function Library:AddWindow(settings)
                     local Dropdown = {
                         Name = name,
                         Type = "Dropdown",
+                        Id = Utility:GetItemId(),
                         Items = {},
                         Toggled = false,
                         Callback = callback,
                     }
-                    Dropdown.Id = Utility:GetItemTypeId(Dropdown)
     
                     Dropdown.Holder = Utility:Create("Frame", {
                         Name = name,
