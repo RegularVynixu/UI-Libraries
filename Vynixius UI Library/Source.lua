@@ -8,15 +8,14 @@
              __/ |                                                                         __/ |
             |___/                                                                         |___/ 
 
-    Vynixius UI Library v1.0.3b
+    Vynixius UI Library v1.0.3c
 
     UI - Vynixu
     Scripting - Vynixu
 
     [ What's new? ]
 
-    [*] Every Library item now has its own Id assigned, useful for custom configs
-    [*] Fixed Sections not having the Type property
+    [*] More items now support the .flag setting, useful for configs
 
 ]]--
 
@@ -1351,6 +1350,7 @@ function Library:AddWindow(settings)
                     Name = name,
                     Type = "Box",
                     Id = Utility:GetItemId(),
+                    Flag = settings.flag or name,
                     Callback = callback,
                 }
 
@@ -1457,6 +1457,7 @@ function Library:AddWindow(settings)
                     Name = name,
                     Type = "NumBox",
                     Id = Utility:GetItemId(),
+                    Flag = settings.flag or name,
                     Callback = callback,
                 }
 
@@ -1561,6 +1562,7 @@ function Library:AddWindow(settings)
                     Name = name,
                     Type = "PlayerBox",
                     Id = Utility:GetItemId(),
+                    Flag = settings.flag or name,
                     Callback = callback,
                 }
 
@@ -1677,6 +1679,7 @@ function Library:AddWindow(settings)
                     Name = name,
                     Type = "Bind",
                     Id = Utility:GetItemId(),
+                    Flag = settings.flag or name,
                     Bind = bind,
                     Callback = callback,
                 }
@@ -1806,6 +1809,7 @@ function Library:AddWindow(settings)
                     Name = name,
                     Type = "Slider",
                     Id = Utility:GetItemId(),
+                    Flag = settings.flag or name,
                     Min = settings.min,
                     Max = settings.max,
                     Value = settings.default or settings.min,
@@ -1971,6 +1975,7 @@ function Library:AddWindow(settings)
                     Name = name,
                     Type = "Dropdown",
                     Id = Utility:GetItemId(),
+                    Flag = settings.flag or name,
                     Items = {},
                     Toggled = false,
                     Callback = callback,
@@ -2704,6 +2709,7 @@ function Library:AddWindow(settings)
                         Name = name,
                         Type = "Box",
                         Id = Utility:GetItemId(),
+                        Flag = settings.flag or name,
                         Callback = callback,
                     }
     
@@ -2810,6 +2816,7 @@ function Library:AddWindow(settings)
                         Name = name,
                         Type = "NumBox",
                         Id = Utility:GetItemId(),
+                        Flag = settings.flag or name,
                         Callback = callback,
                     }
     
@@ -2914,6 +2921,7 @@ function Library:AddWindow(settings)
                         Name = name,
                         Type = "PlayerBox",
                         Id = Utility:GetItemId(),
+                        Flag = settings.flag or name,
                         Callback = callback,
                     }
     
@@ -3030,6 +3038,7 @@ function Library:AddWindow(settings)
                         Name = name,
                         Type = "Bind",
                         Id = Utility:GetItemId(),
+                        Flag = settings.flag or name,
                         Bind = bind,
                         Callback = callback,
                     }
@@ -3151,6 +3160,7 @@ function Library:AddWindow(settings)
                         Name = name,
                         Type = "Slider",
                         Id = Utility:GetItemId(),
+                        Flag = settings.flag or name,
                         Min = settings.min,
                         Max = settings.max,
                         Value = settings.default or settings.min,
@@ -3316,6 +3326,7 @@ function Library:AddWindow(settings)
                         Name = name,
                         Type = "Dropdown",
                         Id = Utility:GetItemId(),
+                        Flag = settings.flag or name,
                         Items = {},
                         Toggled = false,
                         Callback = callback,
