@@ -16,6 +16,7 @@
     [ What's new? ]
 
     [*] More items now support the .flag setting, useful for configs
+    [-] Removed the .Id setting from all library items
 
 ]]--
 
@@ -31,8 +32,6 @@ local UIS = game:GetService("UserInputService")
 
 local Player = Players.LocalPlayer
 local Mouse = Player:GetMouse()
-
-local ItemsIdCount = 0
 
 -- Utility
 
@@ -81,11 +80,6 @@ function Utility:Create(class, properties, radius)
         uicorner.CornerRadius = radius
     end
     return instance
-end
-
-function Utility:GetItemId()
-    ItemsIdCount = ItemsIdCount + 1
-    return ItemsIdCount
 end
 
 -- Library
@@ -986,7 +980,6 @@ function Library:AddWindow(settings)
                 local Button = {
                     Name = name,
                     Type = "Button",
-                    Id = Utility:GetItemId(),
                     Callback = callback,
                 }
 
@@ -1074,7 +1067,6 @@ function Library:AddWindow(settings)
                 local Toggle = {
                     Name = name,
                     Type = "Toggle",
-                    Id = Utility:GetItemId(),
                     Flag = settings.flag or name,
                     Callback = callback,
                 }
@@ -1163,7 +1155,6 @@ function Library:AddWindow(settings)
                 local Label = {
                     Name = name,
                     Type = "Label",
-                    Id = Utility:GetItemId(),
                     Alignment = settings.alignment or Enum.TextXAlignment.Center,
                 }
 
@@ -1204,7 +1195,6 @@ function Library:AddWindow(settings)
                         Label2 = name[2],
                     },
                     Type = "DualLabel",
-                    Id = Utility:GetItemId(),
                 }
 
                 DualLabel.Holder = Utility:Create("Frame", {
@@ -1257,7 +1247,6 @@ function Library:AddWindow(settings)
                 local ClipboardLabel = {
                     Name = name,
                     Type = "ClipboardLabel",
-                    Id = Utility:GetItemId(),
                     Alignment = settings.alignment or Enum.TextXAlignment.Center,
                     Button = {
                         Mouse = false,
@@ -1349,7 +1338,6 @@ function Library:AddWindow(settings)
                 local Box = {
                     Name = name,
                     Type = "Box",
-                    Id = Utility:GetItemId(),
                     Flag = settings.flag or name,
                     Callback = callback,
                 }
@@ -1456,7 +1444,6 @@ function Library:AddWindow(settings)
                 local NumBox = {
                     Name = name,
                     Type = "NumBox",
-                    Id = Utility:GetItemId(),
                     Flag = settings.flag or name,
                     Callback = callback,
                 }
@@ -1561,7 +1548,6 @@ function Library:AddWindow(settings)
                 local PlayerBox = {
                     Name = name,
                     Type = "PlayerBox",
-                    Id = Utility:GetItemId(),
                     Flag = settings.flag or name,
                     Callback = callback,
                 }
@@ -1678,7 +1664,6 @@ function Library:AddWindow(settings)
                 local Bind = {
                     Name = name,
                     Type = "Bind",
-                    Id = Utility:GetItemId(),
                     Flag = settings.flag or name,
                     Bind = bind,
                     Callback = callback,
@@ -1808,7 +1793,6 @@ function Library:AddWindow(settings)
                 local Slider = {
                     Name = name,
                     Type = "Slider",
-                    Id = Utility:GetItemId(),
                     Flag = settings.flag or name,
                     Min = settings.min,
                     Max = settings.max,
@@ -1974,7 +1958,6 @@ function Library:AddWindow(settings)
                 local Dropdown = {
                     Name = name,
                     Type = "Dropdown",
-                    Id = Utility:GetItemId(),
                     Flag = settings.flag or name,
                     Items = {},
                     Toggled = false,
@@ -2211,7 +2194,6 @@ function Library:AddWindow(settings)
                 local SubSection = {
                     Name = name,
                     Type = "SubSection",
-                    Id = Utility:GetItemId(),
                     Toggled = settings.default or false,
                     Items = {},
                 }
@@ -2345,7 +2327,6 @@ function Library:AddWindow(settings)
                     local Button = {
                         Name = name,
                         Type = "Button",
-                        Id = Utility:GetItemId(),
                         Callback = callback,
                     }
     
@@ -2433,7 +2414,6 @@ function Library:AddWindow(settings)
                     local Toggle = {
                         Name = name,
                         Type = "Toggle",
-                        Id = Utility:GetItemId(),
                         Flag = settings.flag or name,
                         Callback = callback,
                     }
@@ -2522,7 +2502,6 @@ function Library:AddWindow(settings)
                     local Label = {
                         Name = name,
                         Type = "Label",
-                        Id = Utility:GetItemId(),
                         Alignment = settings.alignment or Enum.TextXAlignment.Center,
                     }
     
@@ -2563,7 +2542,6 @@ function Library:AddWindow(settings)
                             Label2 = name[2],
                         },
                         Type = "DualLabel",
-                        Id = Utility:GetItemId(),
                     }
     
                     DualLabel.Holder = Utility:Create("Frame", {
@@ -2616,7 +2594,6 @@ function Library:AddWindow(settings)
                     local ClipboardLabel = {
                         Name = name,
                         Type = "ClipboardLabel",
-                        Id = Utility:GetItemId(),
                         Alignment = settings.alignment or Enum.TextXAlignment.Center,
                         Button = {
                             Mouse = false,
@@ -2708,7 +2685,6 @@ function Library:AddWindow(settings)
                     local Box = {
                         Name = name,
                         Type = "Box",
-                        Id = Utility:GetItemId(),
                         Flag = settings.flag or name,
                         Callback = callback,
                     }
@@ -2815,7 +2791,6 @@ function Library:AddWindow(settings)
                     local NumBox = {
                         Name = name,
                         Type = "NumBox",
-                        Id = Utility:GetItemId(),
                         Flag = settings.flag or name,
                         Callback = callback,
                     }
@@ -2920,7 +2895,6 @@ function Library:AddWindow(settings)
                     local PlayerBox = {
                         Name = name,
                         Type = "PlayerBox",
-                        Id = Utility:GetItemId(),
                         Flag = settings.flag or name,
                         Callback = callback,
                     }
@@ -3037,7 +3011,6 @@ function Library:AddWindow(settings)
                     local Bind = {
                         Name = name,
                         Type = "Bind",
-                        Id = Utility:GetItemId(),
                         Flag = settings.flag or name,
                         Bind = bind,
                         Callback = callback,
@@ -3159,7 +3132,6 @@ function Library:AddWindow(settings)
                     local Slider = {
                         Name = name,
                         Type = "Slider",
-                        Id = Utility:GetItemId(),
                         Flag = settings.flag or name,
                         Min = settings.min,
                         Max = settings.max,
@@ -3325,7 +3297,6 @@ function Library:AddWindow(settings)
                     local Dropdown = {
                         Name = name,
                         Type = "Dropdown",
-                        Id = Utility:GetItemId(),
                         Flag = settings.flag or name,
                         Items = {},
                         Toggled = false,
