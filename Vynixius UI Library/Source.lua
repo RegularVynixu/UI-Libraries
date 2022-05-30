@@ -33,54 +33,7 @@ local UIS = game:GetService("UserInputService")
 local Player = Players.LocalPlayer
 local Mouse = Player:GetMouse()
 
--- Utility
-
-local Utility = {}
-
-Utility.Colors = {
-    Add = function(c1, c2)
-        local r, g, b = c1.R + c2.R, c1.G + c2.G, c1.B + c2.B
-        return Color3.fromRGB(math.min(r*255, 255), math.min(g*255, 255), math.min(b*255, 255))
-    end,
-
-    Sub = function(c1, c2)
-        local r, g, b = c1.R - c2.R, c1.G - c2.G, c1.B - c2.B
-        return Color3.fromRGB(math.max(r*255, 0), math.max(g*255, 0), math.max(b*255, 0))
-    end,
-}
-
-function Utility:Drag(obj, drag)
-    drag.InputBegan:Connect(function(input, processed)
-        if not processed and input.UserInputType == Enum.UserInputType.MouseButton1 then
-            local Start = Vector2.new(Mouse.X - obj.AbsolutePosition.X, Mouse.Y - obj.AbsolutePosition.Y)
-            repeat task.wait()
-                TS:Create(obj, TweenInfo.new(.05, Enum.EasingStyle.Linear), {
-                    Position = UDim2.new(0, Mouse.X - Start.X, 0, Mouse.Y - Start.Y),
-                }):Play()
-            until not UIS:IsMouseButtonPressed(Enum.UserInputType.MouseButton1)
-        end
-    end)
-end
-
-function Utility:Create(class, properties, radius)
-    local instance = Instance.new(class)
-
-    for i, v in next, properties do
-        if i ~= "Parent" then
-            if typeof(v) == "Instance" then
-                v.Parent = instance
-            else
-                instance[i] = v
-            end
-        end
-    end
-
-    if radius then
-        local uicorner = Instance.new("UICorner", instance)
-        uicorner.CornerRadius = radius
-    end
-    return instance
-end
+local Utils = loadstring(game:HttpGet("https://raw.githubusercontent.com/RegularVynixu/Utilities/main/Utils.lua"))()
 
 -- Library
 
@@ -134,7 +87,7 @@ function Library:Notify(settings, callback)
     if not Library.Notification.Gui then
         print("No notifications gui")
 
-		Library.Notification.Gui = Utility:Create("ScreenGui", {
+		Library.Notification.Gui = Utils.Create("ScreenGui", {
             Name = "Notifications",
             Parent = CG,
             ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
@@ -143,19 +96,19 @@ function Library:Notify(settings, callback)
         Library.Notification.Gui.Parent = CG
 	end
     
-    Notification.Holder = Utility:Create("Frame", {
+    Notification.Holder = Utils.Create("Frame", {
         Name = "Holder",
         BackgroundTransparency = 1,
         ClipsDescendants = true,
         Size = UDim2.new(0, Library.Notification.Config.SizeX, 0, 42 + Library.Notification.Config.MaxLines * 14),
 
-        Utility:Create("Frame", {
+        Utils.Create("Frame", {
             Name = "Background",
             BackgroundColor3 = Color3.fromRGB(10, 10, 10),
             Position = UDim2.new(0, 0, 0, 28),
             Size = UDim2.new(1, 0, 1, -28),
 
-            Utility:Create("Frame", {
+            Utils.Create("Frame", {
                 Name = "Filling",
                 BackgroundColor3 = Color3.fromRGB(10, 10, 10),
                 BorderSizePixel = 0,
@@ -163,12 +116,12 @@ function Library:Notify(settings, callback)
             }),
         }, UDim.new(0, 3)),
 
-        Utility:Create("Frame", {
+        Utils.Create("Frame", {
             Name = "Topbar",
             BackgroundColor3 = Color3.fromRGB(20, 20, 20),
             Size = UDim2.new(1, 0, 0, 28),
 
-            Utility:Create("Frame", {
+            Utils.Create("Frame", {
                 Name = "Filling",
                 BackgroundColor3 = Color3.fromRGB(20, 20, 20),
                 BorderSizePixel = 0,
@@ -178,7 +131,7 @@ function Library:Notify(settings, callback)
         }, UDim.new(0, 3)),
     })
 
-    Notification.Title = Utility:Create("TextLabel", {
+    Notification.Title = Utils.Create("TextLabel", {
         Name = "Title",
         BackgroundTransparency = 1,
         Position = UDim2.new(0, 11, 0.5, -8),
@@ -190,7 +143,7 @@ function Library:Notify(settings, callback)
         TextXAlignment = Enum.TextXAlignment.Left,
     })
 
-    Notification.Description = Utility:Create("TextLabel", {
+    Notification.Description = Utils.Create("TextLabel", {
         Name = "Desc",
         BackgroundTransparency = 1,
         Position = UDim2.new(0, 11, 0, 7),
@@ -204,7 +157,7 @@ function Library:Notify(settings, callback)
         TextYAlignment = Enum.TextYAlignment.Top,
     })
 	
-    Notification.Buttons.Yes = Utility:Create("ImageButton", {
+    Notification.Buttons.Yes = Utils.Create("ImageButton", {
         Name = "Yes",
         BackgroundTransparency = 1,
         Position = UDim2.new(1, -44, 0.5, -10),
@@ -212,7 +165,7 @@ function Library:Notify(settings, callback)
         Image = "http://www.roblox.com/asset/?id=7919581359",
     })
 
-    Notification.Buttons.No = Utility:Create("ImageButton", {
+    Notification.Buttons.No = Utils.Create("ImageButton", {
         Name = "No",
         BackgroundTransparency = 1,
         Position = UDim2.new(1, -22, 0.5, -10),
@@ -220,11 +173,11 @@ function Library:Notify(settings, callback)
         Image = "http://www.roblox.com/asset/?id=7919583990",
     })
 
-    Notification.Indicator = Utility:Create("Frame", {
+    Notification.Indicator = Utils.Create("Frame", {
         Name = "Indicator",
         BackgroundColor3 = settings.Color or Library.Theme.ThemeColor,
         Size = UDim2.new(0, 4, 1, 0),
-        Utility:Create("Frame", {
+        Utils.Create("Frame", {
             Name = "Filling",
             BackgroundColor3 = settings.Color or Library.Theme.ThemeColor,
             BorderSizePixel = 0,
@@ -401,29 +354,29 @@ function Library:AddWindow(settings)
         end
     end
 
-    Window.Gui = Utility:Create("ScreenGui", {
+    Window.Gui = Utils.Create("ScreenGui", {
         Name = settings.title[1].. " ".. settings.title[2],
         ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
 
-        Utility:Create("Frame", {
+        Utils.Create("Frame", {
             Name = "Window",
             BackgroundTransparency = 1,
             ClipsDescendants = true,
             Position = UDim2.new(1, -420, 1, -440),
             Size = UDim2.new(0, 400, 0, 420),
 
-            Utility:Create("Frame", {
+            Utils.Create("Frame", {
                 Name = "Holder",
                 BackgroundTransparency = 1,
                 Size = UDim2.new(0, 400, 0, 420),
 
                 -- Topbar
-                Utility:Create("Frame", {
+                Utils.Create("Frame", {
                     Name = "Topbar",
                     BackgroundColor3 = Library.Theme.TopbarColor,
                     Size = UDim2.new(1, 0, 0, 40),
 
-                    Utility:Create("Frame", {
+                    Utils.Create("Frame", {
                         Name = "Filling",
                         BackgroundColor3 = Library.Theme.TopbarColor,
                         BorderSizePixel = 0,
@@ -431,14 +384,14 @@ function Library:AddWindow(settings)
                         Size = UDim2.new(1, 0, 0.5, 0),
                     }),
 
-                    Utility:Create("Frame", {
+                    Utils.Create("Frame", {
                         Name = "Holder",
                         BackgroundTransparency = 1,
                         Position = UDim2.new(0, 5, 0.5, -10),
                         Size = UDim2.new(1, -10, 0, 20),
                         ZIndex = 2,
 
-                        Utility:Create("TextLabel", {
+                        Utils.Create("TextLabel", {
                             Name = "Title1",
                             BackgroundTransparency = 1,
                             Size = UDim2.new(0.5, 0, 1, 0),
@@ -448,7 +401,7 @@ function Library:AddWindow(settings)
                             TextSize = 20,
                         }),
 
-                        Utility:Create("TextLabel", {
+                        Utils.Create("TextLabel", {
                             Name = "Title2",
                             BackgroundTransparency = 1,
                             Size = UDim2.new(0.5, 0, 1, 0),
@@ -461,7 +414,7 @@ function Library:AddWindow(settings)
                 }, UDim.new(0, 5)),
 
                 -- Sidebar
-                Utility:Create("Frame", {
+                Utils.Create("Frame", {
                     Name = "Sidebar",
                     Active = true,
                     BackgroundColor3 = Library.Theme.SidebarColor,
@@ -470,14 +423,14 @@ function Library:AddWindow(settings)
                     Size = UDim2.new(0, 35, 1, -40),
                     ZIndex = 2,
 
-                    Utility:Create("Frame", {
+                    Utils.Create("Frame", {
                         Name = "H_Filling",
                         BackgroundColor3 = Library.Theme.SidebarColor,
                         BorderSizePixel = 0,
                         Size = UDim2.new(1, 0, 0, 5),
                     }),
 
-                    Utility:Create("Frame", {
+                    Utils.Create("Frame", {
                         Name = "V_Filling",
                         BackgroundColor3 = Library.Theme.SidebarColor,
                         BorderSizePixel = 0,
@@ -486,7 +439,7 @@ function Library:AddWindow(settings)
                         ZIndex = 2,
                     }),
 
-                    Utility:Create("Frame", {
+                    Utils.Create("Frame", {
                         Name = "Border",
                         BackgroundColor3 = Library.Theme.BackgroundColor,
                         BorderSizePixel = 0,
@@ -495,15 +448,15 @@ function Library:AddWindow(settings)
                         ZIndex = 2,
                     }),
 
-                    Utility:Create("Frame", {
+                    Utils.Create("Frame", {
                         Name = "Line",
-                        BackgroundColor3 = Utility.Colors.Add(Library.Theme.SidebarColor, Color3.fromRGB(5, 5, 5)),
+                        BackgroundColor3 = Utils.Colors.Add(Library.Theme.SidebarColor, Color3.fromRGB(5, 5, 5)),
                         BorderSizePixel = 0,
                         Position = UDim2.new(0, 5, 0, 29),
                         Size = UDim2.new(1, -15, 0, 2),
                     }),
 
-                    Utility:Create("ScrollingFrame", {
+                    Utils.Create("ScrollingFrame", {
                         Name = "List",
                         Active = true,
                         BackgroundTransparency = 1,
@@ -512,16 +465,16 @@ function Library:AddWindow(settings)
                         Size = UDim2.new(0, 110, 1, -40),
                         CanvasSize = UDim2.new(0, 0, 0, 0),
                         ScrollingDirection = Enum.ScrollingDirection.Y,
-                        ScrollBarImageColor3 = Utility.Colors.Add(Library.Theme.SidebarColor, Color3.fromRGB(10, 10, 10)),
+                        ScrollBarImageColor3 = Utils.Colors.Add(Library.Theme.SidebarColor, Color3.fromRGB(10, 10, 10)),
                         ScrollBarThickness = 5,
 
-                        Utility:Create("UIListLayout", {
+                        Utils.Create("UIListLayout", {
                             SortOrder = Enum.SortOrder.LayoutOrder,
                             Padding = UDim.new(0, 5),
                         }),
                     }),
 
-                    Utility:Create("TextButton", {
+                    Utils.Create("TextButton", {
                         Name = "Indicator",
                         BackgroundTransparency = 1,
                         Position = UDim2.new(1, -35, 0, 0),
@@ -534,29 +487,29 @@ function Library:AddWindow(settings)
                 }, UDim.new(0, 5)),
 
                 -- Background
-                Utility:Create("Frame", {
+                Utils.Create("Frame", {
                     Name = "Background",
                     BackgroundColor3 = Library.Theme.BackgroundColor,
                     Position = UDim2.new(0, 30, 0, 40),
                     Size = UDim2.new(1, -30, 1, -40),
 
-                    Utility:Create("Frame", {
+                    Utils.Create("Frame", {
                         Name = "H_Filling",
                         BackgroundColor3 = Library.Theme.BackgroundColor,
                         BorderSizePixel = 0,
                         Size = UDim2.new(1, 0, 0, 5),
                     }),
 
-                    Utility:Create("Frame", {
+                    Utils.Create("Frame", {
                         Name = "V_Filling",
                         BackgroundColor3 = Library.Theme.BackgroundColor,
                         BorderSizePixel = 0,
                         Size = UDim2.new(0, 5, 1, 0),
                     }),
 
-                    Utility:Create("Frame", {
+                    Utils.Create("Frame", {
                         Name = "Tabs",
-                        BackgroundColor3 = Utility.Colors.Add(Library.Theme.BackgroundColor, Color3.fromRGB(5, 5, 5)),
+                        BackgroundColor3 = Utils.Colors.Add(Library.Theme.BackgroundColor, Color3.fromRGB(5, 5, 5)),
                         Position = UDim2.new(0, 5, 0, 5),
                         Size = UDim2.new(1, -10, 1, -10),
                     }, UDim.new(0, 5)),
@@ -614,17 +567,12 @@ function Library:AddWindow(settings)
         end
         for i, v in next, items do
             if v.Type == "Toggle" then
-                v.Indicator.Indicator.BackgroundColor3 = Utility.Colors.Add(Library.Theme.ThemeColor, Color3.fromRGB(50, 50, 50))
+                v.Indicator.Indicator.BackgroundColor3 = Utils.Colors.Add(Library.Theme.ThemeColor, Color3.fromRGB(50, 50, 50))
             elseif v.Type == "Slider" then
-                v.Slider.Bar.BackgroundColor3 = Utility.Colors.Sub(Library.Theme.ThemeColor, Color3.fromRGB(50, 50, 50))
+                v.Slider.Bar.BackgroundColor3 = Utils.Colors.Sub(Library.Theme.ThemeColor, Color3.fromRGB(50, 50, 50))
                 v.Slider.Point.BackgroundColor3 = Library.Theme.ThemeColor
             end
         end
-    end
-
-    function Window:ChangeKey(input)
-        assert(typeof(input) == Enum.KeyCode)
-        Window.Key = input
     end
 
     function Window:Toggle(bool)
@@ -678,7 +626,7 @@ function Library:AddWindow(settings)
     -- Scripts
 
     Window.Gui.Parent = game.CoreGui
-    Utility:Drag(WindowHolder, Topbar)
+    Utils.MakeDraggable(WindowHolder, Topbar)
 
     TitleHolder.Title1.Size = UDim2.new(0, GetTitleSize().Title1, 1, 0)
     TitleHolder.Title2.Size = UDim2.new(0, GetTitleSize().Title2, 1, 0)
@@ -719,7 +667,7 @@ function Library:AddWindow(settings)
             },
         }
 
-        Tab.Frame = Utility:Create("ScrollingFrame", {
+        Tab.Frame = Utils.Create("ScrollingFrame", {
             Name = name,
             Active = true,
             BackgroundTransparency = 1,
@@ -728,29 +676,29 @@ function Library:AddWindow(settings)
             Size = UDim2.new(1, -10, 1, -10),
             CanvasSize = UDim2.new(0, 0, 0, 0),
             ScrollingDirection = Enum.ScrollingDirection.Y,
-            ScrollBarImageColor3 = Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
+            ScrollBarImageColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
             ScrollBarThickness = 5,
             Visible = false,
 
-            Utility:Create("UIListLayout", {
+            Utils.Create("UIListLayout", {
                 SortOrder = Enum.SortOrder.LayoutOrder,
                 Padding = UDim.new(0, 5),
             }),
         })
 
-        Tab.Button.Holder = Utility:Create("Frame", {
+        Tab.Button.Holder = Utils.Create("Frame", {
             Name = name,
             BackgroundTransparency = 1,
             Size = UDim2.new(1, 0, 0, 30),
         })
 
-        Tab.Button.Button = Utility:Create("TextButton", {
+        Tab.Button.Button = Utils.Create("TextButton", {
             Name = "Button",
             BackgroundTransparency = 1,
             Size = UDim2.new(1, 0, 0, 30),
             Font = Enum.Font.SourceSans,
             Text = name,
-            TextColor3 = Utility.Colors.Sub(Library.Theme.TextColor, Color3.fromRGB(100, 100, 100)),
+            TextColor3 = Utils.Colors.Sub(Library.Theme.TextColor, Color3.fromRGB(100, 100, 100)),
             TextTransparency = Window.Sidebar.Toggled and 0 or 1,
             TextSize = 14,
             TextWrapped = true,
@@ -767,7 +715,7 @@ function Library:AddWindow(settings)
                 Window.Sidebar:Toggle(false)
 
                 TS:Create(v.Button.Button, TweenInfo.new(.25, Enum.EasingStyle.Quint), {
-                    TextColor3 = bool and Library.Theme.TextColor or Utility.Colors.Sub(Library.Theme.TextColor, Color3.fromRGB(100, 100, 100)),
+                    TextColor3 = bool and Library.Theme.TextColor or Utils.Colors.Sub(Library.Theme.TextColor, Color3.fromRGB(100, 100, 100)),
                 }):Play()
             end
         end
@@ -803,7 +751,7 @@ function Library:AddWindow(settings)
         Window.Sidebar:UpdateHeight()
 
         if settings.icon then
-            Tab.Button.Icon = Utility:Create("ImageLabel", {
+            Tab.Button.Icon = Utils.Create("ImageLabel", {
                 Name = "Icon",
                 BackgroundTransparency = 1,
                 Size = UDim2.new(0, 30, 1, 0),
@@ -854,12 +802,12 @@ function Library:AddWindow(settings)
                 Items = {},
             }
 
-            Section.Frame = Utility:Create("Frame", {
+            Section.Frame = Utils.Create("Frame", {
                 Name = name,
                 BackgroundColor3 = Library.Theme.SectionColor,
                 Size = UDim2.new(1, -10, 0, 40),
 
-                Utility:Create("TextLabel", {
+                Utils.Create("TextLabel", {
                     Name = "Indicator",
                     BackgroundTransparency = 1,
                     Position = UDim2.new(1, -30, 0, 0),
@@ -871,7 +819,7 @@ function Library:AddWindow(settings)
                     TextWrapped = true,
                 }),
 
-                Utility:Create("TextLabel", {
+                Utils.Create("TextLabel", {
                     Name = "Header",
                     BackgroundTransparency = 1,
                     Position = UDim2.new(0, 10, 0, 8),
@@ -884,23 +832,23 @@ function Library:AddWindow(settings)
                     TextXAlignment = Enum.TextXAlignment.Left,
                 }),
 
-                Utility:Create("Frame", {
+                Utils.Create("Frame", {
                     Name = "Line",
-                    BackgroundColor3 = Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
+                    BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
                     BorderSizePixel = 0,
                     Position = UDim2.new(0, 5, 0, 30),
                     Size = UDim2.new(1, -10, 0, 2),
                 }),
             }, UDim.new(0, 5))
 
-            Section.List = Utility:Create("Frame", {
+            Section.List = Utils.Create("Frame", {
                 Name = "List",
                 BackgroundTransparency = 1,
                 ClipsDescendants = true,
                 Position = UDim2.new(0, 5, 0, 40),
                 Size = UDim2.new(1, -10, 1, -40),
 
-                Utility:Create("UIListLayout", {
+                Utils.Create("UIListLayout", {
                     SortOrder = Enum.SortOrder.LayoutOrder,
                     Padding = UDim.new(0, 5),
                 }),
@@ -983,16 +931,16 @@ function Library:AddWindow(settings)
                     Callback = callback,
                 }
 
-                Button.Holder = Utility:Create("Frame", {
+                Button.Holder = Utils.Create("Frame", {
                     Name = name,
-                    BackgroundColor3 = Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
+                    BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
                     Size = UDim2.new(1, 0, 0, 30),
                 }, UDim.new(0, 5))
 
-                Button.Button = Utility:Create("TextButton", {
+                Button.Button = Utils.Create("TextButton", {
                     Name = "Button",
                     AutoButtonColor = false,
-                    BackgroundColor3 = Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
+                    BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
                     Position = UDim2.new(0, 2, 0, 2),
                     Size = UDim2.new(1, -4, 1, -4),
                     Font = Enum.Font.SourceSans,
@@ -1006,13 +954,13 @@ function Library:AddWindow(settings)
 
                 function Button:Highlight(bool)
                     TS:Create(Button.Button, TweenInfo.new(.25, Enum.EasingStyle.Quint), {
-                        BackgroundColor3 = bool and Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)) or Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
+                        BackgroundColor3 = bool and Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)) or Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
                     }):Play()
                 end
 
                 function Button:Visual()
                     task.spawn(function()
-                        local Visual = Utility:Create("Frame", {
+                        local Visual = Utils.Create("Frame", {
                             Name = "Visual",
                             AnchorPoint = Vector2.new(.5, .5),
                             BackgroundColor3 = Color3.fromRGB(255, 255, 255),
@@ -1071,12 +1019,12 @@ function Library:AddWindow(settings)
                     Callback = callback,
                 }
 
-                Toggle.Holder = Utility:Create("Frame", {
+                Toggle.Holder = Utils.Create("Frame", {
                     Name = name,
-                    BackgroundColor3 = Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
+                    BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
                     Size = UDim2.new(1, 0, 0, 30),
 
-                    Utility:Create("TextLabel", {
+                    Utils.Create("TextLabel", {
                         Name = "Label",
                         BackgroundTransparency = 1,
                         Position = UDim2.new(0, 5, 0.5, -7),
@@ -1090,19 +1038,19 @@ function Library:AddWindow(settings)
                     }),
                 }, UDim.new(0, 5))
 
-                Toggle.Indicator = Utility:Create("Frame", {
+                Toggle.Indicator = Utils.Create("Frame", {
                     Name = "Holder",
-                    BackgroundColor3 = Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
+                    BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
                     Position = UDim2.new(1, -42, 0, 2),
                     Size = UDim2.new(0, 40, 0, 26),
 
-                    Utility:Create("ImageLabel", {
+                    Utils.Create("ImageLabel", {
                         Name = "Indicator",
-                        BackgroundColor3 = Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
+                        BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
                         Position = UDim2.new(0, 2, 0, 2),
                         Size = UDim2.new(0, 22, 0, 22),
 
-                        Utility:Create("ImageLabel", {
+                        Utils.Create("ImageLabel", {
                             Name = "Overlay",
                             AnchorPoint = Vector2.new(0.5, 0.5),
                             BackgroundTransparency = 1,
@@ -1120,7 +1068,7 @@ function Library:AddWindow(settings)
 
                     TS:Create(Toggle.Indicator.Indicator, TweenInfo.new(.25, Enum.EasingStyle.Quint), {
                         Position = bool and UDim2.new(1, -24, 0, 2) or UDim2.new(0, 2, 0, 2),
-                        BackgroundColor3 = bool and Utility.Colors.Add(Library.Theme.ThemeColor, Color3.fromRGB(50, 50, 50)) or Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
+                        BackgroundColor3 = bool and Utils.Colors.Add(Library.Theme.ThemeColor, Color3.fromRGB(50, 50, 50)) or Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
                     }):Play()
 
                     TS:Create(Toggle.Indicator.Indicator.Overlay, TweenInfo.new(.25, Enum.EasingStyle.Quint), {
@@ -1158,13 +1106,13 @@ function Library:AddWindow(settings)
                     Alignment = settings.alignment or Enum.TextXAlignment.Center,
                 }
 
-                Label.Holder = Utility:Create("Frame", {
+                Label.Holder = Utils.Create("Frame", {
                     Name = name,
-                    BackgroundColor3 = Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
+                    BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
                     Size = UDim2.new(1, 0, 0, 20)
                 }, UDim.new(0, 5))
 
-                Label.Label = Utility:Create("TextLabel", {
+                Label.Label = Utils.Create("TextLabel", {
                     Name = "Label",
                     BackgroundTransparency = 1,
                     Position = UDim2.new(0, 5, 0.5, -7),
@@ -1197,13 +1145,13 @@ function Library:AddWindow(settings)
                     Type = "DualLabel",
                 }
 
-                DualLabel.Holder = Utility:Create("Frame", {
+                DualLabel.Holder = Utils.Create("Frame", {
                     Name = name[1].. " ".. name[2],
-                    BackgroundColor3 = Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
+                    BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
                     Size = UDim2.new(1, 0, 0, 20)
                 }, UDim.new(0, 5))
 
-                DualLabel.Label1 = Utility:Create("TextLabel", {
+                DualLabel.Label1 = Utils.Create("TextLabel", {
                     Name = "Label1",
                     BackgroundTransparency = 1,
                     Position = UDim2.new(0, 5, 0.5, -7),
@@ -1216,7 +1164,7 @@ function Library:AddWindow(settings)
                     TextXAlignment = Enum.TextXAlignment.Left,
                 })
 
-                DualLabel.Label2 = Utility:Create("TextLabel", {
+                DualLabel.Label2 = Utils.Create("TextLabel", {
                     Name = "Label2",
                     BackgroundTransparency = 1,
                     Position = UDim2.new(0.5, 0, 0.5, -7),
@@ -1253,13 +1201,13 @@ function Library:AddWindow(settings)
                     },
                 }
 
-                ClipboardLabel.Holder = Utility:Create("Frame", {
+                ClipboardLabel.Holder = Utils.Create("Frame", {
                     Name = name,
-                    BackgroundColor3 = Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
+                    BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
                     Size = UDim2.new(1, 0, 0, 20)
                 }, UDim.new(0, 5))
 
-                ClipboardLabel.Label = Utility:Create("TextLabel", {
+                ClipboardLabel.Label = Utils.Create("TextLabel", {
                     Name = "Label",
                     BackgroundTransparency = 1,
                     Position = UDim2.new(0, 5, 0.5, -7),
@@ -1272,21 +1220,21 @@ function Library:AddWindow(settings)
                     TextXAlignment = ClipboardLabel.Alignment,
                 })
 
-                ClipboardLabel.Button.Button = Utility:Create("ImageButton", {
+                ClipboardLabel.Button.Button = Utils.Create("ImageButton", {
                     Name = "Copy",
                     AutoButtonColor = false,
                     BackgroundTransparency = 1,
                     Position = UDim2.new(1, -18, 0, 2),
                     Size = UDim2.new(0, 16, 0, 16),
                     Image = "http://www.roblox.com/asset/?id=7832104884",
-                    ImageColor3 = Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(25, 25, 25)),
+                    ImageColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(25, 25, 25)),
                 })
 
                 -- Functions
 
                 function ClipboardLabel:Highlight(bool)
                     TS:Create(ClipboardLabel.Button.Button, TweenInfo.new(.25, Enum.EasingStyle.Quint), {
-                        ImageColor3 = bool and Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(45, 45, 45)) or Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(25, 25, 25)),
+                        ImageColor3 = bool and Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(45, 45, 45)) or Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(25, 25, 25)),
                     }):Play()
                 end
 
@@ -1297,7 +1245,7 @@ function Library:AddWindow(settings)
                     task.wait(.25)
 
                     TS:Create(ClipboardLabel.Button.Button, TweenInfo.new(.25, Enum.EasingStyle.Quint), {
-                        ImageColor3 = ClipboardLabel.Button.Mouse and Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(45, 45, 45)) or Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(25, 25, 25)),
+                        ImageColor3 = ClipboardLabel.Button.Mouse and Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(45, 45, 45)) or Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(25, 25, 25)),
                     }):Play()
                 end
                 
@@ -1342,12 +1290,12 @@ function Library:AddWindow(settings)
                     Callback = callback,
                 }
 
-                Box.Holder = Utility:Create("Frame", {
+                Box.Holder = Utils.Create("Frame", {
                     Name = name,
-                    BackgroundColor3 = Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
+                    BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
                     Size = UDim2.new(1, 0, 0, 30),
 
-                    Utility:Create("TextLabel", {
+                    Utils.Create("TextLabel", {
                         Name = "Label",
                         BackgroundTransparency = 1,
                         Position = UDim2.new(0, 5, 0.5, -7),
@@ -1360,27 +1308,27 @@ function Library:AddWindow(settings)
                         TextXAlignment = Enum.TextXAlignment.Left,
                     }),
 
-                    Utility:Create("Frame", {
+                    Utils.Create("Frame", {
                         Name = "Holder",
-                        BackgroundColor3 = Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
+                        BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
                         Position = UDim2.new(1, -125, 0.5, -10),
                         Size = UDim2.new(0, 120, 0, 20),
 
-                        Utility:Create("TextLabel", {
+                        Utils.Create("TextLabel", {
                             Name = "Icon",
                             BackgroundTransparency = 1,
                             Position = UDim2.new(0, 3, 0, 3),
                             Size = UDim2.new(0, 14, 0, 14),
                             Font = Enum.Font.SourceSansBold,
                             Text = "T",
-                            TextColor3 = Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(30, 30, 30)),
+                            TextColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(30, 30, 30)),
                             TextSize = 18,
                             TextWrapped = true,
                         }),
                     }, UDim.new(0, 5)),
                 }, UDim.new(0, 5))
 
-                Box.Box = Utility:Create("TextBox", {
+                Box.Box = Utils.Create("TextBox", {
                     Name = "Box",
                     BackgroundTransparency = 1,
                     ClearTextOnFocus = settings.clearOnFocus or false,
@@ -1407,7 +1355,7 @@ function Library:AddWindow(settings)
                     }):Play()
 
                     TS:Create(Box.Holder.Holder.Icon, TweenInfo.new(.5, Enum.EasingStyle.Quint), {
-                        TextColor3 = bool and Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(50, 50, 50)) or Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(30, 30, 30)),
+                        TextColor3 = bool and Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(50, 50, 50)) or Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(30, 30, 30)),
                     }):Play()
                 end
 
@@ -1448,12 +1396,12 @@ function Library:AddWindow(settings)
                     Callback = callback,
                 }
 
-                NumBox.Holder = Utility:Create("Frame", {
+                NumBox.Holder = Utils.Create("Frame", {
                     Name = name,
-                    BackgroundColor3 = Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
+                    BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
                     Size = UDim2.new(1, 0, 0, 30),
 
-                    Utility:Create("TextLabel", {
+                    Utils.Create("TextLabel", {
                         Name = "Label",
                         BackgroundTransparency = 1,
                         Position = UDim2.new(0, 5, 0.5, -7),
@@ -1466,24 +1414,24 @@ function Library:AddWindow(settings)
                         TextXAlignment = Enum.TextXAlignment.Left,
                     }),
 
-                    Utility:Create("Frame", {
+                    Utils.Create("Frame", {
                         Name = "Holder",
-                        BackgroundColor3 = Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
+                        BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
                         Position = UDim2.new(1, -125, 0.5, -10),
                         Size = UDim2.new(0, 120, 0, 20),
 
-                        Utility:Create("ImageLabel", {
+                        Utils.Create("ImageLabel", {
                             Name = "Icon",
                             BackgroundTransparency = 1,
                             Position = UDim2.new(0, 3, 0, 3),
                             Size = UDim2.new(0, 14, 0, 14),
                             Image = "http://www.roblox.com/asset/?id=7865555617",
-                            ImageColor3 = Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(30, 30, 30)),
+                            ImageColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(30, 30, 30)),
                         }),
                     }, UDim.new(0, 5)),
                 }, UDim.new(0, 5))
 
-                NumBox.Box = Utility:Create("TextBox", {
+                NumBox.Box = Utils.Create("TextBox", {
                     Name = "Box",
                     BackgroundTransparency = 1,
                     ClearTextOnFocus = settings.clearOnFocus or false,
@@ -1510,7 +1458,7 @@ function Library:AddWindow(settings)
                     }):Play()
 
                     TS:Create(NumBox.Holder.Holder.Icon, TweenInfo.new(.5, Enum.EasingStyle.Quint), {
-                        ImageColor3 = bool and Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(50, 50, 50)) or Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(30, 30, 30)),
+                        ImageColor3 = bool and Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(50, 50, 50)) or Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(30, 30, 30)),
                     }):Play()
                 end
 
@@ -1552,12 +1500,12 @@ function Library:AddWindow(settings)
                     Callback = callback,
                 }
 
-                PlayerBox.Holder = Utility:Create("Frame", {
+                PlayerBox.Holder = Utils.Create("Frame", {
                     Name = name,
-                    BackgroundColor3 = Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
+                    BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
                     Size = UDim2.new(1, 0, 0, 30),
 
-                    Utility:Create("TextLabel", {
+                    Utils.Create("TextLabel", {
                         Name = "Label",
                         BackgroundTransparency = 1,
                         Position = UDim2.new(0, 5, 0.5, -7),
@@ -1570,24 +1518,24 @@ function Library:AddWindow(settings)
                         TextXAlignment = Enum.TextXAlignment.Left,
                     }),
 
-                    Utility:Create("Frame", {
+                    Utils.Create("Frame", {
                         Name = "Holder",
-                        BackgroundColor3 = Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
+                        BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
                         Position = UDim2.new(1, -125, 0.5, -10),
                         Size = UDim2.new(0, 120, 0, 20),
 
-                        Utility:Create("ImageLabel", {
+                        Utils.Create("ImageLabel", {
                             Name = "Icon",
                             BackgroundTransparency = 1,
                             Position = UDim2.new(0, 3, 0, 3),
                             Size = UDim2.new(0, 14, 0, 14),
                             Image = "http://www.roblox.com/asset/?id=7860874011",
-                            ImageColor3 = Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(30, 30, 30)),
+                            ImageColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(30, 30, 30)),
                         }),
                     }, UDim.new(0, 5)),
                 }, UDim.new(0, 5))
 
-                PlayerBox.Box = Utility:Create("TextBox", {
+                PlayerBox.Box = Utils.Create("TextBox", {
                     Name = "Box",
                     BackgroundTransparency = 1,
                     Position = UDim2.new(0, 20, 0, 0),
@@ -1613,7 +1561,7 @@ function Library:AddWindow(settings)
                     }):Play()
 
                     TS:Create(PlayerBox.Holder.Holder.Icon, TweenInfo.new(.5, Enum.EasingStyle.Quint), {
-                        ImageColor3 = bool and Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(50, 50, 50)) or Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(30, 30, 30)),
+                        ImageColor3 = bool and Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(50, 50, 50)) or Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(30, 30, 30)),
                     }):Play()
                 end
 
@@ -1669,12 +1617,12 @@ function Library:AddWindow(settings)
                     Callback = callback,
                 }
 
-                Bind.Holder = Utility:Create("Frame", {
+                Bind.Holder = Utils.Create("Frame", {
                     Name = name,
-                    BackgroundColor3 = Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
+                    BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
                     Size = UDim2.new(1, 0, 0, 30),
 
-                    Utility:Create("TextLabel", {
+                    Utils.Create("TextLabel", {
                         Name = "Label",
                         BackgroundTransparency = 1,
                         Position = UDim2.new(0, 5, 0.5, -7),
@@ -1687,24 +1635,24 @@ function Library:AddWindow(settings)
                         TextXAlignment = Enum.TextXAlignment.Left,
                     }),
 
-                    Utility:Create("Frame", {
+                    Utils.Create("Frame", {
                         Name = "Holder",
-                        BackgroundColor3 = Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
+                        BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
                         Position = UDim2.new(1, -96, 0.5, -10),
                         Size = UDim2.new(0, 91, 0, 20),
 
-                        Utility:Create("ImageLabel", {
+                        Utils.Create("ImageLabel", {
                             Name = "Icon",
                             BackgroundTransparency = 1,
                             Position = UDim2.new(0, 6, 0, 6),
                             Size = UDim2.new(0, 14, 0, 14),
                             Image = "http://www.roblox.com/asset/?id=7867015035",
-                            ImageColor3 = Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(30, 30, 30)),
+                            ImageColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(30, 30, 30)),
                         }),
                     }, UDim.new(0, 5)),
                 }, UDim.new(0, 5))
 
-                Bind.Box = Utility:Create("TextBox", {
+                Bind.Box = Utils.Create("TextBox", {
                     Name = "Box",
                     BackgroundTransparency = 1,
                     ClearTextOnFocus = false,
@@ -1733,7 +1681,7 @@ function Library:AddWindow(settings)
 
                 function Bind:Highlight(bool)
                     TS:Create(Bind.Holder.Holder.Icon, TweenInfo.new(.5, Enum.EasingStyle.Quint), {
-                        TextColor3 = bool and Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(50, 50, 50)) or Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(30, 30, 30)),
+                        TextColor3 = bool and Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(50, 50, 50)) or Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(30, 30, 30)),
                     }):Play()
                 end
 
@@ -1801,12 +1749,12 @@ function Library:AddWindow(settings)
                     Slider = {},
                 }
 
-                Slider.Holder = Utility:Create("Frame", {
+                Slider.Holder = Utils.Create("Frame", {
                     Name = name,
-                    BackgroundColor3 = Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
+                    BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
                     Size = UDim2.new(1, 0, 0, 40),
 
-                    Utility:Create("TextLabel", {
+                    Utils.Create("TextLabel", {
                         Name = "Label",
                         BackgroundTransparency = 1,
                         Position = UDim2.new(0, 5, 0, 5),
@@ -1819,7 +1767,7 @@ function Library:AddWindow(settings)
                         TextXAlignment = Enum.TextXAlignment.Left,
                     }),
 
-                    Utility:Create("TextBox", {
+                    Utils.Create("TextBox", {
                         Name = "Value",
                         BackgroundTransparency = 1,
                         Position = UDim2.new(1, -65, 0, 5),
@@ -1833,27 +1781,27 @@ function Library:AddWindow(settings)
                     }),
                 }, UDim.new(0, 5))
 
-                Slider.Slider.Holder = Utility:Create("Frame", {
+                Slider.Slider.Holder = Utils.Create("Frame", {
                     Name = "Holder",
                     BackgroundTransparency = 1,
                     Position = UDim2.new(0, 5, 0, 24),
                     Size = UDim2.new(1, -10, 0, 10),
                 }, UDim.new(0, 5))
 
-                Slider.Slider.Background = Utility:Create("Frame", {
+                Slider.Slider.Background = Utils.Create("Frame", {
                     Name = "Background",
-                    BackgroundColor3 = Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
+                    BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
                     ClipsDescendants = true,
                     Size = UDim2.new(1, 0, 1, 0),
                 }, UDim.new(0, 5))
 
-                Slider.Slider.Bar = Utility:Create("Frame", {
+                Slider.Slider.Bar = Utils.Create("Frame", {
                     Name = "Bar",
-                    BackgroundColor3 = Utility.Colors.Sub(Library.Theme.ThemeColor, Color3.fromRGB(50, 50, 50)),
+                    BackgroundColor3 = Utils.Colors.Sub(Library.Theme.ThemeColor, Color3.fromRGB(50, 50, 50)),
                     Size = UDim2.new(0.5, 0, 1, 0),
                 }, UDim.new(0, 5))
 
-                Slider.Slider.Point = Utility:Create("Frame", {
+                Slider.Slider.Point = Utils.Create("Frame", {
                     Name = "Point",
                     AnchorPoint = Vector2.new(0.5, 0.5),
                     BackgroundColor3 = Library.Theme.ThemeColor,
@@ -1964,26 +1912,26 @@ function Library:AddWindow(settings)
                     Callback = callback,
                 }
 
-                Dropdown.Holder = Utility:Create("Frame", {
+                Dropdown.Holder = Utils.Create("Frame", {
                     Name = name,
-                    BackgroundColor3 = Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
+                    BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
                     ClipsDescendants = true,
                     Size = UDim2.new(1, 0, 0, 40),
 
-                    Utility:Create("Frame", {
+                    Utils.Create("Frame", {
                         Name = "Holder",
                         BackgroundTransparency = 1,
                         Size = UDim2.new(1, 0, 0, 40),
 
-                        Utility:Create("Frame", {
+                        Utils.Create("Frame", {
                             Name = "Line",
-                            BackgroundColor3 = Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
+                            BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
                             BorderSizePixel = 0,
                             Position = UDim2.new(0, 5, 0, 30),
                             Size = UDim2.new(1, -10, 0, 2),
                         }),
 
-                        Utility:Create("TextLabel", {
+                        Utils.Create("TextLabel", {
                             Name = "Label",
                             BackgroundTransparency = 1,
                             Position = UDim2.new(0, 5, 0, 8),
@@ -1996,7 +1944,7 @@ function Library:AddWindow(settings)
                             TextXAlignment = Enum.TextXAlignment.Left,
                         }),
 
-                        Utility:Create("TextLabel", {
+                        Utils.Create("TextLabel", {
                             Name = "Selected",
                             BackgroundTransparency = 1,
                             Position = UDim2.new(0.5, -10, 0, 8),
@@ -2009,7 +1957,7 @@ function Library:AddWindow(settings)
                             TextXAlignment = Enum.TextXAlignment.Right,
                         }),
 
-                        Utility:Create("TextLabel", {
+                        Utils.Create("TextLabel", {
                             Name = "Indicator",
                             BackgroundTransparency = 1,
                             Position = UDim2.new(1, -30, 0, 0),
@@ -2023,7 +1971,7 @@ function Library:AddWindow(settings)
                     }),
                 }, UDim.new(0, 5))
 
-                Dropdown.List = Utility:Create("ScrollingFrame", {
+                Dropdown.List = Utils.Create("ScrollingFrame", {
                     Name = "List",
                     Active = true,
                     BackgroundTransparency = 1,
@@ -2033,15 +1981,15 @@ function Library:AddWindow(settings)
                     CanvasSize = UDim2.new(0, 0, 0, 0),
                     ClipsDescendants = true,
                     ScrollingDirection = Enum.ScrollingDirection.Y,
-                    ScrollBarImageColor3 = Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
+                    ScrollBarImageColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
                     ScrollBarThickness = 5,
 
-                    Utility:Create("UIListLayout", {
+                    Utils.Create("UIListLayout", {
                         SortOrder = Enum.SortOrder.LayoutOrder,
                         Padding = UDim.new(0, 5),
                     }),
 
-                    Utility:Create("UIPadding", {
+                    Utils.Create("UIPadding", {
                         PaddingLeft = UDim.new(0, 5),
                         PaddingRight = UDim.new(0, 5),
                     }),
@@ -2120,7 +2068,7 @@ function Library:AddWindow(settings)
                         Callback = callback,
                     }
 
-                    Item.Button = Utility:Create("TextButton", {
+                    Item.Button = Utils.Create("TextButton", {
                         Name = "Item",
                         BackgroundTransparency = 1,
                         Size = UDim2.new(1, 0, 0, 20),
@@ -2198,12 +2146,12 @@ function Library:AddWindow(settings)
                     Items = {},
                 }
     
-                SubSection.Frame = Utility:Create("Frame", {
+                SubSection.Frame = Utils.Create("Frame", {
                     Name = name,
-                    BackgroundColor3 = Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
+                    BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
                     Size = UDim2.new(1, 0, 0, 40),
     
-                    Utility:Create("TextLabel", {
+                    Utils.Create("TextLabel", {
                         Name = "Indicator",
                         BackgroundTransparency = 1,
                         Position = UDim2.new(1, -30, 0, 0),
@@ -2215,7 +2163,7 @@ function Library:AddWindow(settings)
                         TextWrapped = true,
                     }),
     
-                    Utility:Create("TextLabel", {
+                    Utils.Create("TextLabel", {
                         Name = "Header",
                         BackgroundTransparency = 1,
                         Position = UDim2.new(0, 10, 0, 8),
@@ -2228,23 +2176,23 @@ function Library:AddWindow(settings)
                         TextXAlignment = Enum.TextXAlignment.Left,
                     }),
     
-                    Utility:Create("Frame", {
+                    Utils.Create("Frame", {
                         Name = "Line",
-                        BackgroundColor3 = Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
+                        BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
                         BorderSizePixel = 0,
                         Position = UDim2.new(0, 5, 0, 30),
                         Size = UDim2.new(1, -10, 0, 2),
                     }),
                 }, UDim.new(0, 5))
     
-                SubSection.List = Utility:Create("Frame", {
+                SubSection.List = Utils.Create("Frame", {
                     Name = "List",
                     BackgroundTransparency = 1,
                     ClipsDescendants = true,
                     Position = UDim2.new(0, 5, 0, 40),
                     Size = UDim2.new(1, -10, 1, -40),
     
-                    Utility:Create("UIListLayout", {
+                    Utils.Create("UIListLayout", {
                         SortOrder = Enum.SortOrder.LayoutOrder,
                         Padding = UDim.new(0, 5),
                     }),
@@ -2330,16 +2278,16 @@ function Library:AddWindow(settings)
                         Callback = callback,
                     }
     
-                    Button.Holder = Utility:Create("Frame", {
+                    Button.Holder = Utils.Create("Frame", {
                         Name = name,
-                        BackgroundColor3 = Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
+                        BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
                         Size = UDim2.new(1, 0, 0, 30),
                     }, UDim.new(0, 5))
     
-                    Button.Button = Utility:Create("TextButton", {
+                    Button.Button = Utils.Create("TextButton", {
                         Name = "Button",
                         AutoButtonColor = false,
-                        BackgroundColor3 = Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
+                        BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
                         Position = UDim2.new(0, 2, 0, 2),
                         Size = UDim2.new(1, -4, 1, -4),
                         Font = Enum.Font.SourceSans,
@@ -2353,13 +2301,13 @@ function Library:AddWindow(settings)
     
                     function Button:Highlight(bool)
                         TS:Create(Button.Button, TweenInfo.new(.25, Enum.EasingStyle.Quint), {
-                            BackgroundColor3 = bool and Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(20, 20, 20)) or Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
+                            BackgroundColor3 = bool and Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(20, 20, 20)) or Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
                         }):Play()
                     end
     
                     function Button:Visual()
                         task.spawn(function()
-                            local Visual = Utility:Create("Frame", {
+                            local Visual = Utils.Create("Frame", {
                                 Name = "Visual",
                                 AnchorPoint = Vector2.new(.5, .5),
                                 BackgroundColor3 = Color3.fromRGB(255, 255, 255),
@@ -2418,12 +2366,12 @@ function Library:AddWindow(settings)
                         Callback = callback,
                     }
     
-                    Toggle.Holder = Utility:Create("Frame", {
+                    Toggle.Holder = Utils.Create("Frame", {
                         Name = name,
-                        BackgroundColor3 = Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
+                        BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
                         Size = UDim2.new(1, 0, 0, 30),
     
-                        Utility:Create("TextLabel", {
+                        Utils.Create("TextLabel", {
                             Name = "Label",
                             BackgroundTransparency = 1,
                             Position = UDim2.new(0, 5, 0.5, -7),
@@ -2437,19 +2385,19 @@ function Library:AddWindow(settings)
                         }),
                     }, UDim.new(0, 5))
     
-                    Toggle.Indicator = Utility:Create("Frame", {
+                    Toggle.Indicator = Utils.Create("Frame", {
                         Name = "Holder",
-                        BackgroundColor3 = Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
+                        BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
                         Position = UDim2.new(1, -42, 0, 2),
                         Size = UDim2.new(0, 40, 0, 26),
     
-                        Utility:Create("ImageLabel", {
+                        Utils.Create("ImageLabel", {
                             Name = "Indicator",
-                            BackgroundColor3 = Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(20, 20, 20)),
+                            BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(20, 20, 20)),
                             Position = UDim2.new(0, 2, 0, 2),
                             Size = UDim2.new(0, 22, 0, 22),
     
-                            Utility:Create("ImageLabel", {
+                            Utils.Create("ImageLabel", {
                                 Name = "Overlay",
                                 AnchorPoint = Vector2.new(0.5, 0.5),
                                 BackgroundTransparency = 1,
@@ -2467,7 +2415,7 @@ function Library:AddWindow(settings)
     
                         TS:Create(Toggle.Indicator.Indicator, TweenInfo.new(.25, Enum.EasingStyle.Quint), {
                             Position = bool and UDim2.new(1, -24, 0, 2) or UDim2.new(0, 2, 0, 2),
-                            BackgroundColor3 = bool and Utility.Colors.Add(Library.Theme.ThemeColor, Color3.fromRGB(55, 55, 55)) or Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(20, 20, 20)),
+                            BackgroundColor3 = bool and Utils.Colors.Add(Library.Theme.ThemeColor, Color3.fromRGB(55, 55, 55)) or Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(20, 20, 20)),
                         }):Play()
     
                         TS:Create(Toggle.Indicator.Indicator.Overlay, TweenInfo.new(.25, Enum.EasingStyle.Quint), {
@@ -2505,13 +2453,13 @@ function Library:AddWindow(settings)
                         Alignment = settings.alignment or Enum.TextXAlignment.Center,
                     }
     
-                    Label.Holder = Utility:Create("Frame", {
+                    Label.Holder = Utils.Create("Frame", {
                         Name = name,
-                        BackgroundColor3 = Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
+                        BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
                         Size = UDim2.new(1, 0, 0, 20)
                     }, UDim.new(0, 5))
     
-                    Label.Label = Utility:Create("TextLabel", {
+                    Label.Label = Utils.Create("TextLabel", {
                         Name = "Label",
                         BackgroundTransparency = 1,
                         Position = UDim2.new(0, 5, 0.5, -7),
@@ -2544,13 +2492,13 @@ function Library:AddWindow(settings)
                         Type = "DualLabel",
                     }
     
-                    DualLabel.Holder = Utility:Create("Frame", {
+                    DualLabel.Holder = Utils.Create("Frame", {
                         Name = name[1].. " ".. name[2],
-                        BackgroundColor3 = Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
+                        BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
                         Size = UDim2.new(1, 0, 0, 20)
                     }, UDim.new(0, 5))
     
-                    DualLabel.Label1 = Utility:Create("TextLabel", {
+                    DualLabel.Label1 = Utils.Create("TextLabel", {
                         Name = "Label1",
                         BackgroundTransparency = 1,
                         Position = UDim2.new(0, 5, 0.5, -7),
@@ -2563,7 +2511,7 @@ function Library:AddWindow(settings)
                         TextXAlignment = Enum.TextXAlignment.Left,
                     })
     
-                    DualLabel.Label2 = Utility:Create("TextLabel", {
+                    DualLabel.Label2 = Utils.Create("TextLabel", {
                         Name = "Label2",
                         BackgroundTransparency = 1,
                         Position = UDim2.new(0.5, 0, 0.5, -7),
@@ -2600,13 +2548,13 @@ function Library:AddWindow(settings)
                         },
                     }
     
-                    ClipboardLabel.Holder = Utility:Create("Frame", {
+                    ClipboardLabel.Holder = Utils.Create("Frame", {
                         Name = name,
-                        BackgroundColor3 = Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
+                        BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
                         Size = UDim2.new(1, 0, 0, 20)
                     }, UDim.new(0, 5))
     
-                    ClipboardLabel.Label = Utility:Create("TextLabel", {
+                    ClipboardLabel.Label = Utils.Create("TextLabel", {
                         Name = "Label",
                         BackgroundTransparency = 1,
                         Position = UDim2.new(0, 5, 0.5, -7),
@@ -2619,21 +2567,21 @@ function Library:AddWindow(settings)
                         TextXAlignment = ClipboardLabel.Alignment,
                     })
     
-                    ClipboardLabel.Button.Button = Utility:Create("ImageButton", {
+                    ClipboardLabel.Button.Button = Utils.Create("ImageButton", {
                         Name = "Copy",
                         AutoButtonColor = false,
                         BackgroundTransparency = 1,
                         Position = UDim2.new(1, -18, 0, 2),
                         Size = UDim2.new(0, 16, 0, 16),
                         Image = "http://www.roblox.com/asset/?id=7832104884",
-                        ImageColor3 = Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(30, 30, 30)),
+                        ImageColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(30, 30, 30)),
                     })
     
                     -- Functions
     
                     function ClipboardLabel:Highlight(bool)
                         TS:Create(ClipboardLabel.Button.Button, TweenInfo.new(.25, Enum.EasingStyle.Quint), {
-                            ImageColor3 = bool and Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(50, 50, 50)) or Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(30, 30, 30)),
+                            ImageColor3 = bool and Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(50, 50, 50)) or Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(30, 30, 30)),
                         }):Play()
                     end
     
@@ -2644,7 +2592,7 @@ function Library:AddWindow(settings)
                         task.wait(.25)
     
                         TS:Create(ClipboardLabel.Button.Button, TweenInfo.new(.25, Enum.EasingStyle.Quint), {
-                            ImageColor3 = ClipboardLabel.Button.Mouse and Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(50, 50, 50)) or Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(30, 30, 30)),
+                            ImageColor3 = ClipboardLabel.Button.Mouse and Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(50, 50, 50)) or Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(30, 30, 30)),
                         }):Play()
                     end
                     
@@ -2689,12 +2637,12 @@ function Library:AddWindow(settings)
                         Callback = callback,
                     }
     
-                    Box.Holder = Utility:Create("Frame", {
+                    Box.Holder = Utils.Create("Frame", {
                         Name = name,
-                        BackgroundColor3 = Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
+                        BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
                         Size = UDim2.new(1, 0, 0, 30),
     
-                        Utility:Create("TextLabel", {
+                        Utils.Create("TextLabel", {
                             Name = "Label",
                             BackgroundTransparency = 1,
                             Position = UDim2.new(0, 5, 0.5, -7),
@@ -2707,27 +2655,27 @@ function Library:AddWindow(settings)
                             TextXAlignment = Enum.TextXAlignment.Left,
                         }),
     
-                        Utility:Create("Frame", {
+                        Utils.Create("Frame", {
                             Name = "Holder",
-                            BackgroundColor3 = Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
+                            BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
                             Position = UDim2.new(1, -125, 0.5, -10),
                             Size = UDim2.new(0, 120, 0, 20),
     
-                            Utility:Create("TextLabel", {
+                            Utils.Create("TextLabel", {
                                 Name = "Icon",
                                 BackgroundTransparency = 1,
                                 Position = UDim2.new(0, 3, 0, 3),
                                 Size = UDim2.new(0, 14, 0, 14),
                                 Font = Enum.Font.SourceSansBold,
                                 Text = "T",
-                                TextColor3 = Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(35, 35, 35)),
+                                TextColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(35, 35, 35)),
                                 TextSize = 18,
                                 TextWrapped = true,
                             }),
                         }, UDim.new(0, 5)),
                     }, UDim.new(0, 5))
     
-                    Box.Box = Utility:Create("TextBox", {
+                    Box.Box = Utils.Create("TextBox", {
                         Name = "Box",
                         BackgroundTransparency = 1,
                         ClearTextOnFocus = settings.clearOnFocus or false,
@@ -2754,7 +2702,7 @@ function Library:AddWindow(settings)
                         }):Play()
     
                         TS:Create(Box.Holder.Holder.Icon, TweenInfo.new(.5, Enum.EasingStyle.Quint), {
-                            TextColor3 = bool and Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(55, 55, 55)) or Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(35, 35, 35)),
+                            TextColor3 = bool and Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(55, 55, 55)) or Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(35, 35, 35)),
                         }):Play()
                     end
     
@@ -2795,12 +2743,12 @@ function Library:AddWindow(settings)
                         Callback = callback,
                     }
     
-                    NumBox.Holder = Utility:Create("Frame", {
+                    NumBox.Holder = Utils.Create("Frame", {
                         Name = name,
-                        BackgroundColor3 = Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
+                        BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
                         Size = UDim2.new(1, 0, 0, 30),
     
-                        Utility:Create("TextLabel", {
+                        Utils.Create("TextLabel", {
                             Name = "Label",
                             BackgroundTransparency = 1,
                             Position = UDim2.new(0, 5, 0.5, -7),
@@ -2813,24 +2761,24 @@ function Library:AddWindow(settings)
                             TextXAlignment = Enum.TextXAlignment.Left,
                         }),
     
-                        Utility:Create("Frame", {
+                        Utils.Create("Frame", {
                             Name = "Holder",
-                            BackgroundColor3 = Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
+                            BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
                             Position = UDim2.new(1, -125, 0.5, -10),
                             Size = UDim2.new(0, 120, 0, 20),
     
-                            Utility:Create("ImageLabel", {
+                            Utils.Create("ImageLabel", {
                                 Name = "Icon",
                                 BackgroundTransparency = 1,
                                 Position = UDim2.new(0, 3, 0, 3),
                                 Size = UDim2.new(0, 14, 0, 14),
                                 Image = "http://www.roblox.com/asset/?id=7865555617",
-                                ImageColor3 = Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(35, 35, 35)),
+                                ImageColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(35, 35, 35)),
                             }),
                         }, UDim.new(0, 5)),
                     }, UDim.new(0, 5))
     
-                    NumBox.Box = Utility:Create("TextBox", {
+                    NumBox.Box = Utils.Create("TextBox", {
                         Name = "Box",
                         BackgroundTransparency = 1,
                         ClearTextOnFocus = settings.clearOnFocus or false,
@@ -2857,7 +2805,7 @@ function Library:AddWindow(settings)
                         }):Play()
     
                         TS:Create(NumBox.Holder.Holder.Icon, TweenInfo.new(.5, Enum.EasingStyle.Quint), {
-                            ImageColor3 = bool and Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(55, 55, 55)) or Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(35, 35, 35)),
+                            ImageColor3 = bool and Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(55, 55, 55)) or Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(35, 35, 35)),
                         }):Play()
                     end
     
@@ -2899,12 +2847,12 @@ function Library:AddWindow(settings)
                         Callback = callback,
                     }
     
-                    PlayerBox.Holder = Utility:Create("Frame", {
+                    PlayerBox.Holder = Utils.Create("Frame", {
                         Name = name,
-                        BackgroundColor3 = Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
+                        BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
                         Size = UDim2.new(1, 0, 0, 30),
     
-                        Utility:Create("TextLabel", {
+                        Utils.Create("TextLabel", {
                             Name = "Label",
                             BackgroundTransparency = 1,
                             Position = UDim2.new(0, 5, 0.5, -7),
@@ -2917,24 +2865,24 @@ function Library:AddWindow(settings)
                             TextXAlignment = Enum.TextXAlignment.Left,
                         }),
     
-                        Utility:Create("Frame", {
+                        Utils.Create("Frame", {
                             Name = "Holder",
-                            BackgroundColor3 = Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
+                            BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
                             Position = UDim2.new(1, -125, 0.5, -10),
                             Size = UDim2.new(0, 120, 0, 20),
     
-                            Utility:Create("ImageLabel", {
+                            Utils.Create("ImageLabel", {
                                 Name = "Icon",
                                 BackgroundTransparency = 1,
                                 Position = UDim2.new(0, 3, 0, 3),
                                 Size = UDim2.new(0, 14, 0, 14),
                                 Image = "http://www.roblox.com/asset/?id=7860874011",
-                                ImageColor3 = Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(35, 35, 35)),
+                                ImageColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(35, 35, 35)),
                             }),
                         }, UDim.new(0, 5)),
                     }, UDim.new(0, 5))
     
-                    PlayerBox.Box = Utility:Create("TextBox", {
+                    PlayerBox.Box = Utils.Create("TextBox", {
                         Name = "Box",
                         BackgroundTransparency = 1,
                         Position = UDim2.new(0, 20, 0, 0),
@@ -2960,7 +2908,7 @@ function Library:AddWindow(settings)
                         }):Play()
     
                         TS:Create(PlayerBox.Holder.Holder.Icon, TweenInfo.new(.5, Enum.EasingStyle.Quint), {
-                            ImageColor3 = bool and Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(55, 55, 55)) or Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(35, 35, 35)),
+                            ImageColor3 = bool and Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(55, 55, 55)) or Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(35, 35, 35)),
                         }):Play()
                     end
     
@@ -3016,12 +2964,12 @@ function Library:AddWindow(settings)
                         Callback = callback,
                     }
     
-                    Bind.Holder = Utility:Create("Frame", {
+                    Bind.Holder = Utils.Create("Frame", {
                         Name = name,
-                        BackgroundColor3 = Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
+                        BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
                         Size = UDim2.new(1, 0, 0, 30),
     
-                        Utility:Create("TextLabel", {
+                        Utils.Create("TextLabel", {
                             Name = "Label",
                             BackgroundTransparency = 1,
                             Position = UDim2.new(0, 5, 0.5, -7),
@@ -3034,24 +2982,24 @@ function Library:AddWindow(settings)
                             TextXAlignment = Enum.TextXAlignment.Left,
                         }),
     
-                        Utility:Create("Frame", {
+                        Utils.Create("Frame", {
                             Name = "Holder",
-                            BackgroundColor3 = Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
+                            BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
                             Position = UDim2.new(1, -96, 0.5, -10),
                             Size = UDim2.new(0, 91, 0, 20),
     
-                            Utility:Create("ImageLabel", {
+                            Utils.Create("ImageLabel", {
                                 Name = "Icon",
                                 BackgroundTransparency = 1,
                                 Position = UDim2.new(0, 6, 0, 6),
                                 Size = UDim2.new(0, 14, 0, 14),
                                 Image = "http://www.roblox.com/asset/?id=7867015035",
-                                ImageColor3 = Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(35, 35, 35)),
+                                ImageColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(35, 35, 35)),
                             }),
                         }, UDim.new(0, 5)),
                     }, UDim.new(0, 5))
     
-                    Bind.Box = Utility:Create("TextBox", {
+                    Bind.Box = Utils.Create("TextBox", {
                         Name = "Box",
                         BackgroundTransparency = 1,
                         ClearTextOnFocus = false,
@@ -3076,7 +3024,7 @@ function Library:AddWindow(settings)
     
                     function Bind:Highlight(bool)
                         TS:Create(Bind.Holder.Holder.Icon, TweenInfo.new(.5, Enum.EasingStyle.Quint), {
-                            TextColor3 = bool and Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(55, 55, 55)) or Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(35, 35, 35)),
+                            TextColor3 = bool and Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(55, 55, 55)) or Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(35, 35, 35)),
                         }):Play()
                     end
     
@@ -3140,12 +3088,12 @@ function Library:AddWindow(settings)
                         Slider = {},
                     }
     
-                    Slider.Holder = Utility:Create("Frame", {
+                    Slider.Holder = Utils.Create("Frame", {
                         Name = name,
-                        BackgroundColor3 = Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
+                        BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
                         Size = UDim2.new(1, 0, 0, 40),
     
-                        Utility:Create("TextLabel", {
+                        Utils.Create("TextLabel", {
                             Name = "Label",
                             BackgroundTransparency = 1,
                             Position = UDim2.new(0, 5, 0, 5),
@@ -3158,7 +3106,7 @@ function Library:AddWindow(settings)
                             TextXAlignment = Enum.TextXAlignment.Left,
                         }),
     
-                        Utility:Create("TextBox", {
+                        Utils.Create("TextBox", {
                             Name = "Value",
                             BackgroundTransparency = 1,
                             Position = UDim2.new(1, -65, 0, 5),
@@ -3172,27 +3120,27 @@ function Library:AddWindow(settings)
                         }),
                     }, UDim.new(0, 5))
     
-                    Slider.Slider.Holder = Utility:Create("Frame", {
+                    Slider.Slider.Holder = Utils.Create("Frame", {
                         Name = "Holder",
                         BackgroundTransparency = 1,
                         Position = UDim2.new(0, 5, 0, 24),
                         Size = UDim2.new(1, -10, 0, 10),
                     }, UDim.new(0, 5))
     
-                    Slider.Slider.Background = Utility:Create("Frame", {
+                    Slider.Slider.Background = Utils.Create("Frame", {
                         Name = "Background",
-                        BackgroundColor3 = Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
+                        BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
                         ClipsDescendants = true,
                         Size = UDim2.new(1, 0, 1, 0),
                     }, UDim.new(0, 5))
     
-                    Slider.Slider.Bar = Utility:Create("Frame", {
+                    Slider.Slider.Bar = Utils.Create("Frame", {
                         Name = "Bar",
-                        BackgroundColor3 = Utility.Colors.Sub(Library.Theme.ThemeColor, Color3.fromRGB(55, 55, 55)),
+                        BackgroundColor3 = Utils.Colors.Sub(Library.Theme.ThemeColor, Color3.fromRGB(55, 55, 55)),
                         Size = UDim2.new(0.5, 0, 1, 0),
                     }, UDim.new(0, 5))
     
-                    Slider.Slider.Point = Utility:Create("Frame", {
+                    Slider.Slider.Point = Utils.Create("Frame", {
                         Name = "Point",
                         AnchorPoint = Vector2.new(0.5, 0.5),
                         BackgroundColor3 = Library.Theme.ThemeColor,
@@ -3303,26 +3251,26 @@ function Library:AddWindow(settings)
                         Callback = callback,
                     }
     
-                    Dropdown.Holder = Utility:Create("Frame", {
+                    Dropdown.Holder = Utils.Create("Frame", {
                         Name = name,
-                        BackgroundColor3 = Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
+                        BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
                         ClipsDescendants = true,
                         Size = UDim2.new(1, 0, 0, 40),
     
-                        Utility:Create("Frame", {
+                        Utils.Create("Frame", {
                             Name = "Holder",
                             BackgroundTransparency = 1,
                             Size = UDim2.new(1, 0, 0, 40),
     
-                            Utility:Create("Frame", {
+                            Utils.Create("Frame", {
                                 Name = "Line",
-                                BackgroundColor3 = Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
+                                BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
                                 BorderSizePixel = 0,
                                 Position = UDim2.new(0, 5, 0, 30),
                                 Size = UDim2.new(1, -10, 0, 2),
                             }),
     
-                            Utility:Create("TextLabel", {
+                            Utils.Create("TextLabel", {
                                 Name = "Label",
                                 BackgroundTransparency = 1,
                                 Position = UDim2.new(0, 5, 0, 8),
@@ -3335,7 +3283,7 @@ function Library:AddWindow(settings)
                                 TextXAlignment = Enum.TextXAlignment.Left,
                             }),
     
-                            Utility:Create("TextLabel", {
+                            Utils.Create("TextLabel", {
                                 Name = "Selected",
                                 BackgroundTransparency = 1,
                                 Position = UDim2.new(0.5, -10, 0, 8),
@@ -3348,7 +3296,7 @@ function Library:AddWindow(settings)
                                 TextXAlignment = Enum.TextXAlignment.Right,
                             }),
     
-                            Utility:Create("TextLabel", {
+                            Utils.Create("TextLabel", {
                                 Name = "Indicator",
                                 BackgroundTransparency = 1,
                                 Position = UDim2.new(1, -30, 0, 0),
@@ -3362,7 +3310,7 @@ function Library:AddWindow(settings)
                         }),
                     }, UDim.new(0, 5))
     
-                    Dropdown.List = Utility:Create("ScrollingFrame", {
+                    Dropdown.List = Utils.Create("ScrollingFrame", {
                         Name = "List",
                         Active = true,
                         BackgroundTransparency = 1,
@@ -3372,15 +3320,15 @@ function Library:AddWindow(settings)
                         CanvasSize = UDim2.new(0, 0, 0, 0),
                         ClipsDescendants = true,
                         ScrollingDirection = Enum.ScrollingDirection.Y,
-                        ScrollBarImageColor3 = Utility.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(20, 20, 20)),
+                        ScrollBarImageColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(20, 20, 20)),
                         ScrollBarThickness = 5,
     
-                        Utility:Create("UIListLayout", {
+                        Utils.Create("UIListLayout", {
                             SortOrder = Enum.SortOrder.LayoutOrder,
                             Padding = UDim.new(0, 5),
                         }),
     
-                        Utility:Create("UIPadding", {
+                        Utils.Create("UIPadding", {
                             PaddingLeft = UDim.new(0, 5),
                             PaddingRight = UDim.new(0, 5),
                         }),
@@ -3463,7 +3411,7 @@ function Library:AddWindow(settings)
                             Callback = callback,
                         }
     
-                        Item.Button = Utility:Create("TextButton", {
+                        Item.Button = Utils.Create("TextButton", {
                             Name = "Item",
                             BackgroundTransparency = 1,
                             Size = UDim2.new(1, 0, 0, 20),
