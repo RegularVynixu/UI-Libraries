@@ -626,7 +626,7 @@ function Library:AddWindow(settings)
     -- Scripts
 
     Window.Gui.Parent = game.CoreGui
-    Utils.MakeDraggable(WindowHolder, Topbar)
+    Utils.MakeDraggable(WindowHolder, Topbar, 0.1)
 
     TitleHolder.Title1.Size = UDim2.new(0, GetTitleSize().Title1, 1, 0)
     TitleHolder.Title2.Size = UDim2.new(0, GetTitleSize().Title2, 1, 0)
