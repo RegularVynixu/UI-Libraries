@@ -53,14 +53,13 @@ local function tween(...)
 	local tween = TS:Create(args[1], TweenInfo.new(args[3], Enum.EasingStyle.Quint), args[4])
 
 	if args[2] == "Cosmetic" then
-		Storage.Tween.Cosmetic[#Storage.Tween.Cosmetic + 1] = tween
+		Storage.Tween.Cosmetic[args[1]] = tween
 
 		task.spawn(function()
 			task.wait(args[3])
 
-			local tweenIndex = table.find(Storage.Tween.Cosmetic, tween)
-			if tweenIndex ~= nil then
-				table.remove(Storage.Tween.Cosmetic, tweenIndex)
+			if Storage.Tween.Cosmetic[tween] then
+				Storage.Tween.Cosmetic[tween] = nil
 			end
 		end)
 	end
@@ -430,11 +429,14 @@ function Library:AddWindow(options)
 			for _, section in next, tab.Sections do
 				for _, item in next, section.List do
 
-					for _, tween in next, Storage.Tween.Cosmetic do
-						tween:Cancel()
-					end
-
 					if tab.Flags[item.Flag] == true or item.Rainbow == true then
+						local overlay = item.Frame.Holder.Indicator.Overlay
+						
+						if Storage.Tween.Cosmetic[overlay] then
+							Storage.Tween.Cosmetic[overlay]:Cancel()
+							Storage.Tween.Cosmetic[overlay] = nil
+						end
+
 						for _, v in next, item.Frame:GetDescendants() do
 							if v.Name == "Overlay" then
 								v.BackgroundColor3 = Utils.Colors.Add(accent, Color3.fromRGB(50, 50, 50))
