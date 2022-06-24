@@ -1570,7 +1570,7 @@ function Library:AddWindow(options)
 					Name = name,
 					Type = "Dropdown",
 					Toggled = false,
-					Selected = nil,
+					Selected = "",
 					List = {},
 					Callback = callback,
 				}
@@ -3137,7 +3137,7 @@ function Library:AddWindow(options)
 						Name = name,
 						Type = "Dropdown",
 						Toggled = false,
-						Selected = nil,
+						Selected = "",
 						List = {},
 						Callback = callback,
 					}
