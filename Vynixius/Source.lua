@@ -1179,8 +1179,9 @@ function Library:AddWindow(options)
 				local Bind = {
 					Name = name,
 					Type = "Bind",
-					Bind = bind,
 					Flag = options.flag or name,
+					Bind = bind,
+					Toggled = options.default or false,
 					Callback = callback,
 				}
 
@@ -1274,7 +1275,7 @@ function Library:AddWindow(options)
 					function Bind:Toggle(bool, instant)
 						Tab.Flags[Bind.Flag] = bool
 
-						if options.fireontoggle == true then
+						if options.fireontoggle ~= false then
 							task.spawn(Bind.Callback)
 						end
 
@@ -1353,6 +1354,7 @@ function Library:AddWindow(options)
 					Name = name,
 					Type = "Slider",
 					Value = default,
+					Toggled = options.default or false,
 					Flag = options.flag or name,
 					Callback = callback,
 				}
@@ -1468,7 +1470,7 @@ function Library:AddWindow(options)
 					function Slider:Toggle(bool, instant)
 						Tab.Flags[Slider.Flag] = bool
 
-						if options.fireontoggle == true then
+						if options.fireontoggle ~= false then
 							task.spawn(Slider.Callback, Slider.Value, bool)
 						end
 
@@ -1489,7 +1491,7 @@ function Library:AddWindow(options)
 							local sliderPercent = math.clamp((Mouse.X - Slider.Frame.Holder.Slider.AbsolutePosition.X) / Slider.Frame.Holder.Slider.AbsoluteSize.X, 0, 1)
 							local sliderValue = math.floor((min + sliderPercent * (max - min)) * 10) / 10
 
-							if options.fireondrag == true then
+							if options.fireondrag ~= false then
 								Slider:Set(sliderValue)
 							else
 								sliderVisual(sliderValue)
