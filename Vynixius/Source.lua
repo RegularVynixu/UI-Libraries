@@ -260,7 +260,7 @@ function Library:AddWindow(options)
 		Type = "Window",
 		Tabs = {},
 		Sidebar = { List = {}, Toggled = false },
-		Toggled = options.default or true,
+		Toggled = options.default ~= false,
 	}
 
 	-- Custom theme setup
@@ -280,7 +280,7 @@ function Library:AddWindow(options)
 		BackgroundTransparency = 1,
 		Size = UDim2.new(0, 460, 0, 497),
 		Position = UDim2.new(1, -490, 1, -527),
-		Visible = options.default or true,
+		Visible = options.default ~= false,
 
 		Utils.Create("Frame", {
 			Name = "Topbar",
