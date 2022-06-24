@@ -453,11 +453,11 @@ function Library:AddWindow(options)
 	end
 
 	function Window:SetAccent(accent)
-		if typeof(accent) == "string" and string.lower(accent) == "rainbow" then
-			if Storage.Connections.WindowRainbow ~= nil then
-				Storage.Connections.WindowRainbow:Disconnect()
-			end
+		if Storage.Connections.WindowRainbow ~= nil then
+			Storage.Connections.WindowRainbow:Disconnect()
+		end
 
+		if typeof(accent) == "string" and string.lower(accent) == "rainbow" then
 			Storage.Connections.WindowRainbow = RS.Heartbeat:Connect(function()
 				setAccent(Color3.fromHSV(tick() % 5 / 5, 1, 1))
 			end)
@@ -1672,10 +1672,12 @@ function Library:AddWindow(options)
 				end
 
 				function Dropdown:UpdateHeight()
-					Dropdown.Frame.Size = UDim2.new(1, 2, 0, Dropdown:GetHeight())
 					Dropdown.Frame.Holder.List.CanvasSize = UDim2.new(0, 0, 0, #Dropdown.List * 27 - 5)
 
-					Section:UpdateHeight()
+					if Dropdown.Toggled == true then
+						Dropdown.Frame.Size = UDim2.new(1, 2, 0, Dropdown:GetHeight())
+						Section:UpdateHeight()
+					end
 				end
 
 				function Dropdown:Add(name, options, callback)
@@ -1760,7 +1762,13 @@ function Library:AddWindow(options)
 
 				Section.List[#Section.List + 1] = Dropdown
 				Dropdown.Frame.Parent = Section.Frame.List
-
+				
+				Dropdown.Frame.Holder.List.ChildAdded:Connect(function(c)
+					if c.ClassName == "Frame" then
+						Dropdown:UpdateHeight()
+					end
+				end)
+				
 				Dropdown.Frame.InputBegan:Connect(function(input)
 					if input.UserInputType == Enum.UserInputType.MouseButton1 and #Dropdown.List > 0 and Mouse.Y - Dropdown.Frame.AbsolutePosition.Y <= 30 then
 						Dropdown:Toggle(not Dropdown.Toggled)
@@ -1770,7 +1778,7 @@ function Library:AddWindow(options)
 				for i, v in next, list do
 					Dropdown:Add(v)
 				end
-				
+
 				if typeof(options.default) == "string" then
 					Dropdown:Select(options.default)
 				end
@@ -3243,10 +3251,12 @@ function Library:AddWindow(options)
 					end
 
 					function Dropdown:UpdateHeight()
-						Dropdown.Frame.Size = UDim2.new(1, 2, 0, Dropdown:GetHeight())
 						Dropdown.Frame.Holder.List.CanvasSize = UDim2.new(0, 0, 0, #Dropdown.List * 27 - 5)
-
-						SubSection:UpdateHeight()
+						
+						if Dropdown.Toggled == true then
+							Dropdown.Frame.Size = UDim2.new(1, 2, 0, Dropdown:GetHeight())
+							SubSection:UpdateHeight()
+						end
 					end
 
 					function Dropdown:Add(name, options, callback)
@@ -3332,7 +3342,13 @@ function Library:AddWindow(options)
 
 					SubSection.List[#SubSection.List + 1] = Dropdown
 					Dropdown.Frame.Parent = SubSection.Frame.Holder.List
-
+					
+					Dropdown.Frame.Holder.List.ChildAdded:Connect(function(c)
+						if c.ClassName == "Frame" then
+							Dropdown:UpdateHeight()
+						end
+					end)
+					
 					Dropdown.Frame.InputBegan:Connect(function(input)
 						if input.UserInputType == Enum.UserInputType.MouseButton1 and #Dropdown.List > 0 and Mouse.Y - Dropdown.Frame.AbsolutePosition.Y <= 30 then
 							Dropdown:Toggle(not Dropdown.Toggled)
@@ -3342,7 +3358,7 @@ function Library:AddWindow(options)
 					for i, v in next, list do
 						Dropdown:Add(v)
 					end
-					
+
 					if typeof(options.default) == "string" then
 						Dropdown:Select(options.default)
 					end
