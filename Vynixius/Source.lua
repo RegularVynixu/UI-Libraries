@@ -945,6 +945,7 @@ function Library:AddWindow(options)
 				-- Scripts
 
 				Section.List[#Section.List + 1] = Label
+				Label.Label = Label.Frame.Holder.Label
 				Label.Frame.Parent = Section.Frame.List
 
 				return Label
@@ -1002,6 +1003,8 @@ function Library:AddWindow(options)
 				-- Scripts
 
 				Section.List[#Section.List + 1] = DualLabel
+				DualLabel.Label1 = DualLabel.Frame.Holder.Label1
+				DualLabel.Label2 = DualLabel.Frame.Holder.Label2
 				DualLabel.Frame.Parent = Section.Frame.List
 
 				return DualLabel
@@ -1053,6 +1056,7 @@ function Library:AddWindow(options)
 				-- Scripts
 
 				Section.List[#Section.List + 1] = ClipboardLabel
+				ClipboardLabel.Label = ClipboardLabel.Frame.Holder.Label
 				ClipboardLabel.Frame.Parent = Section.Frame.List
 
 				ClipboardLabel.Frame.InputBegan:Connect(function(input)
