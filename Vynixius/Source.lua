@@ -513,7 +513,7 @@ function Library:AddWindow(options)
 			Flags = {},
 			Button = {
 				Name = name,
-				Selected = options.default == true,
+				Selected = false,
 			},
 		}
 
@@ -1121,7 +1121,7 @@ function Library:AddWindow(options)
 									Name = "Box",
 									AnchorPoint = Vector2.new(0, 0.5),
 									BackgroundTransparency = 1,
-									ClearTextOnFocus = options.clearonfocus == true,
+									ClearTextOnFocus = options.clearonfocus ~= true,
 									Position = UDim2.new(0, 28, 0.5, 0),
 									Size = UDim2.new(1, -30, 1, 0),
 									Font = Enum.Font.SourceSans,
@@ -1283,7 +1283,7 @@ function Library:AddWindow(options)
 					function Bind:Toggle(bool, instant)
 						Tab.Flags[Bind.Flag] = bool
 
-						if options.fireontoggle == true then
+						if options.fireontoggle ~= false then
 							task.spawn(Bind.Callback)
 						end
 
@@ -1477,7 +1477,7 @@ function Library:AddWindow(options)
 					function Slider:Toggle(bool, instant)
 						Tab.Flags[Slider.Flag] = bool
 
-						if options.fireontoggle == true then
+						if options.fireontoggle ~= false then
 							task.spawn(Slider.Callback, Slider.Value, bool)
 						end
 
@@ -1498,7 +1498,7 @@ function Library:AddWindow(options)
 							local sliderPercent = math.clamp((Mouse.X - Slider.Frame.Holder.Slider.AbsolutePosition.X) / Slider.Frame.Holder.Slider.AbsoluteSize.X, 0, 1)
 							local sliderValue = math.floor((min + sliderPercent * (max - min)) * 10) / 10
 
-							if options.fireondrag == true then
+							if options.fireondrag ~= false then
 								Slider:Set(sliderValue)
 							else
 								sliderVisual(sliderValue)
@@ -1513,7 +1513,7 @@ function Library:AddWindow(options)
 						connections.move:Disconnect()
 						connections.move = nil
 
-						if options.fireondrag == false then
+						if options.fireondrag ~= true then
 							local sliderPercent = math.clamp((Mouse.X - Slider.Frame.Holder.Slider.AbsolutePosition.X) / Slider.Frame.Holder.Slider.AbsoluteSize.X, 0, 1)
 							local sliderValue = math.floor((min + sliderPercent * (max - min)) * 10) / 10
 
@@ -2692,7 +2692,7 @@ function Library:AddWindow(options)
 										Name = "Box",
 										AnchorPoint = Vector2.new(0, 0.5),
 										BackgroundTransparency = 1,
-										ClearTextOnFocus = options.clearonfocus == true,
+										ClearTextOnFocus = options.clearonfocus ~= true,
 										Position = UDim2.new(0, 28, 0.5, 0),
 										Size = UDim2.new(1, -30, 1, 0),
 										Font = Enum.Font.SourceSans,
@@ -2854,7 +2854,7 @@ function Library:AddWindow(options)
 						function Bind:Toggle(bool, instant)
 							Tab.Flags[Bind.Flag] = bool
 
-							if options.fireontoggle == true then
+							if options.fireontoggle ~= false then
 								task.spawn(Bind.Callback)
 							end
 
@@ -3048,7 +3048,7 @@ function Library:AddWindow(options)
 						function Slider:Toggle(bool, instant)
 							Tab.Flags[Slider.Flag] = bool
 
-							if options.fireontoggle == true then
+							if options.fireontoggle ~= false then
 								task.spawn(Slider.Callback, Slider.Value, bool)
 							end
 
@@ -3069,7 +3069,7 @@ function Library:AddWindow(options)
 								local sliderPercent = math.clamp((Mouse.X - Slider.Frame.Holder.Slider.AbsolutePosition.X) / Slider.Frame.Holder.Slider.AbsoluteSize.X, 0, 1)
 								local sliderValue = math.floor((min + sliderPercent * (max - min)) * 10) / 10
 
-								if options.fireondrag == true then
+								if options.fireondrag ~= false then
 									Slider:Set(sliderValue)
 								else
 									sliderVisual(sliderValue)
@@ -3084,7 +3084,7 @@ function Library:AddWindow(options)
 							connections.move:Disconnect()
 							connections.move = nil
 
-							if options.fireondrag == false then
+							if options.fireondrag ~= true then
 								local sliderPercent = math.clamp((Mouse.X - Slider.Frame.Holder.Slider.AbsolutePosition.X) / Slider.Frame.Holder.Slider.AbsoluteSize.X, 0, 1)
 								local sliderValue = math.floor((min + sliderPercent * (max - min)) * 10) / 10
 
