@@ -2512,6 +2512,7 @@ function Library:AddWindow(options)
 					-- Scripts
 
 					SubSection.List[#SubSection.List + 1] = Label
+					Label.Label = Label.Frame.Holder.Label
 					Label.Frame.Parent = SubSection.Frame.Holder.List
 
 					return Label
@@ -2569,6 +2570,8 @@ function Library:AddWindow(options)
 					-- Scripts
 
 					SubSection.List[#SubSection.List + 1] = DualLabel
+					DualLabel.Label1 = DualLabel.Frame.Holder.Label1
+					DualLabel.Label2 = DualLabel.Frame.Holder.Label2
 					DualLabel.Frame.Parent = SubSection.Frame.Holder.List
 
 					return DualLabel
@@ -2620,6 +2623,7 @@ function Library:AddWindow(options)
 					-- Scripts
 
 					SubSection.List[#SubSection.List + 1] = ClipboardLabel
+					ClipboardLabel.Label = ClipboardLabel.Frame.Holder.Label
 					ClipboardLabel.Frame.Parent = SubSection.Frame.Holder.List
 
 					ClipboardLabel.Frame.InputBegan:Connect(function(input)
