@@ -29,7 +29,7 @@ local CG = game:GetService("CoreGui")
 
 -- Variables
 
-local Utils = loadstring(game:HttpGet("https://raw.githubusercontent.com/RegularVynixu/Utilities/main/Utils.lua"))()
+local Utils = loadstring(game:HttpGet("https://raw.githubusercontent.com/RegularVynixu/Utilities/main/UI.lua"))()
 local Player = Players.LocalPlayer
 local Mouse = Player:GetMouse()
 local Storage = { Connections = {}, Tween = { Cosmetic = {} } }
@@ -301,7 +301,7 @@ function Library:AddWindow(options)
 				Position = UDim2.new(0.5, 0, 0.5, 0),
 				Size = UDim2.new(1, -20, 0, 22),
 				Font = Enum.Font.SourceSans,
-				Text = string.format("%s - <font color='%s'>%s</font>", options.title[1], Utils.Colors.ToFormat(Library.Theme.Accent), options.title[2]),
+				Text = string.format("%s - <font color='%s'>%s</font>", options.title[1], Utils.Color.ToFormat(Library.Theme.Accent), options.title[2]),
 				RichText = true,
 				TextColor3 = Library.Theme.TextColor,
 				TextSize = 22,
@@ -331,13 +331,13 @@ function Library:AddWindow(options)
 
 			Utils.Create("Frame", {
 				Name = "Tabs",
-				BackgroundColor3 = Utils.Colors.Add(Library.Theme.BackgroundColor, Color3.fromRGB(15, 15, 15)),
+				BackgroundColor3 = Utils.Color.Add(Library.Theme.BackgroundColor, Color3.fromRGB(15, 15, 15)),
 				Position = UDim2.new(0, 3, 0, 3),
 				Size = UDim2.new(1, -6, 1, -6),
 
 				Utils.Create("Frame", {
 					Name = "Holder",
-					BackgroundColor3 = Utils.Colors.Add(Library.Theme.BackgroundColor, Color3.fromRGB(5, 5, 5)),
+					BackgroundColor3 = Utils.Color.Add(Library.Theme.BackgroundColor, Color3.fromRGB(5, 5, 5)),
 					Position = UDim2.new(0, 1, 0, 1),
 					Size = UDim2.new(1, -2, 1, -2),
 				}, UDim.new(0, 5)),
@@ -378,7 +378,7 @@ function Library:AddWindow(options)
 
 			Utils.Create("Frame", {
 				Name = "Line",
-				BackgroundColor3 = Utils.Colors.Add(Library.Theme.SidebarColor, Color3.fromRGB(10, 10, 10)),
+				BackgroundColor3 = Utils.Color.Add(Library.Theme.SidebarColor, Color3.fromRGB(10, 10, 10)),
 				BorderSizePixel = 0,
 				Position = UDim2.new(0, 5, 0, 29),
 				Size = UDim2.new(1, -10, 0, 2),
@@ -423,7 +423,7 @@ function Library:AddWindow(options)
 
 	local function setAccent(accent)
 		Library.Theme.Accent = accent
-		Window.Frame.Topbar.Title.Text = string.format("%s - <font color='%s'>%s</font>", options.title[1], Utils.Colors.ToFormat(accent), options.title[2])
+		Window.Frame.Topbar.Title.Text = string.format("%s - <font color='%s'>%s</font>", options.title[1], Utils.Color.ToFormat(accent), options.title[2])
 
 		for _, tab in next, Window.Tabs do
 			for _, section in next, tab.Sections do
@@ -439,13 +439,13 @@ function Library:AddWindow(options)
 
 						for _, v in next, item.Frame:GetDescendants() do
 							if v.Name == "Overlay" then
-								v.BackgroundColor3 = Utils.Colors.Add(accent, Color3.fromRGB(50, 50, 50))
+								v.BackgroundColor3 = Utils.Color.Add(accent, Color3.fromRGB(50, 50, 50))
 							end
 						end
 					end
 
 					if item.Type == "Slider" then
-						item.Frame.Holder.Slider.Bar.Fill.BackgroundColor3 = Utils.Colors.Sub(accent, Color3.fromRGB(50, 50, 50))
+						item.Frame.Holder.Slider.Bar.Fill.BackgroundColor3 = Utils.Color.Sub(accent, Color3.fromRGB(50, 50, 50))
 						item.Frame.Holder.Slider.Point.BackgroundColor3 = accent
 					end
 
@@ -526,7 +526,7 @@ function Library:AddWindow(options)
 			BorderSizePixel = 0,
 			Position = UDim2.new(0, 5, 0, 5),
 			Size = UDim2.new(1, -10, 1, -10),
-			ScrollBarImageColor3 = Utils.Colors.Add(Library.Theme.BackgroundColor, Color3.fromRGB(15, 15, 15)),
+			ScrollBarImageColor3 = Utils.Color.Add(Library.Theme.BackgroundColor, Color3.fromRGB(15, 15, 15)),
 			ScrollBarThickness = 5,
 			Visible = false,
 
@@ -538,14 +538,14 @@ function Library:AddWindow(options)
 
 		Tab.Button.Frame = Utils.Create("Frame", {
 			Name = name,
-			BackgroundColor3 = Utils.Colors.Add(Library.Theme.SidebarColor, Color3.fromRGB(15, 15, 15)),
+			BackgroundColor3 = Utils.Color.Add(Library.Theme.SidebarColor, Color3.fromRGB(15, 15, 15)),
 			BackgroundTransparency = 1,
 			Size = UDim2.new(0, 120, 0, 32),
 
 			Utils.Create("TextButton", {
 				Name = "Button",
 				AutoButtonColor = false,
-				BackgroundColor3 = Utils.Colors.Add(Library.Theme.SidebarColor, Color3.fromRGB(5, 5, 5)),
+				BackgroundColor3 = Utils.Color.Add(Library.Theme.SidebarColor, Color3.fromRGB(5, 5, 5)),
 				BackgroundTransparency = 1,
 				Position = UDim2.new(0, 1, 0, 1),
 				Size = UDim2.new(1, -2, 1, -2),
@@ -566,8 +566,8 @@ function Library:AddWindow(options)
 				v.Frame.Visible = bool
 				v.Button.Selected = bool
 
-				tween(v.Button.Frame.Button, 0.1, { BackgroundColor3 = bool and Utils.Colors.Add(Library.Theme.SidebarColor, Color3.fromRGB(35, 35, 35)) or Utils.Colors.Add(Library.Theme.SidebarColor, Color3.fromRGB(5, 5, 5)) })
-				tween(v.Button.Frame, 0.1, { BackgroundColor3 = bool and Utils.Colors.Add(Library.Theme.SidebarColor, Color3.fromRGB(45, 45, 45)) or Utils.Colors.Add(Library.Theme.SidebarColor, Color3.fromRGB(15, 15, 15)) })
+				tween(v.Button.Frame.Button, 0.1, { BackgroundColor3 = bool and Utils.Color.Add(Library.Theme.SidebarColor, Color3.fromRGB(35, 35, 35)) or Utils.Color.Add(Library.Theme.SidebarColor, Color3.fromRGB(5, 5, 5)) })
+				tween(v.Button.Frame, 0.1, { BackgroundColor3 = bool and Utils.Color.Add(Library.Theme.SidebarColor, Color3.fromRGB(45, 45, 45)) or Utils.Color.Add(Library.Theme.SidebarColor, Color3.fromRGB(15, 15, 15)) })
 			end
 
 			toggleSidebar(false)
@@ -613,15 +613,15 @@ function Library:AddWindow(options)
 
 		Tab.Button.Frame.Button.MouseEnter:Connect(function()
 			if Tab.Button.Selected == false then
-				tween(Tab.Button.Frame.Button, 0.1, { BackgroundColor3 = Utils.Colors.Add(Library.Theme.SidebarColor, Color3.fromRGB(15, 15, 15)) })
-				tween(Tab.Button.Frame, 0.1, { BackgroundColor3 = Utils.Colors.Add(Library.Theme.SidebarColor, Color3.fromRGB(25, 25, 25)) })
+				tween(Tab.Button.Frame.Button, 0.1, { BackgroundColor3 = Utils.Color.Add(Library.Theme.SidebarColor, Color3.fromRGB(15, 15, 15)) })
+				tween(Tab.Button.Frame, 0.1, { BackgroundColor3 = Utils.Color.Add(Library.Theme.SidebarColor, Color3.fromRGB(25, 25, 25)) })
 			end
 		end)
 
 		Tab.Button.Frame.Button.MouseLeave:Connect(function()
 			if Tab.Button.Selected == false then
-				tween(Tab.Button.Frame.Button, 0.1, { BackgroundColor3 = Utils.Colors.Add(Library.Theme.SidebarColor, Color3.fromRGB(5, 5, 5)) })
-				tween(Tab.Button.Frame, 0.1, { BackgroundColor3 = Utils.Colors.Add(Library.Theme.SidebarColor, Color3.fromRGB(15, 15, 15)) })
+				tween(Tab.Button.Frame.Button, 0.1, { BackgroundColor3 = Utils.Color.Add(Library.Theme.SidebarColor, Color3.fromRGB(5, 5, 5)) })
+				tween(Tab.Button.Frame, 0.1, { BackgroundColor3 = Utils.Color.Add(Library.Theme.SidebarColor, Color3.fromRGB(15, 15, 15)) })
 			end
 		end)
 
@@ -653,7 +653,7 @@ function Library:AddWindow(options)
 
 				Utils.Create("Frame", {
 					Name = "Line",
-					BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
+					BackgroundColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
 					BorderSizePixel = 0,
 					Position = UDim2.new(0, 5, 0, 30),
 					Size = UDim2.new(1, -10, 0, 2),
@@ -765,18 +765,18 @@ function Library:AddWindow(options)
 
 				Button.Frame = Utils.Create("Frame", {
 					Name = name,
-					BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
+					BackgroundColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
 					Size = UDim2.new(1, 2, 0, 32),
 
 					Utils.Create("Frame", {
 						Name = "Holder",
-						BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
+						BackgroundColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
 						Size = UDim2.new(1, -2, 1, -2),
 						Position = UDim2.new(0, 1, 0, 1),
 
 						Utils.Create("TextButton", {
 							Name = "Button",
-							BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
+							BackgroundColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
 							Position = UDim2.new(0, 2, 0, 2),
 							Size = UDim2.new(1, -4, 1, -4),
 							AutoButtonColor = false,
@@ -844,12 +844,12 @@ function Library:AddWindow(options)
 
 				Toggle.Frame = Utils.Create("Frame", {
 					Name = name,
-					BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
+					BackgroundColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
 					Size = UDim2.new(1, 2, 0, 32),
 
 					Utils.Create("Frame", {
 						Name = "Holder",
-						BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
+						BackgroundColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
 						Position = UDim2.new(0, 1, 0, 1),
 						Size = UDim2.new(1, -2, 1, -2),
 
@@ -868,13 +868,13 @@ function Library:AddWindow(options)
 
 						Utils.Create("Frame", {
 							Name = "Indicator",
-							BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
+							BackgroundColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
 							Position = UDim2.new(1, -42, 0, 2),
 							Size = UDim2.new(0, 40, 0, 26),
 
 							Utils.Create("ImageLabel", {
 								Name = "Overlay",
-								BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(25, 25, 25)),
+								BackgroundColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(25, 25, 25)),
 								Position = UDim2.new(0, 2, 0, 2),
 								Size = UDim2.new(0, 22, 0, 22),
 								Image = "http://www.roblox.com/asset/?id=7827504335",
@@ -891,7 +891,7 @@ function Library:AddWindow(options)
 					task.spawn(Toggle.Callback, bool)
 
 					tween(Toggle.Frame.Holder.Indicator.Overlay, 0.25, { ImageTransparency = bool and 0 or 1, Position = bool and UDim2.new(1, -24, 0, 2) or UDim2.new(0, 2, 0, 2) })
-					tween(Toggle.Frame.Holder.Indicator.Overlay, "Cosmetic", 0.25, { BackgroundColor3 = bool and Utils.Colors.Add(Library.Theme.Accent, Color3.fromRGB(50, 50, 50)) or Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(25, 25, 25)) })
+					tween(Toggle.Frame.Holder.Indicator.Overlay, "Cosmetic", 0.25, { BackgroundColor3 = bool and Utils.Color.Add(Library.Theme.Accent, Color3.fromRGB(50, 50, 50)) or Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(25, 25, 25)) })
 				end
 
 				-- Scripts
@@ -921,12 +921,12 @@ function Library:AddWindow(options)
 
 				Label.Frame = Utils.Create("Frame", {
 					Name = name,
-					BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
+					BackgroundColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
 					Size = UDim2.new(1, 2, 0, 22),
 
 					Utils.Create("Frame", {
 						Name = "Holder",
-						BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
+						BackgroundColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
 						Position = UDim2.new(0, 1, 0, 1),
 						Size = UDim2.new(1, -2, 1, -2),
 
@@ -964,12 +964,12 @@ function Library:AddWindow(options)
 
 				DualLabel.Frame = Utils.Create("Frame", {
 					Name = options[1].. " ".. options[2],
-					BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
+					BackgroundColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
 					Size = UDim2.new(1, 2, 0, 22),
 
 					Utils.Create("Frame", {
 						Name = "Holder",
-						BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
+						BackgroundColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
 						Position = UDim2.new(0, 1, 0, 1),
 						Size = UDim2.new(1, -2, 1, -2),
 
@@ -1024,12 +1024,12 @@ function Library:AddWindow(options)
 
 				ClipboardLabel.Frame = Utils.Create("Frame", {
 					Name = name,
-					BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
+					BackgroundColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
 					Size = UDim2.new(1, 2, 0, 22),
 
 					Utils.Create("Frame", {
 						Name = "Holder",
-						BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
+						BackgroundColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
 						Position = UDim2.new(0, 1, 0, 1),
 						Size = UDim2.new(1, -2, 1, -2),
 
@@ -1082,12 +1082,12 @@ function Library:AddWindow(options)
 
 				Box.Frame = Utils.Create("Frame", {
 					Name = name,
-					BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
+					BackgroundColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
 					Size = UDim2.new(1, 2, 0, 32),
 
 					Utils.Create("Frame", {
 						Name = "Holder",
-						BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
+						BackgroundColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
 						Position = UDim2.new(0, 1, 0, 1),
 						Size = UDim2.new(1, -2, 1, -2),
 
@@ -1107,7 +1107,7 @@ function Library:AddWindow(options)
 						Utils.Create("Frame", {
 							Name = "TextBox",
 							AnchorPoint = Vector2.new(1, 0),
-							BackgroundColor3 = Utils.Colors.Sub(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
+							BackgroundColor3 = Utils.Color.Sub(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
 							Position = UDim2.new(1, -2, 0, 2),
 							Size = UDim2.new(0, 140, 1, -4),
 							ZIndex = 2,
@@ -1142,7 +1142,7 @@ function Library:AddWindow(options)
 									Size = UDim2.new(0, 14, 0, 14),
 									Font = Enum.Font.SourceSansBold,
 									Text = "T",
-									TextColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(40, 40, 40)),
+									TextColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(40, 40, 40)),
 									TextSize = 18,
 									TextWrapped = true,
 								}),
@@ -1197,12 +1197,12 @@ function Library:AddWindow(options)
 
 				Bind.Frame = Utils.Create("Frame", {
 					Name = name,
-					BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
+					BackgroundColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
 					Size = UDim2.new(1, 2, 0, 32),
 
 					Utils.Create("Frame", {
 						Name = "Holder",
-						BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
+						BackgroundColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
 						Position = UDim2.new(0, 1, 0, 1),
 						Size = UDim2.new(1, -2, 1, -2),
 
@@ -1222,14 +1222,14 @@ function Library:AddWindow(options)
 						Utils.Create("Frame", {
 							Name = "Bind",
 							AnchorPoint = Vector2.new(1, 0),
-							BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(20, 20, 20)),
+							BackgroundColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(20, 20, 20)),
 							Position = UDim2.new(1, options.toggleable == true and -44 or -2, 0, 2),
 							Size = UDim2.new(0, 78, 0, 26),
 							ZIndex = 2,
 
 							Utils.Create("TextLabel", {
 								Name = "Label",
-								BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
+								BackgroundColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
 								Position = UDim2.new(0, 1, 0, 1),
 								Size = UDim2.new(1, -2, 1, -2),
 								Font = Enum.Font.SourceSans,
@@ -1290,7 +1290,7 @@ function Library:AddWindow(options)
 						end
 
 						tween(Bind.Frame.Holder.Indicator.Overlay, 0.25, { ImageTransparency = bool and 0 or 1, Position = bool and UDim2.new(1, -24, 0, 2) or UDim2.new(0, 2, 0, 2) })
-						tween(Bind.Frame.Holder.Indicator.Overlay, "Cosmetic", 0.25, { BackgroundColor3 = bool and Utils.Colors.Add(Library.Theme.Accent, Color3.fromRGB(50, 50, 50)) or Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(25, 25, 25)) })
+						tween(Bind.Frame.Holder.Indicator.Overlay, "Cosmetic", 0.25, { BackgroundColor3 = bool and Utils.Color.Add(Library.Theme.Accent, Color3.fromRGB(50, 50, 50)) or Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(25, 25, 25)) })
 					end
 				end
 
@@ -1323,13 +1323,13 @@ function Library:AddWindow(options)
 					local indicator = Utils.Create("Frame", {
 						Name = "Indicator",
 						AnchorPoint = Vector2.new(1, 0),
-						BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
+						BackgroundColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
 						Position = UDim2.new(1, -2, 0, 2),
 						Size = UDim2.new(0, 40, 0, 26),
 
 						Utils.Create("ImageLabel", {
 							Name = "Overlay",
-							BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(25, 25, 25)),
+							BackgroundColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(25, 25, 25)),
 							Position = UDim2.new(0, 2, 0, 2),
 							Size = UDim2.new(0, 22, 0, 22),
 							Image = "http://www.roblox.com/asset/?id=7827504335",
@@ -1370,12 +1370,12 @@ function Library:AddWindow(options)
 
 				Slider.Frame = Utils.Create("Frame", {
 					Name = name,
-					BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
+					BackgroundColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
 					Size = UDim2.new(1, 2, 0, 41),
 
 					Utils.Create("Frame", {
 						Name = "Holder",
-						BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
+						BackgroundColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
 						Position = UDim2.new(0, 1, 0, 1),
 						Size = UDim2.new(1, -2, 1, -2),
 
@@ -1400,13 +1400,13 @@ function Library:AddWindow(options)
 
 							Utils.Create("Frame", {
 								Name = "Bar",
-								BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
+								BackgroundColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
 								ClipsDescendants = true,
 								Size = UDim2.new(1, 0, 1, 0),
 
 								Utils.Create("Frame", {
 									Name = "Fill",
-									BackgroundColor3 = Utils.Colors.Sub(Library.Theme.Accent, Color3.fromRGB(50, 50, 50)),
+									BackgroundColor3 = Utils.Color.Sub(Library.Theme.Accent, Color3.fromRGB(50, 50, 50)),
 									Size = UDim2.new(0.5, 0, 1, 0),
 								}, UDim.new(0, 5)),
 							}, UDim.new(0, 5)),
@@ -1484,7 +1484,7 @@ function Library:AddWindow(options)
 						end
 
 						tween(Slider.Frame.Holder.Indicator.Overlay, 0.25, { ImageTransparency = bool and 0 or 1, Position = bool and UDim2.new(1, -24, 0, 2) or UDim2.new(0, 2, 0, 2) })
-						tween(Slider.Frame.Holder.Indicator.Overlay, "Cosmetic", 0.25, { BackgroundColor3 = bool and Utils.Colors.Add(Library.Theme.Accent, Color3.fromRGB(50, 50, 50)) or Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(25, 25, 25)) })
+						tween(Slider.Frame.Holder.Indicator.Overlay, "Cosmetic", 0.25, { BackgroundColor3 = bool and Utils.Color.Add(Library.Theme.Accent, Color3.fromRGB(50, 50, 50)) or Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(25, 25, 25)) })
 					end
 				end
 
@@ -1536,13 +1536,13 @@ function Library:AddWindow(options)
 					local indicator = Utils.Create("Frame", {
 						Name = "Indicator",
 						AnchorPoint = Vector2.new(1, 1),
-						BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
+						BackgroundColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
 						Position = UDim2.new(1, -2, 1, -2),
 						Size = UDim2.new(0, 40, 0, 26),
 
 						Utils.Create("ImageLabel", {
 							Name = "Overlay",
-							BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(25, 25, 25)),
+							BackgroundColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(25, 25, 25)),
 							Position = UDim2.new(0, 2, 0, 2),
 							Size = UDim2.new(0, 22, 0, 22),
 							Image = "http://www.roblox.com/asset/?id=7827504335",
@@ -1584,12 +1584,12 @@ function Library:AddWindow(options)
 
 				Dropdown.Frame = Utils.Create("Frame", {
 					Name = "Dropdown",
-					BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
+					BackgroundColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
 					Size = UDim2.new(1, 2, 0, 42),
 
 					Utils.Create("Frame", {
 						Name = "Holder",
-						BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
+						BackgroundColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
 						Position = UDim2.new(0, 1, 0, 1),
 						Size = UDim2.new(1, -2, 1, -2),
 
@@ -1641,7 +1641,7 @@ function Library:AddWindow(options)
 
 							Utils.Create("Frame", {
 								Name = "Line",
-								BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
+								BackgroundColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
 								BorderSizePixel = 0,
 								Position = UDim2.new(0, 5, 0, 30),
 								Size = UDim2.new(1, -10, 0, 2),
@@ -1656,7 +1656,7 @@ function Library:AddWindow(options)
 							Position = UDim2.new(0, 5, 0, 40),
 							Size = UDim2.new(1, -10, 1, -40),
 							CanvasSize = UDim2.new(0, 0, 0, 0),
-							ScrollBarImageColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
+							ScrollBarImageColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
 							ScrollBarThickness = 5,
 
 							Utils.Create("UIListLayout", {
@@ -1690,12 +1690,12 @@ function Library:AddWindow(options)
 
 					Item.Frame = Utils.Create("Frame", {
 						Name = name,
-						BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(20, 20, 20)),
+						BackgroundColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(20, 20, 20)),
 						Size = UDim2.new(1, -10, 0, 22),
 
 						Utils.Create("TextButton", {
 							Name = "Button",
-							BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
+							BackgroundColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
 							Position = UDim2.new(0, 1, 0, 1),
 							Size = UDim2.new(1, -2, 1, -2),
 							Font = Enum.Font.SourceSans,
@@ -1804,13 +1804,13 @@ function Library:AddWindow(options)
 
 				Picker.Frame = Utils.Create("Frame", {
 					Name = "ColorPicker",
-					BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
+					BackgroundColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
 					ClipsDescendants = true,
 					Size = UDim2.new(1, 2, 0, 42),
 
 					Utils.Create("Frame", {
 						Name = "Holder",
-						BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
+						BackgroundColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
 						ClipsDescendants = true,
 						Position = UDim2.new(0, 1, 0, 1),
 						Size = UDim2.new(1, -2, 1, -2),
@@ -1836,7 +1836,7 @@ function Library:AddWindow(options)
 							Utils.Create("Frame", {
 								Name = "Selected",
 								AnchorPoint = Vector2.new(1, 0),
-								BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
+								BackgroundColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
 								Position = UDim2.new(1, -29, 0, 2),
 								Size = UDim2.new(0, 100, 0, 26),
 
@@ -1857,7 +1857,7 @@ function Library:AddWindow(options)
 									Text = "",
 									TextColor3 = Library.Theme.TextColor,
 									TextSize = 16,
-									TextStrokeColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
+									TextStrokeColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
 									TextStrokeTransparency = 0.5,
 								}),
 							}, UDim.new(0, 5)),
@@ -1873,7 +1873,7 @@ function Library:AddWindow(options)
 
 							Utils.Create("Frame", {
 								Name = "Line",
-								BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
+								BackgroundColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
 								BorderSizePixel = 0,
 								Position = UDim2.new(0, 5, 0, 30),
 								Size = UDim2.new(1, -10, 0, 2),
@@ -1898,7 +1898,7 @@ function Library:AddWindow(options)
 								Utils.Create("Frame", {
 									Name = "Point",
 									AnchorPoint = Vector2.new(0.5, 0.5),
-									BackgroundColor3 = Utils.Colors.Sub(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
+									BackgroundColor3 = Utils.Color.Sub(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
 									Position = UDim2.new(1, 0, 0, 0),
 									Size = UDim2.new(0, 7, 0, 7),
 									ZIndex = 2,
@@ -1960,7 +1960,7 @@ function Library:AddWindow(options)
 								Utils.Create("Frame", {
 									Name = "Bar",
 									AnchorPoint = Vector2.new(0.5, 0.5),
-									BackgroundColor3 = Utils.Colors.Sub(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
+									BackgroundColor3 = Utils.Color.Sub(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
 									Position = UDim2.new(0.5, 0, 0, 0),
 									Size = UDim2.new(0, 6, 1, 6),
 
@@ -1986,7 +1986,7 @@ function Library:AddWindow(options)
 
 									Utils.Create("TextBox", {
 										Name = "Box",
-										BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
+										BackgroundColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
 										Size = UDim2.new(1, 0, 1, 0),
 										Font = Enum.Font.SourceSans,
 										PlaceholderText = "R",
@@ -2005,7 +2005,7 @@ function Library:AddWindow(options)
 
 									Utils.Create("TextBox", {
 										Name = "Box",
-										BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
+										BackgroundColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
 										Size = UDim2.new(1, 0, 1, 0),
 										Font = Enum.Font.SourceSans,
 										PlaceholderText = "G",
@@ -2024,7 +2024,7 @@ function Library:AddWindow(options)
 
 									Utils.Create("TextBox", {
 										Name = "Box",
-										BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
+										BackgroundColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
 										Size = UDim2.new(1, 0, 1, 0),
 										Font = Enum.Font.SourceSans,
 										PlaceholderText = "B",
@@ -2059,12 +2059,12 @@ function Library:AddWindow(options)
 
 								Utils.Create("Frame", {
 									Name = "Indicator",
-									BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
+									BackgroundColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
 									Size = UDim2.new(0, 40, 0, 26),
 
 									Utils.Create("ImageLabel", {
 										Name = "Overlay",
-										BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(25, 25, 25)),
+										BackgroundColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(25, 25, 25)),
 										Position = UDim2.new(0, 2, 0, 2),
 										Size = UDim2.new(0, 22, 0, 22),
 										Image = "http://www.roblox.com/asset/?id=7827504335",
@@ -2099,7 +2099,7 @@ function Library:AddWindow(options)
 					Picker.Rainbow = bool
 
 					tween(Picker.Frame.Holder.Holder.Rainbow.Indicator.Overlay, 0.25, {ImageTransparency = bool and 0 or 1, Position = bool and UDim2.new(1, -24, 0, 2) or UDim2.new(0, 2, 0, 2) })
-					tween(Picker.Frame.Holder.Holder.Rainbow.Indicator.Overlay, "Cosmetic", 0.25, { BackgroundColor3 = bool and Utils.Colors.Add(Library.Theme.Accent, Color3.fromRGB(50, 50, 50)) or Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(25, 25, 25)) })
+					tween(Picker.Frame.Holder.Holder.Rainbow.Indicator.Overlay, "Cosmetic", 0.25, { BackgroundColor3 = bool and Utils.Color.Add(Library.Theme.Accent, Color3.fromRGB(50, 50, 50)) or Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(25, 25, 25)) })
 
 					if bool then
 						if not Storage.Connections[Picker] then
@@ -2235,12 +2235,12 @@ function Library:AddWindow(options)
 
 				SubSection.Frame = Utils.Create("Frame", {
 					Name = "SubSection",
-					BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
+					BackgroundColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
 					Size = UDim2.new(1, 2, 0, 42),
 
 					Utils.Create("Frame", {
 						Name = "Holder",
-						BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
+						BackgroundColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
 						Position = UDim2.new(0, 1, 0, 1),
 						Size = UDim2.new(1, -2, 1, -2),
 
@@ -2271,7 +2271,7 @@ function Library:AddWindow(options)
 
 						Utils.Create("Frame", {
 							Name = "Line",
-							BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(20, 20, 20)),
+							BackgroundColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(20, 20, 20)),
 							BorderSizePixel = 0,
 							Position = UDim2.new(0, 5, 0, 30),
 							Size = UDim2.new(1, -10, 0, 2),
@@ -2344,18 +2344,18 @@ function Library:AddWindow(options)
 
 					Button.Frame = Utils.Create("Frame", {
 						Name = name,
-						BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
+						BackgroundColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
 						Size = UDim2.new(1, 2, 0, 32),
 
 						Utils.Create("Frame", {
 							Name = "Holder",
-							BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
+							BackgroundColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
 							Size = UDim2.new(1, -2, 1, -2),
 							Position = UDim2.new(0, 1, 0, 1),
 
 							Utils.Create("TextButton", {
 								Name = "Button",
-								BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
+								BackgroundColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
 								Position = UDim2.new(0, 2, 0, 2),
 								Size = UDim2.new(1, -4, 1, -4),
 								AutoButtonColor = false,
@@ -2423,12 +2423,12 @@ function Library:AddWindow(options)
 
 					Toggle.Frame = Utils.Create("Frame", {
 						Name = name,
-						BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
+						BackgroundColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
 						Size = UDim2.new(1, 2, 0, 32),
 
 						Utils.Create("Frame", {
 							Name = "Holder",
-							BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
+							BackgroundColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
 							Position = UDim2.new(0, 1, 0, 1),
 							Size = UDim2.new(1, -2, 1, -2),
 
@@ -2447,13 +2447,13 @@ function Library:AddWindow(options)
 
 							Utils.Create("Frame", {
 								Name = "Indicator",
-								BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
+								BackgroundColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
 								Position = UDim2.new(1, -42, 0, 2),
 								Size = UDim2.new(0, 40, 0, 26),
 
 								Utils.Create("ImageLabel", {
 									Name = "Overlay",
-									BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(25, 25, 25)),
+									BackgroundColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(25, 25, 25)),
 									Position = UDim2.new(0, 2, 0, 2),
 									Size = UDim2.new(0, 22, 0, 22),
 									Image = "http://www.roblox.com/asset/?id=7827504335",
@@ -2470,7 +2470,7 @@ function Library:AddWindow(options)
 						task.spawn(Toggle.Callback, bool)
 
 						tween(Toggle.Frame.Holder.Indicator.Overlay, 0.25, { ImageTransparency = bool and 0 or 1, Position = bool and UDim2.new(1, -24, 0, 2) or UDim2.new(0, 2, 0, 2) })
-						tween(Toggle.Frame.Holder.Indicator.Overlay, "Cosmetic", 0.25, { BackgroundColor3 = bool and Utils.Colors.Add(Library.Theme.Accent, Color3.fromRGB(50, 50, 50)) or Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(25, 25, 25)) })
+						tween(Toggle.Frame.Holder.Indicator.Overlay, "Cosmetic", 0.25, { BackgroundColor3 = bool and Utils.Color.Add(Library.Theme.Accent, Color3.fromRGB(50, 50, 50)) or Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(25, 25, 25)) })
 					end
 
 					-- Scripts
@@ -2500,12 +2500,12 @@ function Library:AddWindow(options)
 
 					Label.Frame = Utils.Create("Frame", {
 						Name = name,
-						BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
+						BackgroundColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
 						Size = UDim2.new(1, 2, 0, 22),
 
 						Utils.Create("Frame", {
 							Name = "Holder",
-							BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
+							BackgroundColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
 							Position = UDim2.new(0, 1, 0, 1),
 							Size = UDim2.new(1, -2, 1, -2),
 
@@ -2543,12 +2543,12 @@ function Library:AddWindow(options)
 
 					DualLabel.Frame = Utils.Create("Frame", {
 						Name = options[1].. " ".. options[2],
-						BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
+						BackgroundColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
 						Size = UDim2.new(1, 2, 0, 22),
 
 						Utils.Create("Frame", {
 							Name = "Holder",
-							BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
+							BackgroundColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
 							Position = UDim2.new(0, 1, 0, 1),
 							Size = UDim2.new(1, -2, 1, -2),
 
@@ -2603,12 +2603,12 @@ function Library:AddWindow(options)
 
 					ClipboardLabel.Frame = Utils.Create("Frame", {
 						Name = name,
-						BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
+						BackgroundColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
 						Size = UDim2.new(1, 2, 0, 22),
 
 						Utils.Create("Frame", {
 							Name = "Holder",
-							BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
+							BackgroundColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
 							Position = UDim2.new(0, 1, 0, 1),
 							Size = UDim2.new(1, -2, 1, -2),
 
@@ -2661,12 +2661,12 @@ function Library:AddWindow(options)
 
 					Box.Frame = Utils.Create("Frame", {
 						Name = name,
-						BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
+						BackgroundColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
 						Size = UDim2.new(1, 2, 0, 32),
 
 						Utils.Create("Frame", {
 							Name = "Holder",
-							BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
+							BackgroundColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
 							Position = UDim2.new(0, 1, 0, 1),
 							Size = UDim2.new(1, -2, 1, -2),
 
@@ -2686,7 +2686,7 @@ function Library:AddWindow(options)
 							Utils.Create("Frame", {
 								Name = "TextBox",
 								AnchorPoint = Vector2.new(1, 0),
-								BackgroundColor3 = Utils.Colors.Sub(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
+								BackgroundColor3 = Utils.Color.Sub(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
 								Position = UDim2.new(1, -2, 0, 2),
 								Size = UDim2.new(0, 140, 1, -4),
 								ZIndex = 2,
@@ -2721,7 +2721,7 @@ function Library:AddWindow(options)
 										Size = UDim2.new(0, 14, 0, 14),
 										Font = Enum.Font.SourceSansBold,
 										Text = "T",
-										TextColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(40, 40, 40)),
+										TextColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(40, 40, 40)),
 										TextSize = 18,
 										TextWrapped = true,
 									}),
@@ -2776,12 +2776,12 @@ function Library:AddWindow(options)
 
 					Bind.Frame = Utils.Create("Frame", {
 						Name = name,
-						BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
+						BackgroundColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
 						Size = UDim2.new(1, 2, 0, 32),
 
 						Utils.Create("Frame", {
 							Name = "Holder",
-							BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
+							BackgroundColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
 							Position = UDim2.new(0, 1, 0, 1),
 							Size = UDim2.new(1, -2, 1, -2),
 
@@ -2801,14 +2801,14 @@ function Library:AddWindow(options)
 							Utils.Create("Frame", {
 								Name = "Bind",
 								AnchorPoint = Vector2.new(1, 0),
-								BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(20, 20, 20)),
+								BackgroundColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(20, 20, 20)),
 								Position = UDim2.new(1, options.toggleable == true and -44 or -2, 0, 2),
 								Size = UDim2.new(0, 78, 0, 26),
 								ZIndex = 2,
 
 								Utils.Create("TextLabel", {
 									Name = "Label",
-									BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
+									BackgroundColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
 									Position = UDim2.new(0, 1, 0, 1),
 									Size = UDim2.new(1, -2, 1, -2),
 									Font = Enum.Font.SourceSans,
@@ -2869,7 +2869,7 @@ function Library:AddWindow(options)
 							end
 
 							tween(Bind.Frame.Holder.Indicator.Overlay, 0.25, { ImageTransparency = bool and 0 or 1, Position = bool and UDim2.new(1, -24, 0, 2) or UDim2.new(0, 2, 0, 2) })
-							tween(Bind.Frame.Holder.Indicator.Overlay, "Cosmetic", 0.25, { BackgroundColor3 = bool and Utils.Colors.Add(Library.Theme.Accent, Color3.fromRGB(50, 50, 50)) or Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(25, 25, 25)) })
+							tween(Bind.Frame.Holder.Indicator.Overlay, "Cosmetic", 0.25, { BackgroundColor3 = bool and Utils.Color.Add(Library.Theme.Accent, Color3.fromRGB(50, 50, 50)) or Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(25, 25, 25)) })
 						end
 					end
 
@@ -2902,13 +2902,13 @@ function Library:AddWindow(options)
 						local indicator = Utils.Create("Frame", {
 							Name = "Indicator",
 							AnchorPoint = Vector2.new(1, 0),
-							BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
+							BackgroundColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
 							Position = UDim2.new(1, -2, 0, 2),
 							Size = UDim2.new(0, 40, 0, 26),
 
 							Utils.Create("ImageLabel", {
 								Name = "Overlay",
-								BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(25, 25, 25)),
+								BackgroundColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(25, 25, 25)),
 								Position = UDim2.new(0, 2, 0, 2),
 								Size = UDim2.new(0, 22, 0, 22),
 								Image = "http://www.roblox.com/asset/?id=7827504335",
@@ -2949,12 +2949,12 @@ function Library:AddWindow(options)
 
 					Slider.Frame = Utils.Create("Frame", {
 						Name = name,
-						BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
+						BackgroundColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
 						Size = UDim2.new(1, 2, 0, 41),
 
 						Utils.Create("Frame", {
 							Name = "Holder",
-							BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
+							BackgroundColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
 							Position = UDim2.new(0, 1, 0, 1),
 							Size = UDim2.new(1, -2, 1, -2),
 
@@ -2979,13 +2979,13 @@ function Library:AddWindow(options)
 
 								Utils.Create("Frame", {
 									Name = "Bar",
-									BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
+									BackgroundColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
 									ClipsDescendants = true,
 									Size = UDim2.new(1, 0, 1, 0),
 
 									Utils.Create("Frame", {
 										Name = "Fill",
-										BackgroundColor3 = Utils.Colors.Sub(Library.Theme.Accent, Color3.fromRGB(50, 50, 50)),
+										BackgroundColor3 = Utils.Color.Sub(Library.Theme.Accent, Color3.fromRGB(50, 50, 50)),
 										Size = UDim2.new(0.5, 0, 1, 0),
 									}, UDim.new(0, 5)),
 								}, UDim.new(0, 5)),
@@ -3063,7 +3063,7 @@ function Library:AddWindow(options)
 							end
 
 							tween(Slider.Frame.Holder.Indicator.Overlay, 0.25, { ImageTransparency = bool and 0 or 1, Position = bool and UDim2.new(1, -24, 0, 2) or UDim2.new(0, 2, 0, 2) })
-							tween(Slider.Frame.Holder.Indicator.Overlay, "Cosmetic", 0.25, { BackgroundColor3 = bool and Utils.Colors.Add(Library.Theme.Accent, Color3.fromRGB(50, 50, 50)) or Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(25, 25, 25)) })
+							tween(Slider.Frame.Holder.Indicator.Overlay, "Cosmetic", 0.25, { BackgroundColor3 = bool and Utils.Color.Add(Library.Theme.Accent, Color3.fromRGB(50, 50, 50)) or Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(25, 25, 25)) })
 						end
 					end
 
@@ -3115,13 +3115,13 @@ function Library:AddWindow(options)
 						local indicator = Utils.Create("Frame", {
 							Name = "Indicator",
 							AnchorPoint = Vector2.new(1, 1),
-							BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
+							BackgroundColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
 							Position = UDim2.new(1, -2, 1, -2),
 							Size = UDim2.new(0, 40, 0, 26),
 
 							Utils.Create("ImageLabel", {
 								Name = "Overlay",
-								BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(25, 25, 25)),
+								BackgroundColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(25, 25, 25)),
 								Position = UDim2.new(0, 2, 0, 2),
 								Size = UDim2.new(0, 22, 0, 22),
 								Image = "http://www.roblox.com/asset/?id=7827504335",
@@ -3163,12 +3163,12 @@ function Library:AddWindow(options)
 
 					Dropdown.Frame = Utils.Create("Frame", {
 						Name = "Dropdown",
-						BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
+						BackgroundColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
 						Size = UDim2.new(1, 2, 0, 42),
 
 						Utils.Create("Frame", {
 							Name = "Holder",
-							BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
+							BackgroundColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
 							Position = UDim2.new(0, 1, 0, 1),
 							Size = UDim2.new(1, -2, 1, -2),
 
@@ -3220,7 +3220,7 @@ function Library:AddWindow(options)
 
 								Utils.Create("Frame", {
 									Name = "Line",
-									BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
+									BackgroundColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
 									BorderSizePixel = 0,
 									Position = UDim2.new(0, 5, 0, 30),
 									Size = UDim2.new(1, -10, 0, 2),
@@ -3235,7 +3235,7 @@ function Library:AddWindow(options)
 								Position = UDim2.new(0, 5, 0, 40),
 								Size = UDim2.new(1, -10, 1, -40),
 								CanvasSize = UDim2.new(0, 0, 0, 0),
-								ScrollBarImageColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
+								ScrollBarImageColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
 								ScrollBarThickness = 5,
 
 								Utils.Create("UIListLayout", {
@@ -3269,12 +3269,12 @@ function Library:AddWindow(options)
 
 						Item.Frame = Utils.Create("Frame", {
 							Name = name,
-							BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(20, 20, 20)),
+							BackgroundColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(20, 20, 20)),
 							Size = UDim2.new(1, -10, 0, 22),
 
 							Utils.Create("TextButton", {
 								Name = "Button",
-								BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
+								BackgroundColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
 								Position = UDim2.new(0, 1, 0, 1),
 								Size = UDim2.new(1, -2, 1, -2),
 								Font = Enum.Font.SourceSans,
@@ -3384,13 +3384,13 @@ function Library:AddWindow(options)
 
 					Picker.Frame = Utils.Create("Frame", {
 						Name = "ColorPicker",
-						BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
+						BackgroundColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
 						ClipsDescendants = true,
 						Size = UDim2.new(1, 2, 0, 42),
 
 						Utils.Create("Frame", {
 							Name = "Holder",
-							BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
+							BackgroundColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
 							ClipsDescendants = true,
 							Position = UDim2.new(0, 1, 0, 1),
 							Size = UDim2.new(1, -2, 1, -2),
@@ -3416,7 +3416,7 @@ function Library:AddWindow(options)
 								Utils.Create("Frame", {
 									Name = "Selected",
 									AnchorPoint = Vector2.new(1, 0),
-									BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
+									BackgroundColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
 									Position = UDim2.new(1, -29, 0, 2),
 									Size = UDim2.new(0, 100, 0, 26),
 
@@ -3437,7 +3437,7 @@ function Library:AddWindow(options)
 										Text = "",
 										TextColor3 = Library.Theme.TextColor,
 										TextSize = 16,
-										TextStrokeColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
+										TextStrokeColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
 										TextStrokeTransparency = 0.5,
 									}),
 								}, UDim.new(0, 5)),
@@ -3453,7 +3453,7 @@ function Library:AddWindow(options)
 
 								Utils.Create("Frame", {
 									Name = "Line",
-									BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
+									BackgroundColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
 									BorderSizePixel = 0,
 									Position = UDim2.new(0, 5, 0, 30),
 									Size = UDim2.new(1, -10, 0, 2),
@@ -3478,7 +3478,7 @@ function Library:AddWindow(options)
 									Utils.Create("Frame", {
 										Name = "Point",
 										AnchorPoint = Vector2.new(0.5, 0.5),
-										BackgroundColor3 = Utils.Colors.Sub(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
+										BackgroundColor3 = Utils.Color.Sub(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
 										Position = UDim2.new(1, 0, 0, 0),
 										Size = UDim2.new(0, 7, 0, 7),
 										ZIndex = 2,
@@ -3540,7 +3540,7 @@ function Library:AddWindow(options)
 									Utils.Create("Frame", {
 										Name = "Bar",
 										AnchorPoint = Vector2.new(0.5, 0.5),
-										BackgroundColor3 = Utils.Colors.Sub(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
+										BackgroundColor3 = Utils.Color.Sub(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
 										Position = UDim2.new(0.5, 0, 0, 0),
 										Size = UDim2.new(0, 6, 1, 6),
 
@@ -3566,7 +3566,7 @@ function Library:AddWindow(options)
 
 										Utils.Create("TextBox", {
 											Name = "Box",
-											BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
+											BackgroundColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
 											Size = UDim2.new(1, 0, 1, 0),
 											Font = Enum.Font.SourceSans,
 											PlaceholderText = "R",
@@ -3585,7 +3585,7 @@ function Library:AddWindow(options)
 
 										Utils.Create("TextBox", {
 											Name = "Box",
-											BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
+											BackgroundColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
 											Size = UDim2.new(1, 0, 1, 0),
 											Font = Enum.Font.SourceSans,
 											PlaceholderText = "G",
@@ -3604,7 +3604,7 @@ function Library:AddWindow(options)
 
 										Utils.Create("TextBox", {
 											Name = "Box",
-											BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
+											BackgroundColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
 											Size = UDim2.new(1, 0, 1, 0),
 											Font = Enum.Font.SourceSans,
 											PlaceholderText = "B",
@@ -3639,12 +3639,12 @@ function Library:AddWindow(options)
 
 									Utils.Create("Frame", {
 										Name = "Indicator",
-										BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
+										BackgroundColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
 										Size = UDim2.new(0, 40, 0, 26),
 
 										Utils.Create("ImageLabel", {
 											Name = "Overlay",
-											BackgroundColor3 = Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(25, 25, 25)),
+											BackgroundColor3 = Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(25, 25, 25)),
 											Position = UDim2.new(0, 2, 0, 2),
 											Size = UDim2.new(0, 22, 0, 22),
 											Image = "http://www.roblox.com/asset/?id=7827504335",
@@ -3681,7 +3681,7 @@ function Library:AddWindow(options)
 						Picker.Rainbow = bool
 
 						tween(Picker.Frame.Holder.Holder.Rainbow.Indicator.Overlay, 0.25, {ImageTransparency = bool and 0 or 1, Position = bool and UDim2.new(1, -24, 0, 2) or UDim2.new(0, 2, 0, 2) })
-						tween(Picker.Frame.Holder.Holder.Rainbow.Indicator.Overlay, "Cosmetic", 0.25, { BackgroundColor3 = bool and Utils.Colors.Add(Library.Theme.Accent, Color3.fromRGB(50, 50, 50)) or Utils.Colors.Add(Library.Theme.SectionColor, Color3.fromRGB(25, 25, 25)) })
+						tween(Picker.Frame.Holder.Holder.Rainbow.Indicator.Overlay, "Cosmetic", 0.25, { BackgroundColor3 = bool and Utils.Color.Add(Library.Theme.Accent, Color3.fromRGB(50, 50, 50)) or Utils.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(25, 25, 25)) })
 
 						if bool then
 							if not Storage.Connections[Picker] then
