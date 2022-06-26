@@ -2741,6 +2741,7 @@ function Library:AddWindow(options)
 					-- Scripts
 
 					SubSection.List[#SubSection.List + 1] = Box
+					Box.Box = Box.Frame.Holder.TextBox.Holder.Box
 					Box.Frame.Parent = SubSection.Frame.Holder.List
 
 					Box.Frame.Holder.TextBox.Holder.MouseEnter:Connect(function()
