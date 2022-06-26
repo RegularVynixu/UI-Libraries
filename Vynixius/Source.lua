@@ -1728,21 +1728,25 @@ function Library:AddWindow(options)
 				end
 
 				function Dropdown:Remove(name)
-					for i, v in next, Dropdown.List do
-						if v == name then
-							Dropdown.Frame.Holder.List[name]:Destroy()
-							table.remove(Dropdown.List, i)
+					local listIndex = table.find(Dropdown.List, name)
 
-							if Dropdown.Toggled == true then
-								Dropdown:UpdateHeight()
-							end
+					if listIndex ~= nil then
+						Dropdown.Frame.Holder.List[name]:Destroy()
+						table.remove(Dropdown.List, listIndex)
 
-							break
+						if Dropdown.Toggled == true then
+							Dropdown:UpdateHeight()
+						end
+						
+						if #Dropdown.List == 0 then
+							Dropdown:Toggle(false)
 						end
 					end
+				end
 
-					if #Dropdown.List == 0 then
-						Dropdown:Toggle(false)
+				function Dropdown:ClearList()
+					for i, v in next, Dropdown.List do
+						Dropdown:Remove(v)
 					end
 				end
 
@@ -3310,21 +3314,25 @@ function Library:AddWindow(options)
 					end
 
 					function Dropdown:Remove(name)
-						for i, v in next, Dropdown.List do
-							if v == name then
-								Dropdown.Frame.Holder.List:Destroy()
-								table.remove(Dropdown.List, i)
-
-								if Dropdown.Toggled == true then
-									Dropdown:UpdateHeight()
-								end
-
-								break
+						local listIndex = table.find(Dropdown.List, name)
+	
+						if listIndex ~= nil then
+							Dropdown.Frame.Holder.List[name]:Destroy()
+							table.remove(Dropdown.List, listIndex)
+	
+							if Dropdown.Toggled == true then
+								Dropdown:UpdateHeight()
+							end
+							
+							if #Dropdown.List == 0 then
+								Dropdown:Toggle(false)
 							end
 						end
-
-						if #Dropdown.List == 0 then
-							Dropdown:Toggle(false)
+					end
+	
+					function Dropdown:ClearList()
+						for i, v in next, Dropdown.List do
+							Dropdown:Remove(v)
 						end
 					end
 
