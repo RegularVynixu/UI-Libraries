@@ -1160,6 +1160,7 @@ function Library:AddWindow(options)
 				-- Scripts
 
 				Section.List[#Section.List + 1] = Box
+				Box.Box = Box.Frame.Holder.TextBox.Holder.Box
 				Box.Frame.Parent = Section.Frame.List
 
 				Box.Frame.Holder.TextBox.Holder.MouseEnter:Connect(function()
