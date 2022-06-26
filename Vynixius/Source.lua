@@ -1730,7 +1730,7 @@ function Library:AddWindow(options)
 				function Dropdown:Remove(name)
 					for i, v in next, Dropdown.List do
 						if v == name then
-							v.Frame:Destroy()
+							Dropdown.Frame.Holder.List[name]:Destroy()
 							table.remove(Dropdown.List, i)
 
 							if Dropdown.Toggled == true then
@@ -3312,7 +3312,7 @@ function Library:AddWindow(options)
 					function Dropdown:Remove(name)
 						for i, v in next, Dropdown.List do
 							if v == name then
-								v.Frame:Destroy()
+								Dropdown.Frame.Holder.List:Destroy()
 								table.remove(Dropdown.List, i)
 
 								if Dropdown.Toggled == true then
