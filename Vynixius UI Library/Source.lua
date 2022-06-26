@@ -33,7 +33,7 @@ local UIS = game:GetService("UserInputService")
 local Player = Players.LocalPlayer
 local Mouse = Player:GetMouse()
 
-local Utils = loadstring(game:HttpGet("https://raw.githubusercontent.com/RegularVynixu/Utilities/main/Utils.lua"))()
+local Utils = loadstring(game:HttpGet("https://raw.githubusercontent.com/RegularVynixu/Utilities/main/UI.lua"))()
 
 -- Library
 
