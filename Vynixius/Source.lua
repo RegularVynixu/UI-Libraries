@@ -1708,7 +1708,7 @@ function Library:AddWindow(options)
 
 					-- Scripts
 
-					Dropdown.List[#Dropdown.List + 1] = Item
+					Dropdown.List[#Dropdown.List + 1] = name
 					Item.Frame.Parent = Dropdown.Frame.Holder.List
 
 					if Dropdown.Toggled == true then
@@ -1722,11 +1722,13 @@ function Library:AddWindow(options)
 							Dropdown:Select(Item.Name)
 						end
 					end)
+
+					return Item
 				end
 
 				function Dropdown:Remove(name)
 					for i, v in next, Dropdown.List do
-						if v.Name == name then
+						if v == name then
 							v.Frame:Destroy()
 							table.remove(Dropdown.List, i)
 
@@ -3287,7 +3289,7 @@ function Library:AddWindow(options)
 
 						-- Scripts
 
-						Dropdown.List[#Dropdown.List + 1] = Item
+						Dropdown.List[#Dropdown.List + 1] = name
 						Item.Frame.Parent = Dropdown.Frame.Holder.List
 
 						if Dropdown.Toggled == true then
@@ -3301,11 +3303,13 @@ function Library:AddWindow(options)
 								Dropdown:Select(Item.Name)
 							end
 						end)
+
+						return Item
 					end
 
 					function Dropdown:Remove(name)
 						for i, v in next, Dropdown.List do
-							if v.Name == name then
+							if v == name then
 								v.Frame:Destroy()
 								table.remove(Dropdown.List, i)
 
