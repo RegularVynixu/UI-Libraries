@@ -254,6 +254,8 @@ function Library:Notify(options, callback)
 end
 
 function Library:AddWindow(options)
+	assert(options, "No options data assigned to Window")
+
 	local Window = {
 		Name = options.title[1].. " ".. options.title[2],
 		Type = "Window",
@@ -508,6 +510,8 @@ function Library:AddWindow(options)
 	-- Tab
 
 	function Window:AddTab(name, options)
+		options = options or {}
+		
 		local Tab = {
 			Name = name,
 			Type = "Tab",
@@ -638,6 +642,8 @@ function Library:AddWindow(options)
 		-- Section
 
 		function Tab:AddSection(name, options)
+			options = options or {}
+			
 			local Section = {
 				Name = name,
 				Type = "Section",
@@ -957,6 +963,8 @@ function Library:AddWindow(options)
 			-- DualLabel
 
 			function Section:AddDualLabel(options)
+				options = options or {}
+				
 				local DualLabel = {
 					Name = options[1].. " ".. options[2],
 					Type = "DualLabel",
@@ -1467,13 +1475,14 @@ function Library:AddWindow(options)
 
 				function Slider:Set(val)
 					val = getSliderValue(val)
-
 					Slider.Value = val
 					sliderVisual(val)
 
-					if options.toggleable == false or options.toggleable == true and Tab.Flags[Slider.Flag] ~= false then
-						task.spawn(Slider.Callback, val, options.toggleable and Tab.Flags[Slider.Flag] or nil)
+					if options.toggleable == true and Tab.Flags[Slider.Flag] == false then
+						return
 					end
+
+					task.spawn(Slider.Callback, val, Tab.Flags[Slider.Flag] or nil)
 				end
 
 				if options.toggleable == true then
@@ -2233,6 +2242,8 @@ function Library:AddWindow(options)
 			-- SubSection
 
 			function Section:AddSubSection(name, options)
+				options = options or {}
+				
 				local SubSection = {
 					Name = name,
 					Type = "SubSection",
@@ -2424,7 +2435,7 @@ function Library:AddWindow(options)
 					local Toggle = {
 						Name = name,
 						Type = "Toggle",
-						Flag = options.flag or name,
+						Flag = options and options.flag or name,
 						Callback = callback,
 					}
 
@@ -2543,6 +2554,8 @@ function Library:AddWindow(options)
 				-- DualLabel
 
 				function SubSection:AddDualLabel(options)
+					options = options or {}
+					
 					local DualLabel = {
 						Name = options[1].. " ".. options[2],
 						Type = "DualLabel",
@@ -3053,13 +3066,14 @@ function Library:AddWindow(options)
 
 					function Slider:Set(val)
 						val = getSliderValue(val)
-
 						Slider.Value = val
 						sliderVisual(val)
 
-						if options.toggleable == false or options.toggleable == true and Tab.Flags[Slider.Flag] ~= false then
-							task.spawn(Slider.Callback, val, options.toggleable and Tab.Flags[Slider.Flag] or nil)
+						if options.toggleable == true and Tab.Flags[Slider.Flag] == false then
+							return
 						end
+	
+						task.spawn(Slider.Callback, val, Tab.Flags[Slider.Flag] or nil)
 					end
 
 					if options.toggleable == true then
