@@ -245,7 +245,7 @@ function Library:Notify(options, callback)
 	end)
 
 	task.spawn(function()
-		task.wait(10)
+		task.wait(options.duration or 10)
 
 		if Notification.Selection == nil then
 			Notification:Select(false)
