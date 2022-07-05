@@ -166,21 +166,23 @@ function Library:Notify(options, callback)
 	if options.color ~= nil then
 		local indicator = Utils.Create("Frame", {
 			Name = "Indicator",
-			BackgroundColor3 = Color3.fromRGB(25, 230, 25),
+			BackgroundColor3 = options.color,
 			Size = UDim2.new(0, 4, 1, 0),
 
 			Utils.Create("Frame", {
-				BackgroundColor3 = Color3.fromRGB(25, 230, 25),
+				Name = "Filling",
+				BackgroundColor3 = options.color,
 				BorderSizePixel = 0,
 				Position = UDim2.new(0.5, 0, 0, 0),
 				Size = UDim2.new(0.5, 0, 1, 0),
-			}, UDim.new(0, 5)),
-		})
+			}),
+		}, UDim.new(0, 3))
 
 		Notification.Frame.Topbar.Title.Position = UDim2.new(0, 11, 0.5, -8)
 		Notification.Frame.Topbar.Title.Size = UDim2.new(1, -60, 0, 16)
 		Notification.Frame.Background.Description.Position = UDim2.new(0, 11, 0, 7)
 		Notification.Frame.Background.Description.Size = UDim2.new(1, -18, 1, -14)
+		indicator.Parent = Notification.Frame
 	end
 
 	-- Functions
