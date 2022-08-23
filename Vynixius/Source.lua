@@ -15,7 +15,6 @@ local Library = {
 		Queue = {},
 		IsBusy = false,
 	},
-	Key = Enum.KeyCode.RightControl,
 }
 
 -- Services
@@ -34,6 +33,8 @@ local Mouse = Player:GetMouse()
 
 local UI = loadstring(game:HttpGet("https://raw.githubusercontent.com/RegularVynixu/Utilities/main/UI.lua"))()
 local Storage = { Connections = {}, Tween = { Cosmetic = {} } }
+
+local ListenForInput = false
 
 local ScreenGui = UI.Create("ScreenGui", {
 	Name = "Vynixius UI Library",
@@ -192,15 +193,15 @@ function Library:Notify(options, callback)
 	end
 
 	function Notification:Select(bool)
-		task.spawn(Notification.Callback, bool)
-
 		tween(Notification.Frame.Topbar[bool and "Yes" or "No"], 0.1, { ImageColor3 = bool and Color3.fromRGB(75, 255, 75) or Color3.fromRGB(255, 75, 75) })
 		tween(Notification.Frame, 1, { Position = UDim2.new(0, -320, 0, Notification.Frame.AbsolutePosition.Y) })
 
-		local notifIndex = table.find(Library.Notif.Active, Notification)
-		if notifIndex then
-			table.remove(Library.Notif.Active, notifIndex)
+		local notifIdx = table.find(Library.Notif.Active, Notification)
+		if notifIdx then
+			table.remove(Library.Notif.Active, notifIdx)
 		end
+		
+		pcall(Notification.Callback, bool)
 	end
 
 	-- Scripts
@@ -263,6 +264,7 @@ function Library:AddWindow(options)
 		Type = "Window",
 		Tabs = {},
 		Sidebar = { List = {}, Toggled = false },
+		Key = options.key or Enum.KeyCode.RightControl,
 		Toggled = options.default ~= false,
 	}
 
@@ -425,6 +427,10 @@ function Library:AddWindow(options)
 		self.Frame.Visible = bool
 	end
 
+	function Window:SetKey(keycode)
+		self.Key = keycode
+	end
+
 	local function setAccent(accent)
 		Library.Theme.Accent = accent
 		Window.Frame.Topbar.Title.Text = string.format("%s - <font color='%s'>%s</font>", options.title[1], UI.Color.ToFormat(accent), options.title[2])
@@ -459,6 +465,8 @@ function Library:AddWindow(options)
 	end
 
 	function Window:SetAccent(accent)
+		assert(typeof(accent) == "Color3")
+
 		if Storage.Connections.WindowRainbow ~= nil then
 			Storage.Connections.WindowRainbow:Disconnect()
 		end
@@ -491,14 +499,14 @@ function Library:AddWindow(options)
 
 	-- Scripts
 
-	Library.Key = options.key or Library.Key
+	Window.Key = options.key or Window.Key
 	Storage.Connections[Window] = {}
 	UI.MakeDraggable(Window.Frame, Window.Frame.Topbar, 0.1)
 	Window.Sidebar.Frame = Window.Frame.Sidebar
 	Window.Frame.Parent = ScreenGui
 
 	UIS.InputBegan:Connect(function(input, gameProcessed)
-		if gameProcessed == false and input.KeyCode == Library.Key then
+		if not gameProcessed and input.KeyCode == Window.Key and not ListenForInput then
 			Window:Toggle(not Window.Toggled)
 		end
 	end)
@@ -830,7 +838,7 @@ function Library:AddWindow(options)
 					Button.Frame.Holder.Button.TextSize = 14
 					buttonVisual()
 
-					task.spawn(Button.Callback)
+					pcall(Button.Callback)
 				end)
 
 				Button.Frame.Holder.Button.MouseLeave:Connect(function()
@@ -896,10 +904,11 @@ function Library:AddWindow(options)
 
 				function Toggle:Set(bool, instant)
 					Tab.Flags[Toggle.Flag] = bool
-					task.spawn(Toggle.Callback, bool)
 
 					tween(Toggle.Frame.Holder.Indicator.Overlay, instant and 0 or 0.25, { ImageTransparency = bool and 0 or 1, Position = bool and UDim2.new(1, -24, 0, 2) or UDim2.new(0, 2, 0, 2) })
 					tween(Toggle.Frame.Holder.Indicator.Overlay, "Cosmetic", instant and 0 or 0.25, { BackgroundColor3 = bool and UI.Color.Add(Library.Theme.Accent, Color3.fromRGB(50, 50, 50)) or UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(25, 25, 25)) })
+				
+					pcall(Toggle.Callback, bool)
 				end
 
 				-- Scripts
@@ -1074,7 +1083,11 @@ function Library:AddWindow(options)
 
 				ClipboardLabel.Frame.InputBegan:Connect(function(input)
 					if input.UserInputType == Enum.UserInputType.MouseButton1 then
-						setclipboard(ClipboardLabel.Callback())
+						local s, result = pcall(ClipboardLabel.Callback)
+
+						if s then
+							setclipboard(result)
+						end
 					end
 				end)
 
@@ -1189,7 +1202,7 @@ function Library:AddWindow(options)
 					end
 
 					extendBox(false)
-					task.spawn(Box.Callback, Box.Frame.Holder.TextBox.Holder.Box.Text)
+					pcall(Box.Callback, Box.Frame.Holder.TextBox.Holder.Box.Text)
 				end)
 
 				return Box
@@ -1259,15 +1272,16 @@ function Library:AddWindow(options)
 
 				-- Functions
 
-				local function listenForBind()
+				local function listenForInput()
 					if connections.listen then
 						connections.listen:Disconnect()
 					end
 
 					Bind.Frame.Holder.Bind.Label.Text = "..."
+					ListenForInput = true
 
 					connections.listen = UIS.InputBegan:Connect(function(input, gameProcessed)
-						if gameProcessed == false and input.UserInputType == Enum.UserInputType.Keyboard then
+						if not gameProcessed and input.UserInputType == Enum.UserInputType.Keyboard then
 							Bind:Set(input.KeyCode)
 						end
 					end)
@@ -1275,33 +1289,33 @@ function Library:AddWindow(options)
 
 				local function cancelListen()
 					if connections.listen then
-						connections.listen:Disconnect()
-						connections.listen = nil
+						connections.listen:Disconnect(); connections.listen = nil
 					end
 
 					Bind.Frame.Holder.Bind.Label.Text = Bind.Bind.Name
+					task.spawn(function() RS.RenderStepped:Wait(); ListenForInput = false end)
 				end
 
 				function Bind:Set(bind)
-					if connections.listen then
-						cancelListen()
-					end
-
 					Bind.Bind = bind
 					Bind.Frame.Holder.Bind.Label.Text = bind.Name
 					Bind.Frame.Holder.Bind.Size = UDim2.new(0, math.max(12 + math.round(TXS:GetTextSize(bind.Name, 14, Enum.Font.SourceSans, Vector2.new(9e9)).X + 0.5), 42), 0, 26)
+					
+					if connections.listen then
+						cancelListen()
+					end
 				end
 
 				if options.toggleable == true then
 					function Bind:Toggle(bool, instant)
 						Tab.Flags[Bind.Flag] = bool
 
-						if options.fireontoggle ~= false then
-							task.spawn(Bind.Callback)
-						end
-
 						tween(Bind.Frame.Holder.Indicator.Overlay, instant and 0 or 0.25, { ImageTransparency = bool and 0 or 1, Position = bool and UDim2.new(1, -24, 0, 2) or UDim2.new(0, 2, 0, 2) })
 						tween(Bind.Frame.Holder.Indicator.Overlay, "Cosmetic", instant and 0 or 0.25, { BackgroundColor3 = bool and UI.Color.Add(Library.Theme.Accent, Color3.fromRGB(50, 50, 50)) or UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(25, 25, 25)) })
+
+						if options.fireontoggle ~= false then
+							pcall(Bind.Callback)
+						end
 					end
 				end
 
@@ -1315,18 +1329,18 @@ function Library:AddWindow(options)
 						if indicatorEntered == true then
 							Bind:Toggle(not Tab.Flags[Bind.Flag], false)
 						else
-							listenForBind()
+							listenForInput()
 						end
 					end
 				end)
 
 				UIS.InputBegan:Connect(function(input)
 					if input.KeyCode == Bind.Bind then
-						if options.toggleable == true and Tab.Flags[Bind.Flag] == false then
+						if (options.toggleable == true and Tab.Flags[Bind.Flag] == false) or ListenForInput then
 							return
 						end
 
-						task.spawn(Bind.Callback)
+						pcall(Bind.Callback)
 					end
 				end)
 
@@ -1484,19 +1498,19 @@ function Library:AddWindow(options)
 						return
 					end
 
-					task.spawn(Slider.Callback, val, Tab.Flags[Slider.Flag] or nil)
+					pcall(Slider.Callback, val, Tab.Flags[Slider.Flag] or nil)
 				end
 
 				if options.toggleable == true then
 					function Slider:Toggle(bool, instant)
 						Tab.Flags[Slider.Flag] = bool
 
-						if options.fireontoggle ~= false then
-							task.spawn(Slider.Callback, Slider.Value, bool)
-						end
-
 						tween(Slider.Frame.Holder.Indicator.Overlay, instant and 0 or 0.25, { ImageTransparency = bool and 0 or 1, Position = bool and UDim2.new(1, -24, 0, 2) or UDim2.new(0, 2, 0, 2) })
 						tween(Slider.Frame.Holder.Indicator.Overlay, "Cosmetic", instant and 0 or 0.25, { BackgroundColor3 = bool and UI.Color.Add(Library.Theme.Accent, Color3.fromRGB(50, 50, 50)) or UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(25, 25, 25)) })
+
+						if options.fireontoggle ~= false then
+							pcall(Slider.Callback, Slider.Value, bool)
+						end
 					end
 				end
 
@@ -1729,7 +1743,7 @@ function Library:AddWindow(options)
 
 					Item.Frame.Button.Activated:Connect(function()
 						if typeof(Item.Callback) == "function" then
-							task.spawn(Item.Callback)
+							pcall(Item.Callback)
 						else
 							Dropdown:Select(Item.Name)
 						end
@@ -1766,7 +1780,7 @@ function Library:AddWindow(options)
 					Dropdown.Frame.Holder.Holder.Displays.Selected.Text = itemName
 					Dropdown:Toggle(false)
 
-					task.spawn(Dropdown.Callback, itemName)
+					pcall(Dropdown.Callback, itemName)
 				end
 
 				function Dropdown:Toggle(bool)
@@ -2150,7 +2164,7 @@ function Library:AddWindow(options)
 					tween(Picker.Frame.Holder.Holder.HueSlider.Bar, 0.1, { Position = UDim2.new(h, 0, 0.5, 0) })
 					tween(Picker.Frame.Holder.Holder.Palette.Point, 0.1, { Position = UDim2.new(s, 0, 1 - v, 0) })
 
-					task.spawn(Picker.Callback, color)
+					pcall(Picker.Callback, color)
 				end
 
 				-- Scripts
@@ -2421,7 +2435,7 @@ function Library:AddWindow(options)
 						Button.Frame.Holder.Button.TextSize = 14
 						buttonVisual()
 
-						task.spawn(Button.Callback)
+						pcall(Button.Callback)
 					end)
 
 					Button.Frame.Holder.Button.MouseLeave:Connect(function()
@@ -2487,10 +2501,11 @@ function Library:AddWindow(options)
 
 					function Toggle:Set(bool, instant)
 						Tab.Flags[Toggle.Flag] = bool
-						task.spawn(Toggle.Callback, bool)
 
 						tween(Toggle.Frame.Holder.Indicator.Overlay, instant and 0 or 0.25, { ImageTransparency = bool and 0 or 1, Position = bool and UDim2.new(1, -24, 0, 2) or UDim2.new(0, 2, 0, 2) })
 						tween(Toggle.Frame.Holder.Indicator.Overlay, "Cosmetic", instant and 0 or 0.25, { BackgroundColor3 = bool and UI.Color.Add(Library.Theme.Accent, Color3.fromRGB(50, 50, 50)) or UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(25, 25, 25)) })
+					
+						pcall(Toggle.Callback, bool)
 					end
 
 					-- Scripts
@@ -2780,7 +2795,7 @@ function Library:AddWindow(options)
 						end
 
 						extendBox(false)
-						task.spawn(Box.Callback, Box.Frame.Holder.TextBox.Holder.Box.Text)
+						pcall(Box.Callback, Box.Frame.Holder.TextBox.Holder.Box.Text)
 					end)
 
 					return Box
@@ -2850,15 +2865,16 @@ function Library:AddWindow(options)
 
 					-- Functions
 
-					local function listenForBind()
+					local function listenForInput()
 						if connections.listen then
 							connections.listen:Disconnect()
 						end
 
 						Bind.Frame.Holder.Bind.Label.Text = "..."
+						ListenForInput = true
 
 						connections.listen = UIS.InputBegan:Connect(function(input, gameProcessed)
-							if gameProcessed == false and input.UserInputType == Enum.UserInputType.Keyboard then
+							if not gameProcessed and input.UserInputType == Enum.UserInputType.Keyboard then
 								Bind:Set(input.KeyCode)
 							end
 						end)
@@ -2866,33 +2882,33 @@ function Library:AddWindow(options)
 
 					local function cancelListen()
 						if connections.listen then
-							connections.listen:Disconnect()
-							connections.listen = nil
+							connections.listen:Disconnect(); connections.listen = nil
 						end
 
 						Bind.Frame.Holder.Bind.Label.Text = Bind.Bind.Name
+						task.spawn(function() RS.RenderStepped:Wait(); ListenForInput = false end)
 					end
 
 					function Bind:Set(bind)
-						if connections.listen then
-							cancelListen()
-						end
-
 						Bind.Bind = bind
 						Bind.Frame.Holder.Bind.Label.Text = bind.Name
 						Bind.Frame.Holder.Bind.Size = UDim2.new(0, math.max(12 + math.round(TXS:GetTextSize(bind.Name, 14, Enum.Font.SourceSans, Vector2.new(9e9)).X + 0.5), 42), 0, 26)
+						
+						if connections.listen then
+							cancelListen()
+						end
 					end
 
 					if options.toggleable == true then
 						function Bind:Toggle(bool, instant)
 							Tab.Flags[Bind.Flag] = bool
 
-							if options.fireontoggle ~= false then
-								task.spawn(Bind.Callback)
-							end
-
 							tween(Bind.Frame.Holder.Indicator.Overlay, instant and 0 or 0.25, { ImageTransparency = bool and 0 or 1, Position = bool and UDim2.new(1, -24, 0, 2) or UDim2.new(0, 2, 0, 2) })
 							tween(Bind.Frame.Holder.Indicator.Overlay, "Cosmetic", instant and 0 or 0.25, { BackgroundColor3 = bool and UI.Color.Add(Library.Theme.Accent, Color3.fromRGB(50, 50, 50)) or UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(25, 25, 25)) })
+
+							if options.fireontoggle ~= false then
+								pcall(Bind.Callback)
+							end
 						end
 					end
 
@@ -2906,7 +2922,7 @@ function Library:AddWindow(options)
 							if indicatorEntered == true then
 								Bind:Toggle(not Tab.Flags[Bind.Flag], false)
 							else
-								listenForBind()
+								listenForInput()
 							end
 						end
 					end)
@@ -2917,7 +2933,7 @@ function Library:AddWindow(options)
 								return
 							end
 
-							task.spawn(Bind.Callback)
+							pcall(Bind.Callback)
 						end
 					end)
 
@@ -3075,19 +3091,19 @@ function Library:AddWindow(options)
 							return
 						end
 	
-						task.spawn(Slider.Callback, val, Tab.Flags[Slider.Flag] or nil)
+						pcall(Slider.Callback, val, Tab.Flags[Slider.Flag] or nil)
 					end
 
 					if options.toggleable == true then
 						function Slider:Toggle(bool, instant)
 							Tab.Flags[Slider.Flag] = bool
 
-							if options.fireontoggle ~= false then
-								task.spawn(Slider.Callback, Slider.Value, bool)
-							end
-
 							tween(Slider.Frame.Holder.Indicator.Overlay, instant and 0 or 0.25, { ImageTransparency = bool and 0 or 1, Position = bool and UDim2.new(1, -24, 0, 2) or UDim2.new(0, 2, 0, 2) })
 							tween(Slider.Frame.Holder.Indicator.Overlay, "Cosmetic", instant and 0 or 0.25, { BackgroundColor3 = bool and UI.Color.Add(Library.Theme.Accent, Color3.fromRGB(50, 50, 50)) or UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(25, 25, 25)) })
+						
+							if options.fireontoggle ~= false then
+								pcall(Slider.Callback, Slider.Value, bool)
+							end
 						end
 					end
 
@@ -3320,7 +3336,7 @@ function Library:AddWindow(options)
 
 						Item.Frame.Button.Activated:Connect(function()
 							if typeof(Item.Callback) == "function" then
-								task.spawn(Item.Callback)
+								pcall(Item.Callback)
 							else
 								Dropdown:Select(Item.Name)
 							end
@@ -3357,7 +3373,7 @@ function Library:AddWindow(options)
 						Dropdown.Frame.Holder.Holder.Displays.Selected.Text = itemName
 						Dropdown:Toggle(false)
 
-						task.spawn(Dropdown.Callback, itemName)
+						pcall(Dropdown.Callback, itemName)
 					end
 
 					function Dropdown:Toggle(bool)
@@ -3744,7 +3760,7 @@ function Library:AddWindow(options)
 						tween(Picker.Frame.Holder.Holder.HueSlider.Bar, 0.1, { Position = UDim2.new(h, 0, 0.5, 0) })
 						tween(Picker.Frame.Holder.Holder.Palette.Point, 0.1, { Position = UDim2.new(s, 0, 1 - v, 0) })
 
-						task.spawn(Picker.Callback, color)
+						pcall(Picker.Callback, color)
 					end
 
 					-- Scripts
