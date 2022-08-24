@@ -201,7 +201,7 @@ function Library:Notify(options, callback)
 			table.remove(Library.Notif.Active, notifIdx)
 		end
 		
-		pcall(Notification.Callback, bool)
+		pcall(task.spawn, Notification.Callback, bool)
 	end
 
 	-- Scripts
@@ -838,7 +838,7 @@ function Library:AddWindow(options)
 					Button.Frame.Holder.Button.TextSize = 14
 					buttonVisual()
 
-					pcall(Button.Callback)
+					pcall(task.spawn, Button.Callback)
 				end)
 
 				Button.Frame.Holder.Button.MouseLeave:Connect(function()
@@ -908,7 +908,7 @@ function Library:AddWindow(options)
 					tween(Toggle.Frame.Holder.Indicator.Overlay, instant and 0 or 0.25, { ImageTransparency = bool and 0 or 1, Position = bool and UDim2.new(1, -24, 0, 2) or UDim2.new(0, 2, 0, 2) })
 					tween(Toggle.Frame.Holder.Indicator.Overlay, "Cosmetic", instant and 0 or 0.25, { BackgroundColor3 = bool and UI.Color.Add(Library.Theme.Accent, Color3.fromRGB(50, 50, 50)) or UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(25, 25, 25)) })
 				
-					pcall(Toggle.Callback, bool)
+					pcall(task.spawn, Toggle.Callback, bool)
 				end
 
 				-- Scripts
@@ -1202,7 +1202,7 @@ function Library:AddWindow(options)
 					end
 
 					extendBox(false)
-					pcall(Box.Callback, Box.Frame.Holder.TextBox.Holder.Box.Text)
+					pcall(task.spawn, Box.Callback, Box.Frame.Holder.TextBox.Holder.Box.Text)
 				end)
 
 				return Box
@@ -1314,7 +1314,7 @@ function Library:AddWindow(options)
 						tween(Bind.Frame.Holder.Indicator.Overlay, "Cosmetic", instant and 0 or 0.25, { BackgroundColor3 = bool and UI.Color.Add(Library.Theme.Accent, Color3.fromRGB(50, 50, 50)) or UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(25, 25, 25)) })
 
 						if options.fireontoggle ~= false then
-							pcall(Bind.Callback)
+							pcall(task.spawn, Bind.Callback)
 						end
 					end
 				end
@@ -1340,7 +1340,7 @@ function Library:AddWindow(options)
 							return
 						end
 
-						pcall(Bind.Callback)
+						pcall(task.spawn, Bind.Callback)
 					end
 				end)
 
@@ -1498,7 +1498,7 @@ function Library:AddWindow(options)
 						return
 					end
 
-					pcall(Slider.Callback, val, Tab.Flags[Slider.Flag] or nil)
+					pcall(task.spawn, Slider.Callback, val, Tab.Flags[Slider.Flag] or nil)
 				end
 
 				if options.toggleable == true then
@@ -1509,7 +1509,7 @@ function Library:AddWindow(options)
 						tween(Slider.Frame.Holder.Indicator.Overlay, "Cosmetic", instant and 0 or 0.25, { BackgroundColor3 = bool and UI.Color.Add(Library.Theme.Accent, Color3.fromRGB(50, 50, 50)) or UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(25, 25, 25)) })
 
 						if options.fireontoggle ~= false then
-							pcall(Slider.Callback, Slider.Value, bool)
+							pcall(task.spawn, Slider.Callback, Slider.Value, bool)
 						end
 					end
 				end
@@ -1743,7 +1743,7 @@ function Library:AddWindow(options)
 
 					Item.Frame.Button.Activated:Connect(function()
 						if typeof(Item.Callback) == "function" then
-							pcall(Item.Callback)
+							pcall(task.spawn, Item.Callback)
 						else
 							Dropdown:Select(Item.Name)
 						end
@@ -1780,7 +1780,7 @@ function Library:AddWindow(options)
 					Dropdown.Frame.Holder.Holder.Displays.Selected.Text = itemName
 					Dropdown:Toggle(false)
 
-					pcall(Dropdown.Callback, itemName)
+					pcall(task.spawn, Dropdown.Callback, itemName)
 				end
 
 				function Dropdown:Toggle(bool)
@@ -2164,7 +2164,7 @@ function Library:AddWindow(options)
 					tween(Picker.Frame.Holder.Holder.HueSlider.Bar, 0.1, { Position = UDim2.new(h, 0, 0.5, 0) })
 					tween(Picker.Frame.Holder.Holder.Palette.Point, 0.1, { Position = UDim2.new(s, 0, 1 - v, 0) })
 
-					pcall(Picker.Callback, color)
+					pcall(task.spawn, Picker.Callback, color)
 				end
 
 				-- Scripts
@@ -2435,7 +2435,7 @@ function Library:AddWindow(options)
 						Button.Frame.Holder.Button.TextSize = 14
 						buttonVisual()
 
-						pcall(Button.Callback)
+						pcall(task.spawn, Button.Callback)
 					end)
 
 					Button.Frame.Holder.Button.MouseLeave:Connect(function()
@@ -2505,7 +2505,7 @@ function Library:AddWindow(options)
 						tween(Toggle.Frame.Holder.Indicator.Overlay, instant and 0 or 0.25, { ImageTransparency = bool and 0 or 1, Position = bool and UDim2.new(1, -24, 0, 2) or UDim2.new(0, 2, 0, 2) })
 						tween(Toggle.Frame.Holder.Indicator.Overlay, "Cosmetic", instant and 0 or 0.25, { BackgroundColor3 = bool and UI.Color.Add(Library.Theme.Accent, Color3.fromRGB(50, 50, 50)) or UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(25, 25, 25)) })
 					
-						pcall(Toggle.Callback, bool)
+						pcall(task.spawn, Toggle.Callback, bool)
 					end
 
 					-- Scripts
@@ -2680,7 +2680,11 @@ function Library:AddWindow(options)
 
 					ClipboardLabel.Frame.InputBegan:Connect(function(input)
 						if input.UserInputType == Enum.UserInputType.MouseButton1 then
-							setclipboard(ClipboardLabel.Callback())
+							local s, result = pcall(ClipboardLabel.Callback)
+
+							if s then
+								setclipboard(result)
+							end
 						end
 					end)
 
@@ -2795,7 +2799,7 @@ function Library:AddWindow(options)
 						end
 
 						extendBox(false)
-						pcall(Box.Callback, Box.Frame.Holder.TextBox.Holder.Box.Text)
+						pcall(task.spawn, Box.Callback, Box.Frame.Holder.TextBox.Holder.Box.Text)
 					end)
 
 					return Box
@@ -2907,7 +2911,7 @@ function Library:AddWindow(options)
 							tween(Bind.Frame.Holder.Indicator.Overlay, "Cosmetic", instant and 0 or 0.25, { BackgroundColor3 = bool and UI.Color.Add(Library.Theme.Accent, Color3.fromRGB(50, 50, 50)) or UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(25, 25, 25)) })
 
 							if options.fireontoggle ~= false then
-								pcall(Bind.Callback)
+								pcall(task.spawn, Bind.Callback)
 							end
 						end
 					end
@@ -2933,7 +2937,7 @@ function Library:AddWindow(options)
 								return
 							end
 
-							pcall(Bind.Callback)
+							pcall(task.spawn, Bind.Callback)
 						end
 					end)
 
@@ -3091,7 +3095,7 @@ function Library:AddWindow(options)
 							return
 						end
 	
-						pcall(Slider.Callback, val, Tab.Flags[Slider.Flag] or nil)
+						pcall(task.spawn, Slider.Callback, val, Tab.Flags[Slider.Flag] or nil)
 					end
 
 					if options.toggleable == true then
@@ -3102,7 +3106,7 @@ function Library:AddWindow(options)
 							tween(Slider.Frame.Holder.Indicator.Overlay, "Cosmetic", instant and 0 or 0.25, { BackgroundColor3 = bool and UI.Color.Add(Library.Theme.Accent, Color3.fromRGB(50, 50, 50)) or UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(25, 25, 25)) })
 						
 							if options.fireontoggle ~= false then
-								pcall(Slider.Callback, Slider.Value, bool)
+								pcall(task.spawn, Slider.Callback, Slider.Value, bool)
 							end
 						end
 					end
@@ -3336,7 +3340,7 @@ function Library:AddWindow(options)
 
 						Item.Frame.Button.Activated:Connect(function()
 							if typeof(Item.Callback) == "function" then
-								pcall(Item.Callback)
+								pcall(task.spawn, Item.Callback)
 							else
 								Dropdown:Select(Item.Name)
 							end
@@ -3373,7 +3377,7 @@ function Library:AddWindow(options)
 						Dropdown.Frame.Holder.Holder.Displays.Selected.Text = itemName
 						Dropdown:Toggle(false)
 
-						pcall(Dropdown.Callback, itemName)
+						pcall(task.spawn, Dropdown.Callback, itemName)
 					end
 
 					function Dropdown:Toggle(bool)
@@ -3760,7 +3764,7 @@ function Library:AddWindow(options)
 						tween(Picker.Frame.Holder.Holder.HueSlider.Bar, 0.1, { Position = UDim2.new(h, 0, 0.5, 0) })
 						tween(Picker.Frame.Holder.Holder.Palette.Point, 0.1, { Position = UDim2.new(s, 0, 1 - v, 0) })
 
-						pcall(Picker.Callback, color)
+						pcall(task.spawn, Picker.Callback, color)
 					end
 
 					-- Scripts
