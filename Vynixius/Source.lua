@@ -517,8 +517,6 @@ function Library:AddWindow(options)
 	end
 
 	function Window:SetAccent(accent)
-		assert(typeof(accent) == "Color3")
-
 		if Storage.Connections.WindowRainbow ~= nil then
 			Storage.Connections.WindowRainbow:Disconnect()
 		end
@@ -527,7 +525,8 @@ function Library:AddWindow(options)
 			Storage.Connections.WindowRainbow = RS.Heartbeat:Connect(function()
 				setAccent(Color3.fromHSV(tick() % 5 / 5, 1, 1))
 			end)
-		else
+
+		elseif typeof(accent) == "Color3" then
 			setAccent(accent)
 		end
 	end
