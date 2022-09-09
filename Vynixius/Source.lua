@@ -8,12 +8,14 @@ local Library = {
 		BackgroundColor = Color3.fromRGB(10, 10, 10),
 		SectionColor = Color3.fromRGB(20, 20, 20),
 		TextColor = Color3.fromRGB(255, 255, 255),
-		Objects = {},
 	},
 	Notif = {
 		Active = {},
 		Queue = {},
 		IsBusy = false,
+	},
+	Settings = {
+		ConfigPath = nil,
 	},
 }
 
@@ -24,6 +26,7 @@ local UIS = game:GetService("UserInputService")
 local RS = game:GetService("RunService")
 local TS = game:GetService("TweenService")
 local TXS = game:GetService("TextService")
+local HS = game:GetService("HttpService")
 local CG = game:GetService("CoreGui")
 
 -- Variables
@@ -31,18 +34,25 @@ local CG = game:GetService("CoreGui")
 local Player = Players.LocalPlayer
 local Mouse = Player:GetMouse()
 
-local UI = loadstring(game:HttpGet("https://raw.githubusercontent.com/RegularVynixu/Utilities/main/UI.lua"))()
+local SelfModules = {
+	UI = loadstring(game:HttpGet("https://raw.githubusercontent.com/RegularVynixu/Utilities/main/UI.lua"))(),
+	Directory = loadstring(game:HttpGet("https://raw.githubusercontent.com/RegularVynixu/Utilities/main/Directory.lua"))(),
+}
 local Storage = { Connections = {}, Tween = { Cosmetic = {} } }
 
 local ListenForInput = false
 
-local ScreenGui = UI.Create("ScreenGui", {
-	Name = "Vynixius UI Library",
-	ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
-})
-ScreenGui.Parent = game:GetService("CoreGui")
+-- Directory
 
--- Functions
+local Directory = SelfModules.Directory.Create({
+	["Vynixius UI Library"] = {
+		"Configs",
+	},
+})
+
+Library.Settings.ConfigPath = Directory.Configs
+
+-- Misc Functions
 
 local function tween(...)
 	local args = {...}
@@ -68,6 +78,13 @@ local function tween(...)
 	tween:Play()
 end
 
+-- Functions
+
+local ScreenGui = SelfModules.UI.Create("ScreenGui", {
+	Name = "Vynixius UI Library",
+	ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
+})
+
 function Library:Notify(options, callback)
 	if Library.Notif.IsBusy == true then
 		Library.Notif.Queue[#Library.Notif.Queue + 1] = { options, callback }
@@ -82,19 +99,19 @@ function Library:Notify(options, callback)
 		Callback = callback,
 	}
 
-	Notification.Frame = UI.Create("Frame", {
+	Notification.Frame = SelfModules.UI.Create("Frame", {
 		Name = "Notification",
 		BackgroundTransparency = 1,
 		ClipsDescendants = true,
 		Position = UDim2.new(0, 10, 1, -66),
 		Size = UDim2.new(0, 320, 0, 56),
 
-		UI.Create("Frame", {
+		SelfModules.UI.Create("Frame", {
 			Name = "Topbar",
 			BackgroundColor3 = Library.Theme.TopbarColor,
 			Size = UDim2.new(1, 0, 0, 28),
 
-			UI.Create("Frame", {
+			SelfModules.UI.Create("Frame", {
 				Name = "Filling",
 				BackgroundColor3 = Library.Theme.TopbarColor,
 				BorderSizePixel = 0,
@@ -102,7 +119,7 @@ function Library:Notify(options, callback)
 				Size = UDim2.new(1, 0, 0.5, 0),
 			}),
 
-			UI.Create("TextLabel", {
+			SelfModules.UI.Create("TextLabel", {
 				Name = "Title",
 				BackgroundTransparency = 1,
 				Position = UDim2.new(0, 7, 0.5, -8),
@@ -114,7 +131,7 @@ function Library:Notify(options, callback)
 				TextXAlignment = Enum.TextXAlignment.Left,
 			}),
 
-			UI.Create("ImageButton", {
+			SelfModules.UI.Create("ImageButton", {
 				Name = "Yes",
 				AnchorPoint = Vector2.new(1, 0),
 				BackgroundTransparency = 1,
@@ -124,7 +141,7 @@ function Library:Notify(options, callback)
 				ImageColor3 = Library.Theme.TextColor,
 			}),
 
-			UI.Create("ImageButton", {
+			SelfModules.UI.Create("ImageButton", {
 				Name = "No",
 				AnchorPoint = Vector2.new(1, 0),
 				BackgroundTransparency = 1,
@@ -135,13 +152,13 @@ function Library:Notify(options, callback)
 			}),
 		}, UDim.new(0,5)),
 
-		UI.Create("Frame", {
+		SelfModules.UI.Create("Frame", {
 			Name = "Background",
 			BackgroundColor3 = Library.Theme.BackgroundColor,
 			Position = UDim2.new(0, 0, 0, 28),
 			Size = UDim2.new(1, 0, 1, -28),
 
-			UI.Create("TextLabel", {
+			SelfModules.UI.Create("TextLabel", {
 				Name = "Description",
 				BackgroundTransparency = 1,
 				Position = UDim2.new(0, 7, 0, 7),
@@ -155,7 +172,7 @@ function Library:Notify(options, callback)
 				TextYAlignment = Enum.TextYAlignment.Top,
 			}),
 
-			UI.Create("Frame", {
+			SelfModules.UI.Create("Frame", {
 				Name = "Filling",
 				BackgroundColor3 = Library.Theme.BackgroundColor,
 				BorderSizePixel = 0,
@@ -165,12 +182,12 @@ function Library:Notify(options, callback)
 	})
 
 	if options.color ~= nil then
-		local indicator = UI.Create("Frame", {
+		local indicator = SelfModules.UI.Create("Frame", {
 			Name = "Indicator",
 			BackgroundColor3 = options.color,
 			Size = UDim2.new(0, 4, 1, 0),
 
-			UI.Create("Frame", {
+			SelfModules.UI.Create("Frame", {
 				Name = "Filling",
 				BackgroundColor3 = options.color,
 				BorderSizePixel = 0,
@@ -280,19 +297,19 @@ function Library:AddWindow(options)
 
 	-- Window construction
 
-	Window.Frame = UI.Create("Frame", {
+	Window.Frame = SelfModules.UI.Create("Frame", {
 		Name = "Window",
 		BackgroundTransparency = 1,
 		Size = UDim2.new(0, 460, 0, 497),
 		Position = UDim2.new(1, -490, 1, -527),
 		Visible = options.default ~= false,
 
-		UI.Create("Frame", {
+		SelfModules.UI.Create("Frame", {
 			Name = "Topbar",
 			BackgroundColor3 = Library.Theme.TopbarColor,
 			Size = UDim2.new(1, 0, 0, 40),
 
-			UI.Create("Frame", {
+			SelfModules.UI.Create("Frame", {
 				Name = "Filling",
 				BackgroundColor3 = Library.Theme.TopbarColor,
 				BorderSizePixel = 0,
@@ -300,14 +317,14 @@ function Library:AddWindow(options)
 				Size = UDim2.new(1, 0, 0.5, 0),
 			}),
 
-			UI.Create("TextLabel", {
+			SelfModules.UI.Create("TextLabel", {
 				Name = "Title",
 				AnchorPoint = Vector2.new(0.5, 0.5),
 				BackgroundTransparency = 1,
 				Position = UDim2.new(0.5, 0, 0.5, 0),
 				Size = UDim2.new(1, -20, 0, 22),
 				Font = Enum.Font.SourceSans,
-				Text = string.format("%s - <font color='%s'>%s</font>", options.title[1], UI.Color.ToFormat(Library.Theme.Accent), options.title[2]),
+				Text = string.format("%s - <font color='%s'>%s</font>", options.title[1], SelfModules.UI.Color.ToFormat(Library.Theme.Accent), options.title[2]),
 				RichText = true,
 				TextColor3 = Library.Theme.TextColor,
 				TextSize = 22,
@@ -315,56 +332,56 @@ function Library:AddWindow(options)
 			}),
 		}, UDim.new(0, 5)),
 
-		UI.Create("Frame", {
+		SelfModules.UI.Create("Frame", {
 			Name = "Background",
 			BackgroundColor3 = Library.Theme.BackgroundColor,
 			Position = UDim2.new(0, 30, 0, 40),
 			Size = UDim2.new(1, -30, 1, -40),
 
-			UI.Create("Frame", {
+			SelfModules.UI.Create("Frame", {
 				Name = "Filling",
 				BackgroundColor3 = Library.Theme.BackgroundColor,
 				BorderSizePixel = 0,
 				Size = UDim2.new(1, 0, 0, 5),
 			}),
 
-			UI.Create("Frame", {
+			SelfModules.UI.Create("Frame", {
 				Name = "Filling",
 				BackgroundColor3 = Library.Theme.BackgroundColor,
 				BorderSizePixel = 0,
 				Size = UDim2.new(0, 5, 1, 0),
 			}),
 
-			UI.Create("Frame", {
+			SelfModules.UI.Create("Frame", {
 				Name = "Tabs",
-				BackgroundColor3 = UI.Color.Add(Library.Theme.BackgroundColor, Color3.fromRGB(15, 15, 15)),
+				BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.BackgroundColor, Color3.fromRGB(15, 15, 15)),
 				Position = UDim2.new(0, 3, 0, 3),
 				Size = UDim2.new(1, -6, 1, -6),
 
-				UI.Create("Frame", {
+				SelfModules.UI.Create("Frame", {
 					Name = "Holder",
-					BackgroundColor3 = UI.Color.Add(Library.Theme.BackgroundColor, Color3.fromRGB(5, 5, 5)),
+					BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.BackgroundColor, Color3.fromRGB(5, 5, 5)),
 					Position = UDim2.new(0, 1, 0, 1),
 					Size = UDim2.new(1, -2, 1, -2),
 				}, UDim.new(0, 5)),
 			}, UDim.new(0, 5)),
 		}, UDim.new(0, 5)),
 
-		UI.Create("Frame", {
+		SelfModules.UI.Create("Frame", {
 			Name = "Sidebar",
 			BackgroundColor3 = Library.Theme.SidebarColor,
 			Position = UDim2.new(0, 0, 0, 40),
 			Size = UDim2.new(0, 30, 1, -40),
 			ZIndex = 2,
 
-			UI.Create("Frame", {
+			SelfModules.UI.Create("Frame", {
 				Name = "Filling",
 				BackgroundColor3 = Library.Theme.SidebarColor,
 				BorderSizePixel = 0,
 				Size = UDim2.new(1, 0, 0, 5),
 			}),
 
-			UI.Create("Frame", {
+			SelfModules.UI.Create("Frame", {
 				Name = "Filling",
 				BackgroundColor3 = Library.Theme.SidebarColor,
 				BorderSizePixel = 0,
@@ -372,7 +389,7 @@ function Library:AddWindow(options)
 				Size = UDim2.new(0, 5, 1, 0),
 			}),
 
-			UI.Create("Frame", {
+			SelfModules.UI.Create("Frame", {
 				Name = "Border",
 				BackgroundColor3 = Library.Theme.BackgroundColor,
 				BorderSizePixel = 0,
@@ -382,15 +399,15 @@ function Library:AddWindow(options)
 				ZIndex = 2,
 			}),
 
-			UI.Create("Frame", {
+			SelfModules.UI.Create("Frame", {
 				Name = "Line",
-				BackgroundColor3 = UI.Color.Add(Library.Theme.SidebarColor, Color3.fromRGB(10, 10, 10)),
+				BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SidebarColor, Color3.fromRGB(10, 10, 10)),
 				BorderSizePixel = 0,
 				Position = UDim2.new(0, 5, 0, 29),
 				Size = UDim2.new(1, -10, 0, 2),
 			}),
 
-			UI.Create("ScrollingFrame", {
+			SelfModules.UI.Create("ScrollingFrame", {
 				Name = "List",
 				Active = true,
 				BackgroundTransparency = 1,
@@ -401,13 +418,13 @@ function Library:AddWindow(options)
 				CanvasSize = UDim2.new(0, 0, 0, 0),
 				ScrollBarThickness = 5,
 
-				UI.Create("UIListLayout", {
+				SelfModules.UI.Create("UIListLayout", {
 					SortOrder = Enum.SortOrder.LayoutOrder,
 					Padding = UDim.new(0, 5),
 				}),
 			}),
 
-			UI.Create("TextLabel", {
+			SelfModules.UI.Create("TextLabel", {
 				Name = "Indicator",
 				BackgroundTransparency = 1,
 				Position = UDim2.new(1, -30, 0, 0),
@@ -433,32 +450,67 @@ function Library:AddWindow(options)
 
 	local function setAccent(accent)
 		Library.Theme.Accent = accent
-		Window.Frame.Topbar.Title.Text = string.format("%s - <font color='%s'>%s</font>", options.title[1], UI.Color.ToFormat(accent), options.title[2])
+		Window.Frame.Topbar.Title.Text = string.format("%s - <font color='%s'>%s</font>", options.title[1], SelfModules.UI.Color.ToFormat(accent), options.title[2])
 
 		for _, tab in next, Window.Tabs do
 			for _, section in next, tab.Sections do
 				for _, item in next, section.List do
+					local flag = item.Flag or item.Name
 
-					if tab.Flags[item.Flag] == true or item.Rainbow == true then
-						local overlay = item.Frame.Holder.Indicator.Overlay
-						
-						if Storage.Tween.Cosmetic[overlay] then
-							Storage.Tween.Cosmetic[overlay]:Cancel()
-							Storage.Tween.Cosmetic[overlay] = nil
-						end
+					if tab.Flags[flag] == true or item.Rainbow == true then
+						local overlay = nil
 
 						for _, v in next, item.Frame:GetDescendants() do
 							if v.Name == "Overlay" then
-								v.BackgroundColor3 = UI.Color.Add(accent, Color3.fromRGB(50, 50, 50))
+								overlay = v; break
 							end
+						end
+							
+						if overlay then
+							local tween = Storage.Tween.Cosmetic[overlay]
+
+							if tween then
+								tween:Cancel(); tween = nil
+							end
+
+							overlay.BackgroundColor3 = SelfModules.UI.Color.Add(accent, Color3.fromRGB(50, 50, 50))
 						end
 					end
 
 					if item.Type == "Slider" then
-						item.Frame.Holder.Slider.Bar.Fill.BackgroundColor3 = UI.Color.Sub(accent, Color3.fromRGB(50, 50, 50))
+						item.Frame.Holder.Slider.Bar.Fill.BackgroundColor3 = SelfModules.UI.Color.Sub(accent, Color3.fromRGB(50, 50, 50))
 						item.Frame.Holder.Slider.Point.BackgroundColor3 = accent
-					end
 
+					elseif item.Type == "SubSection" then
+						for _, item2 in next, item.List do
+							local flag2 = item2.Flag or item2.Name
+		
+							if tab.Flags[flag2] == true or item2.Rainbow == true then
+								local overlay = nil
+		
+								for _, v in next, item2.Frame:GetDescendants() do
+									if v.Name == "Overlay" then
+										overlay = v; break
+									end
+								end
+									
+								if overlay then
+									local tween = Storage.Tween.Cosmetic[overlay]
+		
+									if tween then
+										tween:Cancel(); tween = nil
+									end
+		
+									overlay.BackgroundColor3 = SelfModules.UI.Color.Add(accent, Color3.fromRGB(50, 50, 50))
+								end
+							end
+		
+							if item2.Type == "Slider" then
+								item2.Frame.Holder.Slider.Bar.Fill.BackgroundColor3 = SelfModules.UI.Color.Sub(accent, Color3.fromRGB(50, 50, 50))
+								item2.Frame.Holder.Slider.Point.BackgroundColor3 = accent
+							end
+						end
+					end
 				end
 			end
 		end
@@ -501,7 +553,7 @@ function Library:AddWindow(options)
 
 	Window.Key = options.key or Window.Key
 	Storage.Connections[Window] = {}
-	UI.MakeDraggable(Window.Frame, Window.Frame.Topbar, 0.1)
+	SelfModules.UI.MakeDraggable(Window.Frame, Window.Frame.Topbar, 0.1)
 	Window.Sidebar.Frame = Window.Frame.Sidebar
 	Window.Frame.Parent = ScreenGui
 
@@ -533,33 +585,33 @@ function Library:AddWindow(options)
 			},
 		}
 
-		Tab.Frame = UI.Create("ScrollingFrame", {
+		Tab.Frame = SelfModules.UI.Create("ScrollingFrame", {
 			Name = "Tab",
 			Active = true,
 			BackgroundTransparency = 1,
 			BorderSizePixel = 0,
 			Position = UDim2.new(0, 5, 0, 5),
 			Size = UDim2.new(1, -10, 1, -10),
-			ScrollBarImageColor3 = UI.Color.Add(Library.Theme.BackgroundColor, Color3.fromRGB(15, 15, 15)),
+			ScrollBarImageColor3 = SelfModules.UI.Color.Add(Library.Theme.BackgroundColor, Color3.fromRGB(15, 15, 15)),
 			ScrollBarThickness = 5,
 			Visible = false,
 
-			UI.Create("UIListLayout", {
+			SelfModules.UI.Create("UIListLayout", {
 				SortOrder = Enum.SortOrder.LayoutOrder,
 				Padding = UDim.new(0, 5),
 			}),
 		})
 
-		Tab.Button.Frame = UI.Create("Frame", {
+		Tab.Button.Frame = SelfModules.UI.Create("Frame", {
 			Name = name,
-			BackgroundColor3 = UI.Color.Add(Library.Theme.SidebarColor, Color3.fromRGB(15, 15, 15)),
+			BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SidebarColor, Color3.fromRGB(15, 15, 15)),
 			BackgroundTransparency = 1,
 			Size = UDim2.new(0, 120, 0, 32),
 
-			UI.Create("TextButton", {
+			SelfModules.UI.Create("TextButton", {
 				Name = "Button",
 				AutoButtonColor = false,
-				BackgroundColor3 = UI.Color.Add(Library.Theme.SidebarColor, Color3.fromRGB(5, 5, 5)),
+				BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SidebarColor, Color3.fromRGB(5, 5, 5)),
 				BackgroundTransparency = 1,
 				Position = UDim2.new(0, 1, 0, 1),
 				Size = UDim2.new(1, -2, 1, -2),
@@ -580,8 +632,8 @@ function Library:AddWindow(options)
 				v.Frame.Visible = bool
 				v.Button.Selected = bool
 
-				tween(v.Button.Frame.Button, 0.1, { BackgroundColor3 = bool and UI.Color.Add(Library.Theme.SidebarColor, Color3.fromRGB(35, 35, 35)) or UI.Color.Add(Library.Theme.SidebarColor, Color3.fromRGB(5, 5, 5)) })
-				tween(v.Button.Frame, 0.1, { BackgroundColor3 = bool and UI.Color.Add(Library.Theme.SidebarColor, Color3.fromRGB(45, 45, 45)) or UI.Color.Add(Library.Theme.SidebarColor, Color3.fromRGB(15, 15, 15)) })
+				tween(v.Button.Frame.Button, 0.1, { BackgroundColor3 = bool and SelfModules.UI.Color.Add(Library.Theme.SidebarColor, Color3.fromRGB(35, 35, 35)) or SelfModules.UI.Color.Add(Library.Theme.SidebarColor, Color3.fromRGB(5, 5, 5)) })
+				tween(v.Button.Frame, 0.1, { BackgroundColor3 = bool and SelfModules.UI.Color.Add(Library.Theme.SidebarColor, Color3.fromRGB(45, 45, 45)) or SelfModules.UI.Color.Add(Library.Theme.SidebarColor, Color3.fromRGB(15, 15, 15)) })
 			end
 
 			toggleSidebar(false)
@@ -627,15 +679,15 @@ function Library:AddWindow(options)
 
 		Tab.Button.Frame.Button.MouseEnter:Connect(function()
 			if Tab.Button.Selected == false then
-				tween(Tab.Button.Frame.Button, 0.1, { BackgroundColor3 = UI.Color.Add(Library.Theme.SidebarColor, Color3.fromRGB(15, 15, 15)) })
-				tween(Tab.Button.Frame, 0.1, { BackgroundColor3 = UI.Color.Add(Library.Theme.SidebarColor, Color3.fromRGB(25, 25, 25)) })
+				tween(Tab.Button.Frame.Button, 0.1, { BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SidebarColor, Color3.fromRGB(15, 15, 15)) })
+				tween(Tab.Button.Frame, 0.1, { BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SidebarColor, Color3.fromRGB(25, 25, 25)) })
 			end
 		end)
 
 		Tab.Button.Frame.Button.MouseLeave:Connect(function()
 			if Tab.Button.Selected == false then
-				tween(Tab.Button.Frame.Button, 0.1, { BackgroundColor3 = UI.Color.Add(Library.Theme.SidebarColor, Color3.fromRGB(5, 5, 5)) })
-				tween(Tab.Button.Frame, 0.1, { BackgroundColor3 = UI.Color.Add(Library.Theme.SidebarColor, Color3.fromRGB(15, 15, 15)) })
+				tween(Tab.Button.Frame.Button, 0.1, { BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SidebarColor, Color3.fromRGB(5, 5, 5)) })
+				tween(Tab.Button.Frame, 0.1, { BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SidebarColor, Color3.fromRGB(15, 15, 15)) })
 			end
 		end)
 
@@ -661,21 +713,21 @@ function Library:AddWindow(options)
 				List = {},
 			}
 
-			Section.Frame = UI.Create("Frame", {
+			Section.Frame = SelfModules.UI.Create("Frame", {
 				Name = "Section",
 				BackgroundColor3 = Library.Theme.SectionColor,
 				ClipsDescendants = true,
 				Size = UDim2.new(1, -10, 0, 40),
 
-				UI.Create("Frame", {
+				SelfModules.UI.Create("Frame", {
 					Name = "Line",
-					BackgroundColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
+					BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
 					BorderSizePixel = 0,
 					Position = UDim2.new(0, 5, 0, 30),
 					Size = UDim2.new(1, -10, 0, 2),
 				}),
 
-				UI.Create("TextLabel", {
+				SelfModules.UI.Create("TextLabel", {
 					Name = "Header",
 					BackgroundTransparency = 1,
 					Position = UDim2.new(0, 5, 0, 8),
@@ -688,20 +740,20 @@ function Library:AddWindow(options)
 					TextXAlignment = Enum.TextXAlignment.Left,
 				}),
 
-				UI.Create("Frame", {
+				SelfModules.UI.Create("Frame", {
 					Name = "List",
 					BackgroundTransparency = 1,
 					ClipsDescendants = true,
 					Position = UDim2.new(0, 5, 0, 40),
 					Size = UDim2.new(1, -10, 1, -40),
 
-					UI.Create("UIListLayout", {
+					SelfModules.UI.Create("UIListLayout", {
 						SortOrder = Enum.SortOrder.LayoutOrder,
 						HorizontalAlignment = Enum.HorizontalAlignment.Center,
 						Padding = UDim.new(0, 5),
 					}),
 
-					UI.Create("UIPadding", {
+					SelfModules.UI.Create("UIPadding", {
 						PaddingBottom = UDim.new(0, 1),
 						PaddingLeft = UDim.new(0, 1),
 						PaddingRight = UDim.new(0, 1),
@@ -709,7 +761,7 @@ function Library:AddWindow(options)
 					}),
 				}),
 
-				UI.Create("TextLabel", {
+				SelfModules.UI.Create("TextLabel", {
 					Name = "Indicator",
 					BackgroundTransparency = 1,
 					Position = UDim2.new(1, -30, 0, 0),
@@ -779,20 +831,20 @@ function Library:AddWindow(options)
 					Callback = callback,
 				}
 
-				Button.Frame = UI.Create("Frame", {
+				Button.Frame = SelfModules.UI.Create("Frame", {
 					Name = name,
-					BackgroundColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
+					BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
 					Size = UDim2.new(1, 2, 0, 32),
 
-					UI.Create("Frame", {
+					SelfModules.UI.Create("Frame", {
 						Name = "Holder",
-						BackgroundColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
+						BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
 						Size = UDim2.new(1, -2, 1, -2),
 						Position = UDim2.new(0, 1, 0, 1),
 
-						UI.Create("TextButton", {
+						SelfModules.UI.Create("TextButton", {
 							Name = "Button",
-							BackgroundColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
+							BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
 							Position = UDim2.new(0, 2, 0, 2),
 							Size = UDim2.new(1, -4, 1, -4),
 							AutoButtonColor = false,
@@ -809,7 +861,7 @@ function Library:AddWindow(options)
 
 				local function buttonVisual()
 					task.spawn(function()
-						local Visual = UI.Create("Frame", {
+						local Visual = SelfModules.UI.Create("Frame", {
 							Name = "Visual",
 							AnchorPoint = Vector2.new(0.5, 0.5),
 							BackgroundColor3 = Color3.fromRGB(255, 255, 255),
@@ -858,18 +910,18 @@ function Library:AddWindow(options)
 					Callback = callback,
 				}
 
-				Toggle.Frame = UI.Create("Frame", {
+				Toggle.Frame = SelfModules.UI.Create("Frame", {
 					Name = name,
-					BackgroundColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
+					BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
 					Size = UDim2.new(1, 2, 0, 32),
 
-					UI.Create("Frame", {
+					SelfModules.UI.Create("Frame", {
 						Name = "Holder",
-						BackgroundColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
+						BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
 						Position = UDim2.new(0, 1, 0, 1),
 						Size = UDim2.new(1, -2, 1, -2),
 
-						UI.Create("TextLabel", {
+						SelfModules.UI.Create("TextLabel", {
 							Name = "Label",
 							BackgroundTransparency = 1,
 							Position = UDim2.new(0, 5, 0.5, -7),
@@ -882,15 +934,15 @@ function Library:AddWindow(options)
 							TextXAlignment = Enum.TextXAlignment.Left,
 						}),
 
-						UI.Create("Frame", {
+						SelfModules.UI.Create("Frame", {
 							Name = "Indicator",
-							BackgroundColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
+							BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
 							Position = UDim2.new(1, -42, 0, 2),
 							Size = UDim2.new(0, 40, 0, 26),
 
-							UI.Create("ImageLabel", {
+							SelfModules.UI.Create("ImageLabel", {
 								Name = "Overlay",
-								BackgroundColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(25, 25, 25)),
+								BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(25, 25, 25)),
 								Position = UDim2.new(0, 2, 0, 2),
 								Size = UDim2.new(0, 22, 0, 22),
 								Image = "http://www.roblox.com/asset/?id=7827504335",
@@ -906,7 +958,7 @@ function Library:AddWindow(options)
 					Tab.Flags[Toggle.Flag] = bool
 
 					tween(Toggle.Frame.Holder.Indicator.Overlay, instant and 0 or 0.25, { ImageTransparency = bool and 0 or 1, Position = bool and UDim2.new(1, -24, 0, 2) or UDim2.new(0, 2, 0, 2) })
-					tween(Toggle.Frame.Holder.Indicator.Overlay, "Cosmetic", instant and 0 or 0.25, { BackgroundColor3 = bool and UI.Color.Add(Library.Theme.Accent, Color3.fromRGB(50, 50, 50)) or UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(25, 25, 25)) })
+					tween(Toggle.Frame.Holder.Indicator.Overlay, "Cosmetic", instant and 0 or 0.25, { BackgroundColor3 = bool and SelfModules.UI.Color.Add(Library.Theme.Accent, Color3.fromRGB(50, 50, 50)) or SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(25, 25, 25)) })
 				
 					pcall(task.spawn, Toggle.Callback, bool)
 				end
@@ -936,18 +988,18 @@ function Library:AddWindow(options)
 					Type = "Label",
 				}
 
-				Label.Frame = UI.Create("Frame", {
+				Label.Frame = SelfModules.UI.Create("Frame", {
 					Name = name,
-					BackgroundColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
+					BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
 					Size = UDim2.new(1, 2, 0, 22),
 
-					UI.Create("Frame", {
+					SelfModules.UI.Create("Frame", {
 						Name = "Holder",
-						BackgroundColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
+						BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
 						Position = UDim2.new(0, 1, 0, 1),
 						Size = UDim2.new(1, -2, 1, -2),
 
-						UI.Create("TextLabel", {
+						SelfModules.UI.Create("TextLabel", {
 							Name = "Label",
 							AnchorPoint = Vector2.new(0, 0.5),
 							BackgroundTransparency = 1,
@@ -981,18 +1033,18 @@ function Library:AddWindow(options)
 					Type = "DualLabel",
 				}
 
-				DualLabel.Frame = UI.Create("Frame", {
+				DualLabel.Frame = SelfModules.UI.Create("Frame", {
 					Name = options[1].. " ".. options[2],
-					BackgroundColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
+					BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
 					Size = UDim2.new(1, 2, 0, 22),
 
-					UI.Create("Frame", {
+					SelfModules.UI.Create("Frame", {
 						Name = "Holder",
-						BackgroundColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
+						BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
 						Position = UDim2.new(0, 1, 0, 1),
 						Size = UDim2.new(1, -2, 1, -2),
 
-						UI.Create("TextLabel", {
+						SelfModules.UI.Create("TextLabel", {
 							Name = "Label1",
 							AnchorPoint = Vector2.new(0, 0.5),
 							BackgroundTransparency = 1,
@@ -1006,7 +1058,7 @@ function Library:AddWindow(options)
 							TextXAlignment = Enum.TextXAlignment.Left,
 						}),
 
-						UI.Create("TextLabel", {
+						SelfModules.UI.Create("TextLabel", {
 							Name = "Label2",
 							AnchorPoint = Vector2.new(0, 0.5),
 							BackgroundTransparency = 1,
@@ -1041,18 +1093,18 @@ function Library:AddWindow(options)
 					Callback = callback,
 				}
 
-				ClipboardLabel.Frame = UI.Create("Frame", {
+				ClipboardLabel.Frame = SelfModules.UI.Create("Frame", {
 					Name = name,
-					BackgroundColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
+					BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
 					Size = UDim2.new(1, 2, 0, 22),
 
-					UI.Create("Frame", {
+					SelfModules.UI.Create("Frame", {
 						Name = "Holder",
-						BackgroundColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
+						BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
 						Position = UDim2.new(0, 1, 0, 1),
 						Size = UDim2.new(1, -2, 1, -2),
 
-						UI.Create("TextLabel", {
+						SelfModules.UI.Create("TextLabel", {
 							Name = "Label",
 							AnchorPoint = Vector2.new(0, 0.5),
 							BackgroundTransparency = 1,
@@ -1065,7 +1117,7 @@ function Library:AddWindow(options)
 							TextWrapped = true,
 						}),
 
-						UI.Create("ImageLabel", {
+						SelfModules.UI.Create("ImageLabel", {
 							Name = "Icon",
 							BackgroundTransparency = 1,
 							Position = UDim2.new(1, -18, 0, 2),
@@ -1103,18 +1155,18 @@ function Library:AddWindow(options)
 					Callback = callback,
 				}
 
-				Box.Frame = UI.Create("Frame", {
+				Box.Frame = SelfModules.UI.Create("Frame", {
 					Name = name,
-					BackgroundColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
+					BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
 					Size = UDim2.new(1, 2, 0, 32),
 
-					UI.Create("Frame", {
+					SelfModules.UI.Create("Frame", {
 						Name = "Holder",
-						BackgroundColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
+						BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
 						Position = UDim2.new(0, 1, 0, 1),
 						Size = UDim2.new(1, -2, 1, -2),
 
-						UI.Create("TextLabel", {
+						SelfModules.UI.Create("TextLabel", {
 							Name = "Label",
 							BackgroundTransparency = 1,
 							Position = UDim2.new(0, 5, 0.5, -7),
@@ -1127,22 +1179,22 @@ function Library:AddWindow(options)
 							TextXAlignment = Enum.TextXAlignment.Left,
 						}),
 
-						UI.Create("Frame", {
+						SelfModules.UI.Create("Frame", {
 							Name = "TextBox",
 							AnchorPoint = Vector2.new(1, 0),
-							BackgroundColor3 = UI.Color.Sub(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
+							BackgroundColor3 = SelfModules.UI.Color.Sub(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
 							Position = UDim2.new(1, -2, 0, 2),
 							Size = UDim2.new(0, 140, 1, -4),
 							ZIndex = 2,
 
-							UI.Create("Frame", {
+							SelfModules.UI.Create("Frame", {
 								Name = "Holder",
 								BackgroundColor3 = Library.Theme.SectionColor,
 								Position = UDim2.new(0, 1, 0, 1),
 								Size = UDim2.new(1, -2, 1, -2),
 								ZIndex = 2,
 
-								UI.Create("TextBox", {
+								SelfModules.UI.Create("TextBox", {
 									Name = "Box",
 									AnchorPoint = Vector2.new(0, 0.5),
 									BackgroundTransparency = 1,
@@ -1157,7 +1209,7 @@ function Library:AddWindow(options)
 									TextWrapped = true,
 								}),
 
-								UI.Create("TextLabel", {
+								SelfModules.UI.Create("TextLabel", {
 									Name = "Icon",
 									AnchorPoint = Vector2.new(0, 0.5),
 									BackgroundTransparency = 1,
@@ -1165,7 +1217,7 @@ function Library:AddWindow(options)
 									Size = UDim2.new(0, 14, 0, 14),
 									Font = Enum.Font.SourceSansBold,
 									Text = "T",
-									TextColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(40, 40, 40)),
+									TextColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(40, 40, 40)),
 									TextSize = 18,
 									TextWrapped = true,
 								}),
@@ -1219,18 +1271,18 @@ function Library:AddWindow(options)
 					Callback = callback,
 				}
 
-				Bind.Frame = UI.Create("Frame", {
+				Bind.Frame = SelfModules.UI.Create("Frame", {
 					Name = name,
-					BackgroundColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
+					BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
 					Size = UDim2.new(1, 2, 0, 32),
 
-					UI.Create("Frame", {
+					SelfModules.UI.Create("Frame", {
 						Name = "Holder",
-						BackgroundColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
+						BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
 						Position = UDim2.new(0, 1, 0, 1),
 						Size = UDim2.new(1, -2, 1, -2),
 
-						UI.Create("TextLabel", {
+						SelfModules.UI.Create("TextLabel", {
 							Name = "Label",
 							BackgroundTransparency = 1,
 							Position = UDim2.new(0, 5, 0.5, -7),
@@ -1243,17 +1295,17 @@ function Library:AddWindow(options)
 							TextXAlignment = Enum.TextXAlignment.Left,
 						}),
 
-						UI.Create("Frame", {
+						SelfModules.UI.Create("Frame", {
 							Name = "Bind",
 							AnchorPoint = Vector2.new(1, 0),
-							BackgroundColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(20, 20, 20)),
+							BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(20, 20, 20)),
 							Position = UDim2.new(1, options.toggleable == true and -44 or -2, 0, 2),
 							Size = UDim2.new(0, 78, 0, 26),
 							ZIndex = 2,
 
-							UI.Create("TextLabel", {
+							SelfModules.UI.Create("TextLabel", {
 								Name = "Label",
-								BackgroundColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
+								BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
 								Position = UDim2.new(0, 1, 0, 1),
 								Size = UDim2.new(1, -2, 1, -2),
 								Font = Enum.Font.SourceSans,
@@ -1311,10 +1363,10 @@ function Library:AddWindow(options)
 						Tab.Flags[Bind.Flag] = bool
 
 						tween(Bind.Frame.Holder.Indicator.Overlay, instant and 0 or 0.25, { ImageTransparency = bool and 0 or 1, Position = bool and UDim2.new(1, -24, 0, 2) or UDim2.new(0, 2, 0, 2) })
-						tween(Bind.Frame.Holder.Indicator.Overlay, "Cosmetic", instant and 0 or 0.25, { BackgroundColor3 = bool and UI.Color.Add(Library.Theme.Accent, Color3.fromRGB(50, 50, 50)) or UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(25, 25, 25)) })
+						tween(Bind.Frame.Holder.Indicator.Overlay, "Cosmetic", instant and 0 or 0.25, { BackgroundColor3 = bool and SelfModules.UI.Color.Add(Library.Theme.Accent, Color3.fromRGB(50, 50, 50)) or SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(25, 25, 25)) })
 
 						if options.fireontoggle ~= false then
-							pcall(task.spawn, Bind.Callback)
+							pcall(task.spawn, Bind.Callback, Bind.Bind)
 						end
 					end
 				end
@@ -1340,21 +1392,21 @@ function Library:AddWindow(options)
 							return
 						end
 
-						pcall(task.spawn, Bind.Callback)
+						pcall(task.spawn, Bind.Callback, Bind.Bind)
 					end
 				end)
 
 				if options.toggleable == true then
-					local indicator = UI.Create("Frame", {
+					local indicator = SelfModules.UI.Create("Frame", {
 						Name = "Indicator",
 						AnchorPoint = Vector2.new(1, 0),
-						BackgroundColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
+						BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
 						Position = UDim2.new(1, -2, 0, 2),
 						Size = UDim2.new(0, 40, 0, 26),
 
-						UI.Create("ImageLabel", {
+						SelfModules.UI.Create("ImageLabel", {
 							Name = "Overlay",
-							BackgroundColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(25, 25, 25)),
+							BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(25, 25, 25)),
 							Position = UDim2.new(0, 2, 0, 2),
 							Size = UDim2.new(0, 22, 0, 22),
 							Image = "http://www.roblox.com/asset/?id=7827504335",
@@ -1393,18 +1445,18 @@ function Library:AddWindow(options)
 					Callback = callback,
 				}
 
-				Slider.Frame = UI.Create("Frame", {
+				Slider.Frame = SelfModules.UI.Create("Frame", {
 					Name = name,
-					BackgroundColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
+					BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
 					Size = UDim2.new(1, 2, 0, 41),
 
-					UI.Create("Frame", {
+					SelfModules.UI.Create("Frame", {
 						Name = "Holder",
-						BackgroundColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
+						BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
 						Position = UDim2.new(0, 1, 0, 1),
 						Size = UDim2.new(1, -2, 1, -2),
 
-						UI.Create("TextLabel", {
+						SelfModules.UI.Create("TextLabel", {
 							Name = "Label",
 							BackgroundTransparency = 1,
 							Position = UDim2.new(0, 5, 0, 5),
@@ -1417,26 +1469,26 @@ function Library:AddWindow(options)
 							TextXAlignment = Enum.TextXAlignment.Left,
 						}),
 
-						UI.Create("Frame", {
+						SelfModules.UI.Create("Frame", {
 							Name = "Slider",
 							BackgroundTransparency = 1,
 							Position = UDim2.new(0, 5, 1, -15),
 							Size = UDim2.new(1, -10, 0, 10),
 
-							UI.Create("Frame", {
+							SelfModules.UI.Create("Frame", {
 								Name = "Bar",
-								BackgroundColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
+								BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
 								ClipsDescendants = true,
 								Size = UDim2.new(1, 0, 1, 0),
 
-								UI.Create("Frame", {
+								SelfModules.UI.Create("Frame", {
 									Name = "Fill",
-									BackgroundColor3 = UI.Color.Sub(Library.Theme.Accent, Color3.fromRGB(50, 50, 50)),
+									BackgroundColor3 = SelfModules.UI.Color.Sub(Library.Theme.Accent, Color3.fromRGB(50, 50, 50)),
 									Size = UDim2.new(0.5, 0, 1, 0),
 								}, UDim.new(0, 5)),
 							}, UDim.new(0, 5)),
 
-							UI.Create("Frame", {
+							SelfModules.UI.Create("Frame", {
 								Name = "Point",
 								AnchorPoint = Vector2.new(0.5, 0.5),
 								BackgroundColor3 = Library.Theme.Accent,
@@ -1445,7 +1497,7 @@ function Library:AddWindow(options)
 							}, UDim.new(0, 5)),
 						}),
 
-						UI.Create("TextBox", {
+						SelfModules.UI.Create("TextBox", {
 							Name = "Input",
 							AnchorPoint = Vector2.new(1, 0),
 							BackgroundTransparency = 1,
@@ -1506,7 +1558,7 @@ function Library:AddWindow(options)
 						Tab.Flags[Slider.Flag] = bool
 
 						tween(Slider.Frame.Holder.Indicator.Overlay, instant and 0 or 0.25, { ImageTransparency = bool and 0 or 1, Position = bool and UDim2.new(1, -24, 0, 2) or UDim2.new(0, 2, 0, 2) })
-						tween(Slider.Frame.Holder.Indicator.Overlay, "Cosmetic", instant and 0 or 0.25, { BackgroundColor3 = bool and UI.Color.Add(Library.Theme.Accent, Color3.fromRGB(50, 50, 50)) or UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(25, 25, 25)) })
+						tween(Slider.Frame.Holder.Indicator.Overlay, "Cosmetic", instant and 0 or 0.25, { BackgroundColor3 = bool and SelfModules.UI.Color.Add(Library.Theme.Accent, Color3.fromRGB(50, 50, 50)) or SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(25, 25, 25)) })
 
 						if options.fireontoggle ~= false then
 							pcall(task.spawn, Slider.Callback, Slider.Value, bool)
@@ -1559,16 +1611,16 @@ function Library:AddWindow(options)
 				end)
 
 				if options.toggleable == true then
-					local indicator = UI.Create("Frame", {
+					local indicator = SelfModules.UI.Create("Frame", {
 						Name = "Indicator",
 						AnchorPoint = Vector2.new(1, 1),
-						BackgroundColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
+						BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
 						Position = UDim2.new(1, -2, 1, -2),
 						Size = UDim2.new(0, 40, 0, 26),
 
-						UI.Create("ImageLabel", {
+						SelfModules.UI.Create("ImageLabel", {
 							Name = "Overlay",
-							BackgroundColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(25, 25, 25)),
+							BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(25, 25, 25)),
 							Position = UDim2.new(0, 2, 0, 2),
 							Size = UDim2.new(0, 22, 0, 22),
 							Image = "http://www.roblox.com/asset/?id=7827504335",
@@ -1608,29 +1660,31 @@ function Library:AddWindow(options)
 					Callback = callback,
 				}
 
-				Dropdown.Frame = UI.Create("Frame", {
+				local ListObjects = {}
+
+				Dropdown.Frame = SelfModules.UI.Create("Frame", {
 					Name = "Dropdown",
-					BackgroundColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
+					BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
 					Size = UDim2.new(1, 2, 0, 42),
 
-					UI.Create("Frame", {
+					SelfModules.UI.Create("Frame", {
 						Name = "Holder",
-						BackgroundColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
+						BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
 						Position = UDim2.new(0, 1, 0, 1),
 						Size = UDim2.new(1, -2, 1, -2),
 
-						UI.Create("Frame", {
+						SelfModules.UI.Create("Frame", {
 							Name = "Holder",
 							BackgroundTransparency = 1,
 							Size = UDim2.new(1, 0, 0, 40),
 
-							UI.Create("Frame", {
+							SelfModules.UI.Create("Frame", {
 								Name = "Displays",
 								BackgroundTransparency = 1,
 								Position = UDim2.new(0, 5, 0, 8),
 								Size = UDim2.new(1, -35, 0, 14),
 
-								UI.Create("TextLabel", {
+								SelfModules.UI.Create("TextLabel", {
 									Name = "Label",
 									BackgroundTransparency = 1,
 									Size = UDim2.new(0.5, 0, 1, 0),
@@ -1642,7 +1696,7 @@ function Library:AddWindow(options)
 									TextXAlignment = Enum.TextXAlignment.Left,
 								}),
 
-								UI.Create("TextLabel", {
+								SelfModules.UI.Create("TextLabel", {
 									Name = "Selected",
 									BackgroundTransparency = 1,
 									Position = UDim2.new(0.5, 0, 0, 0),
@@ -1656,7 +1710,7 @@ function Library:AddWindow(options)
 								}),
 							}),
 
-							UI.Create("ImageLabel", {
+							SelfModules.UI.Create("ImageLabel", {
 								Name = "Indicator",
 								AnchorPoint = Vector2.new(1, 0),
 								BackgroundTransparency = 1,
@@ -1665,16 +1719,16 @@ function Library:AddWindow(options)
 								Image = "rbxassetid://9243354333",
 							}),
 
-							UI.Create("Frame", {
+							SelfModules.UI.Create("Frame", {
 								Name = "Line",
-								BackgroundColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
+								BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
 								BorderSizePixel = 0,
 								Position = UDim2.new(0, 5, 0, 30),
 								Size = UDim2.new(1, -10, 0, 2),
 							}),
 						}, UDim.new(0, 5)),
 
-						UI.Create("ScrollingFrame", {
+						SelfModules.UI.Create("ScrollingFrame", {
 							Name = "List",
 							Active = true,
 							BackgroundTransparency = 1,
@@ -1682,10 +1736,10 @@ function Library:AddWindow(options)
 							Position = UDim2.new(0, 5, 0, 40),
 							Size = UDim2.new(1, -10, 1, -40),
 							CanvasSize = UDim2.new(0, 0, 0, 0),
-							ScrollBarImageColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
+							ScrollBarImageColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
 							ScrollBarThickness = 5,
 
-							UI.Create("UIListLayout", {
+							SelfModules.UI.Create("UIListLayout", {
 								SortOrder = Enum.SortOrder.LayoutOrder,
 								Padding = UDim.new(0, 5),
 							}),
@@ -1714,14 +1768,14 @@ function Library:AddWindow(options)
 						Callback = callback,
 					}
 
-					Item.Frame = UI.Create("Frame", {
+					Item.Frame = SelfModules.UI.Create("Frame", {
 						Name = name,
-						BackgroundColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(20, 20, 20)),
+						BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(20, 20, 20)),
 						Size = UDim2.new(1, -10, 0, 22),
 
-						UI.Create("TextButton", {
+						SelfModules.UI.Create("TextButton", {
 							Name = "Button",
-							BackgroundColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
+							BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
 							Position = UDim2.new(0, 1, 0, 1),
 							Size = UDim2.new(1, -2, 1, -2),
 							Font = Enum.Font.SourceSans,
@@ -1735,6 +1789,7 @@ function Library:AddWindow(options)
 					-- Scripts
 
 					Dropdown.List[#Dropdown.List + 1] = name
+					ListObjects[#ListObjects + 1] = Item
 					Item.Frame.Parent = Dropdown.Frame.Holder.List
 
 					if Dropdown.Toggled == true then
@@ -1752,26 +1807,41 @@ function Library:AddWindow(options)
 					return Item
 				end
 
-				function Dropdown:Remove(name)
-					local listIndex = table.find(Dropdown.List, name)
+				function Dropdown:Remove(name, ignoreToggle)
+					for i, v in next, Dropdown.List do
+						if v == name then
+							local item = ListObjects[i]
 
-					if listIndex ~= nil then
-						Dropdown.Frame.Holder.List[name]:Destroy()
-						table.remove(Dropdown.List, listIndex)
+							if item then
+								item.Frame:Destroy()
+								table.remove(Dropdown.List, i)
+								table.remove(ListObjects, i)
 
-						if Dropdown.Toggled == true then
-							Dropdown:UpdateHeight()
-						end
-						
-						if #Dropdown.List == 0 then
-							Dropdown:Toggle(false)
+								if Dropdown.Toggled then
+									Dropdown:UpdateHeight()
+								end
+								
+								if #Dropdown.List == 0 and not ignoreToggle then
+									Dropdown:Toggle(false)
+								end
+							end
+
+							break
 						end
 					end
 				end
 
 				function Dropdown:ClearList()
-					for i, v in next, Dropdown.List do
-						Dropdown:Remove(v)
+					for _ = 1, #Dropdown.List, 1 do
+						Dropdown:Remove(Dropdown.List[1], true)
+					end
+				end
+
+				function Dropdown:SetList(list)
+					Dropdown:ClearList()
+
+					for _, v in next, list do
+						Dropdown:Add(v)
 					end
 				end
 
@@ -1831,28 +1901,28 @@ function Library:AddWindow(options)
 					Callback = callback,
 				}
 
-				local h, s, v = (options.color or Color3.fromRGB(255, 0, 0)):ToHSV()
+				local h, s, v = (options.color or Library.Theme.Accent):ToHSV()
 				Picker.Color = { R = h, G = s, B = v }
 
-				Picker.Frame = UI.Create("Frame", {
+				Picker.Frame = SelfModules.UI.Create("Frame", {
 					Name = "ColorPicker",
-					BackgroundColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
+					BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
 					ClipsDescendants = true,
 					Size = UDim2.new(1, 2, 0, 42),
 
-					UI.Create("Frame", {
+					SelfModules.UI.Create("Frame", {
 						Name = "Holder",
-						BackgroundColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
+						BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
 						ClipsDescendants = true,
 						Position = UDim2.new(0, 1, 0, 1),
 						Size = UDim2.new(1, -2, 1, -2),
 
-						UI.Create("Frame", {
+						SelfModules.UI.Create("Frame", {
 							Name = "Top",
 							BackgroundTransparency = 1,
 							Size = UDim2.new(1, 0, 0, 40),
 
-							UI.Create("TextLabel", {
+							SelfModules.UI.Create("TextLabel", {
 								Name = "Label",
 								BackgroundTransparency = 1,
 								Position = UDim2.new(0, 5, 0, 8),
@@ -1865,21 +1935,21 @@ function Library:AddWindow(options)
 								TextXAlignment = Enum.TextXAlignment.Left,
 							}),
 
-							UI.Create("Frame", {
+							SelfModules.UI.Create("Frame", {
 								Name = "Selected",
 								AnchorPoint = Vector2.new(1, 0),
-								BackgroundColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
+								BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
 								Position = UDim2.new(1, -29, 0, 2),
 								Size = UDim2.new(0, 100, 0, 26),
 
-								UI.Create("Frame", {
+								SelfModules.UI.Create("Frame", {
 									Name = "Preview",
 									BackgroundColor3 = Color3.fromHSV(Picker.Color.R, Picker.Color.G, Picker.Color.B),
 									Position = UDim2.new(0, 1, 0, 1),
 									Size = UDim2.new(1, -2, 1, -2),
 								}, UDim.new(0, 5)),
 
-								UI.Create("TextLabel", {
+								SelfModules.UI.Create("TextLabel", {
 									Name = "Display",
 									AnchorPoint = Vector2.new(0, 0.5),
 									BackgroundTransparency = 1,
@@ -1889,12 +1959,12 @@ function Library:AddWindow(options)
 									Text = "",
 									TextColor3 = Library.Theme.TextColor,
 									TextSize = 16,
-									TextStrokeColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
+									TextStrokeColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
 									TextStrokeTransparency = 0.5,
 								}),
 							}, UDim.new(0, 5)),
 
-							UI.Create("ImageLabel", {
+							SelfModules.UI.Create("ImageLabel", {
 								Name = "Indicator",
 								AnchorPoint = Vector2.new(1, 0),
 								BackgroundTransparency = 1,
@@ -1903,16 +1973,16 @@ function Library:AddWindow(options)
 								Image = "rbxassetid://9243354333",
 							}),
 
-							UI.Create("Frame", {
+							SelfModules.UI.Create("Frame", {
 								Name = "Line",
-								BackgroundColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
+								BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
 								BorderSizePixel = 0,
 								Position = UDim2.new(0, 5, 0, 30),
 								Size = UDim2.new(1, -10, 0, 2),
 							}),
 						}),
 
-						UI.Create("Frame", {
+						SelfModules.UI.Create("Frame", {
 							Name = "Holder",
 							Active = true,
 							BackgroundTransparency = 1,
@@ -1920,22 +1990,22 @@ function Library:AddWindow(options)
 							Position = UDim2.new(0, 0, 0, 40),
 							Size = UDim2.new(1, 0, 1, -40),
 
-							UI.Create("Frame", {
+							SelfModules.UI.Create("Frame", {
 								Name = "Palette",
 								BackgroundTransparency = 1,
 								BorderSizePixel = 0,
 								Position = UDim2.new(0, 5, 0, 5),
 								Size = UDim2.new(1, -196, 0, 110),
 
-								UI.Create("Frame", {
+								SelfModules.UI.Create("Frame", {
 									Name = "Point",
 									AnchorPoint = Vector2.new(0.5, 0.5),
-									BackgroundColor3 = UI.Color.Sub(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
+									BackgroundColor3 = SelfModules.UI.Color.Sub(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
 									Position = UDim2.new(1, 0, 0, 0),
 									Size = UDim2.new(0, 7, 0, 7),
 									ZIndex = 2,
 
-									UI.Create("Frame", {
+									SelfModules.UI.Create("Frame", {
 										Name = "Inner",
 										BackgroundColor3 = Color3.fromRGB(255, 255, 255),
 										Position = UDim2.new(0, 1, 0, 1),
@@ -1944,25 +2014,25 @@ function Library:AddWindow(options)
 									}, UDim.new(1, 0)),
 								}, UDim.new(1, 0)),
 
-								UI.Create("Frame", {
+								SelfModules.UI.Create("Frame", {
 									Name = "Hue",
 									BackgroundColor3 = Color3.fromRGB(255, 255, 255),
 									BorderSizePixel = 0,
 									Size = UDim2.new(1, 0, 1, 0),
 
-									UI.Create("UIGradient", {
+									SelfModules.UI.Create("UIGradient", {
 										Color = ColorSequence.new{ColorSequenceKeypoint.new(0.00, Color3.fromRGB(255, 255, 255)), ColorSequenceKeypoint.new(1.00, Color3.fromHSV(Picker.Color.R, Picker.Color.G, Picker.Color.B))},
 									}),
 								}, UDim.new(0, 5)),
 
-								UI.Create("Frame", {
+								SelfModules.UI.Create("Frame", {
 									Name = "SatVal",
 									BackgroundColor3 = Color3.fromRGB(255, 255, 255),
 									BorderSizePixel = 0,
 									Size = UDim2.new(1, 0, 1, 0),
 									ZIndex = 2,
 
-									UI.Create("UIGradient", {
+									SelfModules.UI.Create("UIGradient", {
 										Color = ColorSequence.new{ColorSequenceKeypoint.new(0.00, Color3.fromRGB(255, 255, 255)), ColorSequenceKeypoint.new(1.00, Color3.fromRGB(0, 0, 0))},
 										Rotation = 90,
 										Transparency = NumberSequence.new{NumberSequenceKeypoint.new(0.00, 1.00), NumberSequenceKeypoint.new(1.00, 0.00)},
@@ -1970,14 +2040,14 @@ function Library:AddWindow(options)
 								}, UDim.new(0, 5)),
 							}),
 
-							UI.Create("Frame", {
+							SelfModules.UI.Create("Frame", {
 								Name = "HueSlider",
 								BackgroundColor3 = Color3.fromRGB(255, 255, 255),
 								BorderSizePixel = 0,
 								Position = UDim2.new(0, 5, 0, 125),
 								Size = UDim2.new(1, -10, 0, 20),
 
-								UI.Create("UIGradient", {
+								SelfModules.UI.Create("UIGradient", {
 									Color = ColorSequence.new{
 										ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 0, 0)),
 										ColorSequenceKeypoint.new(0.16666, Color3.fromRGB(255, 255, 0)),
@@ -1989,14 +2059,14 @@ function Library:AddWindow(options)
 									},
 								}),
 
-								UI.Create("Frame", {
+								SelfModules.UI.Create("Frame", {
 									Name = "Bar",
 									AnchorPoint = Vector2.new(0.5, 0.5),
-									BackgroundColor3 = UI.Color.Sub(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
+									BackgroundColor3 = SelfModules.UI.Color.Sub(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
 									Position = UDim2.new(0.5, 0, 0, 0),
 									Size = UDim2.new(0, 6, 1, 6),
 
-									UI.Create("Frame", {
+									SelfModules.UI.Create("Frame", {
 										Name = "Inner",
 										BackgroundColor3 = Color3.fromRGB(255, 255, 255),
 										Position = UDim2.new(0, 1, 0, 1),
@@ -2005,20 +2075,20 @@ function Library:AddWindow(options)
 								}, UDim.new(0, 5)),
 							}, UDim.new(0, 5)),
 
-							UI.Create("Frame", {
+							SelfModules.UI.Create("Frame", {
 								Name = "RGB",
 								BackgroundTransparency = 1,
 								Position = UDim2.new(1, -180, 0, 5),
 								Size = UDim2.new(0, 75, 0, 110),
 
-								UI.Create("Frame", {
+								SelfModules.UI.Create("Frame", {
 									Name = "Red",
 									BackgroundTransparency = 1,
 									Size = UDim2.new(1, 0, 0, 30),
 
-									UI.Create("TextBox", {
+									SelfModules.UI.Create("TextBox", {
 										Name = "Box",
-										BackgroundColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
+										BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
 										Size = UDim2.new(1, 0, 1, 0),
 										Font = Enum.Font.SourceSans,
 										PlaceholderText = "R",
@@ -2029,15 +2099,15 @@ function Library:AddWindow(options)
 									}, UDim.new(0, 5)),
 								}, UDim.new(0, 5)),
 
-								UI.Create("Frame", {
+								SelfModules.UI.Create("Frame", {
 									Name = "Green",
 									BackgroundTransparency = 1,
 									Position = UDim2.new(0, 0, 0, 40),
 									Size = UDim2.new(1, 0, 0, 30),
 
-									UI.Create("TextBox", {
+									SelfModules.UI.Create("TextBox", {
 										Name = "Box",
-										BackgroundColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
+										BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
 										Size = UDim2.new(1, 0, 1, 0),
 										Font = Enum.Font.SourceSans,
 										PlaceholderText = "G",
@@ -2048,15 +2118,15 @@ function Library:AddWindow(options)
 									}, UDim.new(0, 5)),
 								}, UDim.new(0, 5)),
 
-								UI.Create("Frame", {
+								SelfModules.UI.Create("Frame", {
 									Name = "Blue",
 									BackgroundTransparency = 1,
 									Position = UDim2.new(0, 0, 0, 80),
 									Size = UDim2.new(1, 0, 0, 30),
 
-									UI.Create("TextBox", {
+									SelfModules.UI.Create("TextBox", {
 										Name = "Box",
-										BackgroundColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
+										BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
 										Size = UDim2.new(1, 0, 1, 0),
 										Font = Enum.Font.SourceSans,
 										PlaceholderText = "B",
@@ -2068,14 +2138,14 @@ function Library:AddWindow(options)
 								}, UDim.new(0, 5)),
 							}),
 
-							UI.Create("Frame", {
+							SelfModules.UI.Create("Frame", {
 								Name = "Rainbow",
 								AnchorPoint = Vector2.new(1, 0),
 								BackgroundTransparency = 1,
 								Position = UDim2.new(1, -5, 0, 87),
 								Size = UDim2.new(0, 90, 0, 26),
 
-								UI.Create("TextLabel", {
+								SelfModules.UI.Create("TextLabel", {
 									Name = "Label",
 									AnchorPoint = Vector2.new(0, 0.5),
 									BackgroundTransparency = 1,
@@ -2089,14 +2159,14 @@ function Library:AddWindow(options)
 									TextXAlignment = Enum.TextXAlignment.Left,
 								}),
 
-								UI.Create("Frame", {
+								SelfModules.UI.Create("Frame", {
 									Name = "Indicator",
-									BackgroundColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
+									BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
 									Size = UDim2.new(0, 40, 0, 26),
 
-									UI.Create("ImageLabel", {
+									SelfModules.UI.Create("ImageLabel", {
 										Name = "Overlay",
-										BackgroundColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(25, 25, 25)),
+										BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(25, 25, 25)),
 										Position = UDim2.new(0, 2, 0, 2),
 										Size = UDim2.new(0, 22, 0, 22),
 										Image = "http://www.roblox.com/asset/?id=7827504335",
@@ -2131,7 +2201,7 @@ function Library:AddWindow(options)
 					Picker.Rainbow = bool
 
 					tween(Picker.Frame.Holder.Holder.Rainbow.Indicator.Overlay, 0.25, {ImageTransparency = bool and 0 or 1, Position = bool and UDim2.new(1, -24, 0, 2) or UDim2.new(0, 2, 0, 2) })
-					tween(Picker.Frame.Holder.Holder.Rainbow.Indicator.Overlay, "Cosmetic", 0.25, { BackgroundColor3 = bool and UI.Color.Add(Library.Theme.Accent, Color3.fromRGB(50, 50, 50)) or UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(25, 25, 25)) })
+					tween(Picker.Frame.Holder.Holder.Rainbow.Indicator.Overlay, "Cosmetic", 0.25, { BackgroundColor3 = bool and SelfModules.UI.Color.Add(Library.Theme.Accent, Color3.fromRGB(50, 50, 50)) or SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(25, 25, 25)) })
 
 					if bool then
 						if not Storage.Connections[Picker] then
@@ -2267,18 +2337,18 @@ function Library:AddWindow(options)
 					List = {},
 				}
 
-				SubSection.Frame = UI.Create("Frame", {
+				SubSection.Frame = SelfModules.UI.Create("Frame", {
 					Name = "SubSection",
-					BackgroundColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
+					BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
 					Size = UDim2.new(1, 2, 0, 42),
 
-					UI.Create("Frame", {
+					SelfModules.UI.Create("Frame", {
 						Name = "Holder",
-						BackgroundColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
+						BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
 						Position = UDim2.new(0, 1, 0, 1),
 						Size = UDim2.new(1, -2, 1, -2),
 
-						UI.Create("TextLabel", {
+						SelfModules.UI.Create("TextLabel", {
 							Name = "Header",
 							BackgroundTransparency = 1,
 							Position = UDim2.new(0, 5, 0, 8),
@@ -2291,7 +2361,7 @@ function Library:AddWindow(options)
 							TextXAlignment = Enum.TextXAlignment.Left,
 						}),
 
-						UI.Create("TextLabel", {
+						SelfModules.UI.Create("TextLabel", {
 							Name = "Indicator",
 							AnchorPoint = Vector2.new(1, 0),
 							BackgroundTransparency = 1,
@@ -2303,28 +2373,28 @@ function Library:AddWindow(options)
 							TextSize = 20,
 						}),
 
-						UI.Create("Frame", {
+						SelfModules.UI.Create("Frame", {
 							Name = "Line",
-							BackgroundColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
+							BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
 							BorderSizePixel = 0,
 							Position = UDim2.new(0, 5, 0, 30),
 							Size = UDim2.new(1, -10, 0, 2),
 						}),
 
-						UI.Create("Frame", {
+						SelfModules.UI.Create("Frame", {
 							Name = "List",
 							BackgroundTransparency = 1,
 							ClipsDescendants = true,
 							Position = UDim2.new(0, 5, 0, 40),
 							Size = UDim2.new(1, -10, 1, -40),
 
-							UI.Create("UIListLayout", {
+							SelfModules.UI.Create("UIListLayout", {
 								HorizontalAlignment = Enum.HorizontalAlignment.Center,
 								SortOrder = Enum.SortOrder.LayoutOrder,
 								Padding = UDim.new(0, 5),
 							}),
 
-							UI.Create("UIPadding", {
+							SelfModules.UI.Create("UIPadding", {
 								PaddingBottom = UDim.new(0, 1),
 								PaddingLeft = UDim.new(0, 1),
 								PaddingRight = UDim.new(0, 1),
@@ -2360,7 +2430,7 @@ function Library:AddWindow(options)
 
 				function SubSection:UpdateHeight()
 					if SubSection.Toggled == true then
-						SubSection.Frame.Size = UDim2.new(1, -10, 0, SubSection:GetHeight())
+						SubSection.Frame.Size = UDim2.new(1, 2, 0, SubSection:GetHeight())
 						SubSection.Frame.Holder.Indicator.Rotation = 45
 
 						Section:UpdateHeight()
@@ -2376,20 +2446,20 @@ function Library:AddWindow(options)
 						Callback = callback,
 					}
 
-					Button.Frame = UI.Create("Frame", {
+					Button.Frame = SelfModules.UI.Create("Frame", {
 						Name = name,
-						BackgroundColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(20, 20, 20)),
+						BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(20, 20, 20)),
 						Size = UDim2.new(1, 2, 0, 32),
 
-						UI.Create("Frame", {
+						SelfModules.UI.Create("Frame", {
 							Name = "Holder",
-							BackgroundColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
+							BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
 							Size = UDim2.new(1, -2, 1, -2),
 							Position = UDim2.new(0, 1, 0, 1),
 
-							UI.Create("TextButton", {
+							SelfModules.UI.Create("TextButton", {
 								Name = "Button",
-								BackgroundColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(20, 20, 20)),
+								BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(20, 20, 20)),
 								Position = UDim2.new(0, 2, 0, 2),
 								Size = UDim2.new(1, -4, 1, -4),
 								AutoButtonColor = false,
@@ -2406,7 +2476,7 @@ function Library:AddWindow(options)
 
 					local function buttonVisual()
 						task.spawn(function()
-							local Visual = UI.Create("Frame", {
+							local Visual = SelfModules.UI.Create("Frame", {
 								Name = "Visual",
 								AnchorPoint = Vector2.new(0.5, 0.5),
 								BackgroundColor3 = Color3.fromRGB(255, 255, 255),
@@ -2455,18 +2525,18 @@ function Library:AddWindow(options)
 						Callback = callback,
 					}
 
-					Toggle.Frame = UI.Create("Frame", {
+					Toggle.Frame = SelfModules.UI.Create("Frame", {
 						Name = name,
-						BackgroundColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(20, 20, 20)),
+						BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(20, 20, 20)),
 						Size = UDim2.new(1, 2, 0, 32),
 
-						UI.Create("Frame", {
+						SelfModules.UI.Create("Frame", {
 							Name = "Holder",
-							BackgroundColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
+							BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
 							Position = UDim2.new(0, 1, 0, 1),
 							Size = UDim2.new(1, -2, 1, -2),
 
-							UI.Create("TextLabel", {
+							SelfModules.UI.Create("TextLabel", {
 								Name = "Label",
 								BackgroundTransparency = 1,
 								Position = UDim2.new(0, 5, 0.5, -7),
@@ -2479,15 +2549,15 @@ function Library:AddWindow(options)
 								TextXAlignment = Enum.TextXAlignment.Left,
 							}),
 
-							UI.Create("Frame", {
+							SelfModules.UI.Create("Frame", {
 								Name = "Indicator",
-								BackgroundColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(20, 20, 20)),
+								BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(20, 20, 20)),
 								Position = UDim2.new(1, -42, 0, 2),
 								Size = UDim2.new(0, 40, 0, 26),
 
-								UI.Create("ImageLabel", {
+								SelfModules.UI.Create("ImageLabel", {
 									Name = "Overlay",
-									BackgroundColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(25, 25, 25)),
+									BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(25, 25, 25)),
 									Position = UDim2.new(0, 2, 0, 2),
 									Size = UDim2.new(0, 22, 0, 22),
 									Image = "http://www.roblox.com/asset/?id=7827504335",
@@ -2503,7 +2573,7 @@ function Library:AddWindow(options)
 						Tab.Flags[Toggle.Flag] = bool
 
 						tween(Toggle.Frame.Holder.Indicator.Overlay, instant and 0 or 0.25, { ImageTransparency = bool and 0 or 1, Position = bool and UDim2.new(1, -24, 0, 2) or UDim2.new(0, 2, 0, 2) })
-						tween(Toggle.Frame.Holder.Indicator.Overlay, "Cosmetic", instant and 0 or 0.25, { BackgroundColor3 = bool and UI.Color.Add(Library.Theme.Accent, Color3.fromRGB(50, 50, 50)) or UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(25, 25, 25)) })
+						tween(Toggle.Frame.Holder.Indicator.Overlay, "Cosmetic", instant and 0 or 0.25, { BackgroundColor3 = bool and SelfModules.UI.Color.Add(Library.Theme.Accent, Color3.fromRGB(50, 50, 50)) or SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(25, 25, 25)) })
 					
 						pcall(task.spawn, Toggle.Callback, bool)
 					end
@@ -2533,18 +2603,18 @@ function Library:AddWindow(options)
 						Type = "Label",
 					}
 
-					Label.Frame = UI.Create("Frame", {
+					Label.Frame = SelfModules.UI.Create("Frame", {
 						Name = name,
-						BackgroundColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(20, 20, 20)),
+						BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(20, 20, 20)),
 						Size = UDim2.new(1, 2, 0, 22),
 
-						UI.Create("Frame", {
+						SelfModules.UI.Create("Frame", {
 							Name = "Holder",
-							BackgroundColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
+							BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
 							Position = UDim2.new(0, 1, 0, 1),
 							Size = UDim2.new(1, -2, 1, -2),
 
-							UI.Create("TextLabel", {
+							SelfModules.UI.Create("TextLabel", {
 								Name = "Label",
 								AnchorPoint = Vector2.new(0, 0.5),
 								BackgroundTransparency = 1,
@@ -2578,18 +2648,18 @@ function Library:AddWindow(options)
 						Type = "DualLabel",
 					}
 
-					DualLabel.Frame = UI.Create("Frame", {
+					DualLabel.Frame = SelfModules.UI.Create("Frame", {
 						Name = options[1].. " ".. options[2],
-						BackgroundColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(20, 20, 20)),
+						BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(20, 20, 20)),
 						Size = UDim2.new(1, 2, 0, 22),
 
-						UI.Create("Frame", {
+						SelfModules.UI.Create("Frame", {
 							Name = "Holder",
-							BackgroundColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
+							BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
 							Position = UDim2.new(0, 1, 0, 1),
 							Size = UDim2.new(1, -2, 1, -2),
 
-							UI.Create("TextLabel", {
+							SelfModules.UI.Create("TextLabel", {
 								Name = "Label1",
 								AnchorPoint = Vector2.new(0, 0.5),
 								BackgroundTransparency = 1,
@@ -2603,7 +2673,7 @@ function Library:AddWindow(options)
 								TextXAlignment = Enum.TextXAlignment.Left,
 							}),
 
-							UI.Create("TextLabel", {
+							SelfModules.UI.Create("TextLabel", {
 								Name = "Label2",
 								AnchorPoint = Vector2.new(0, 0.5),
 								BackgroundTransparency = 1,
@@ -2638,18 +2708,18 @@ function Library:AddWindow(options)
 						Callback = callback,
 					}
 
-					ClipboardLabel.Frame = UI.Create("Frame", {
+					ClipboardLabel.Frame = SelfModules.UI.Create("Frame", {
 						Name = name,
-						BackgroundColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(20, 20, 20)),
+						BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(20, 20, 20)),
 						Size = UDim2.new(1, 2, 0, 22),
 
-						UI.Create("Frame", {
+						SelfModules.UI.Create("Frame", {
 							Name = "Holder",
-							BackgroundColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
+							BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
 							Position = UDim2.new(0, 1, 0, 1),
 							Size = UDim2.new(1, -2, 1, -2),
 
-							UI.Create("TextLabel", {
+							SelfModules.UI.Create("TextLabel", {
 								Name = "Label",
 								AnchorPoint = Vector2.new(0, 0.5),
 								BackgroundTransparency = 1,
@@ -2662,7 +2732,7 @@ function Library:AddWindow(options)
 								TextWrapped = true,
 							}),
 
-							UI.Create("ImageLabel", {
+							SelfModules.UI.Create("ImageLabel", {
 								Name = "Icon",
 								BackgroundTransparency = 1,
 								Position = UDim2.new(1, -18, 0, 2),
@@ -2700,18 +2770,18 @@ function Library:AddWindow(options)
 						Callback = callback,
 					}
 
-					Box.Frame = UI.Create("Frame", {
+					Box.Frame = SelfModules.UI.Create("Frame", {
 						Name = name,
-						BackgroundColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(20, 20, 20)),
+						BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(20, 20, 20)),
 						Size = UDim2.new(1, 2, 0, 32),
 
-						UI.Create("Frame", {
+						SelfModules.UI.Create("Frame", {
 							Name = "Holder",
-							BackgroundColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
+							BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
 							Position = UDim2.new(0, 1, 0, 1),
 							Size = UDim2.new(1, -2, 1, -2),
 
-							UI.Create("TextLabel", {
+							SelfModules.UI.Create("TextLabel", {
 								Name = "Label",
 								BackgroundTransparency = 1,
 								Position = UDim2.new(0, 5, 0.5, -7),
@@ -2724,7 +2794,7 @@ function Library:AddWindow(options)
 								TextXAlignment = Enum.TextXAlignment.Left,
 							}),
 
-							UI.Create("Frame", {
+							SelfModules.UI.Create("Frame", {
 								Name = "TextBox",
 								AnchorPoint = Vector2.new(1, 0),
 								BackgroundColor3 = Library.Theme.SectionColor,
@@ -2732,14 +2802,14 @@ function Library:AddWindow(options)
 								Size = UDim2.new(0, 140, 1, -4),
 								ZIndex = 2,
 
-								UI.Create("Frame", {
+								SelfModules.UI.Create("Frame", {
 									Name = "Holder",
-									BackgroundColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
+									BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(5, 5, 5)),
 									Position = UDim2.new(0, 1, 0, 1),
 									Size = UDim2.new(1, -2, 1, -2),
 									ZIndex = 2,
 
-									UI.Create("TextBox", {
+									SelfModules.UI.Create("TextBox", {
 										Name = "Box",
 										AnchorPoint = Vector2.new(0, 0.5),
 										BackgroundTransparency = 1,
@@ -2754,7 +2824,7 @@ function Library:AddWindow(options)
 										TextWrapped = true,
 									}),
 
-									UI.Create("TextLabel", {
+									SelfModules.UI.Create("TextLabel", {
 										Name = "Icon",
 										AnchorPoint = Vector2.new(0, 0.5),
 										BackgroundTransparency = 1,
@@ -2762,7 +2832,7 @@ function Library:AddWindow(options)
 										Size = UDim2.new(0, 14, 0, 14),
 										Font = Enum.Font.SourceSansBold,
 										Text = "T",
-										TextColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(40, 40, 40)),
+										TextColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(40, 40, 40)),
 										TextSize = 18,
 										TextWrapped = true,
 									}),
@@ -2816,18 +2886,18 @@ function Library:AddWindow(options)
 						Callback = callback,
 					}
 
-					Bind.Frame = UI.Create("Frame", {
+					Bind.Frame = SelfModules.UI.Create("Frame", {
 						Name = name,
-						BackgroundColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(20, 20, 20)),
+						BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(20, 20, 20)),
 						Size = UDim2.new(1, 2, 0, 32),
 
-						UI.Create("Frame", {
+						SelfModules.UI.Create("Frame", {
 							Name = "Holder",
-							BackgroundColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
+							BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
 							Position = UDim2.new(0, 1, 0, 1),
 							Size = UDim2.new(1, -2, 1, -2),
 
-							UI.Create("TextLabel", {
+							SelfModules.UI.Create("TextLabel", {
 								Name = "Label",
 								BackgroundTransparency = 1,
 								Position = UDim2.new(0, 5, 0.5, -7),
@@ -2840,17 +2910,17 @@ function Library:AddWindow(options)
 								TextXAlignment = Enum.TextXAlignment.Left,
 							}),
 
-							UI.Create("Frame", {
+							SelfModules.UI.Create("Frame", {
 								Name = "Bind",
 								AnchorPoint = Vector2.new(1, 0),
-								BackgroundColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(20, 20, 20)),
+								BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(20, 20, 20)),
 								Position = UDim2.new(1, options.toggleable == true and -44 or -2, 0, 2),
 								Size = UDim2.new(0, 78, 0, 26),
 								ZIndex = 2,
 
-								UI.Create("TextLabel", {
+								SelfModules.UI.Create("TextLabel", {
 									Name = "Label",
-									BackgroundColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
+									BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
 									Position = UDim2.new(0, 1, 0, 1),
 									Size = UDim2.new(1, -2, 1, -2),
 									Font = Enum.Font.SourceSans,
@@ -2908,10 +2978,10 @@ function Library:AddWindow(options)
 							Tab.Flags[Bind.Flag] = bool
 
 							tween(Bind.Frame.Holder.Indicator.Overlay, instant and 0 or 0.25, { ImageTransparency = bool and 0 or 1, Position = bool and UDim2.new(1, -24, 0, 2) or UDim2.new(0, 2, 0, 2) })
-							tween(Bind.Frame.Holder.Indicator.Overlay, "Cosmetic", instant and 0 or 0.25, { BackgroundColor3 = bool and UI.Color.Add(Library.Theme.Accent, Color3.fromRGB(50, 50, 50)) or UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(25, 25, 25)) })
+							tween(Bind.Frame.Holder.Indicator.Overlay, "Cosmetic", instant and 0 or 0.25, { BackgroundColor3 = bool and SelfModules.UI.Color.Add(Library.Theme.Accent, Color3.fromRGB(50, 50, 50)) or SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(25, 25, 25)) })
 
 							if options.fireontoggle ~= false then
-								pcall(task.spawn, Bind.Callback)
+								pcall(task.spawn, Bind.Callback, Bind.Bind)
 							end
 						end
 					end
@@ -2937,21 +3007,21 @@ function Library:AddWindow(options)
 								return
 							end
 
-							pcall(task.spawn, Bind.Callback)
+							pcall(task.spawn, Bind.Callback, Bind.Bind)
 						end
 					end)
 
 					if options.toggleable == true then
-						local indicator = UI.Create("Frame", {
+						local indicator = SelfModules.UI.Create("Frame", {
 							Name = "Indicator",
 							AnchorPoint = Vector2.new(1, 0),
-							BackgroundColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(20, 20, 20)),
+							BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(20, 20, 20)),
 							Position = UDim2.new(1, -2, 0, 2),
 							Size = UDim2.new(0, 40, 0, 26),
 
-							UI.Create("ImageLabel", {
+							SelfModules.UI.Create("ImageLabel", {
 								Name = "Overlay",
-								BackgroundColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(25, 25, 25)),
+								BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(25, 25, 25)),
 								Position = UDim2.new(0, 2, 0, 2),
 								Size = UDim2.new(0, 22, 0, 22),
 								Image = "http://www.roblox.com/asset/?id=7827504335",
@@ -2990,18 +3060,18 @@ function Library:AddWindow(options)
 						Callback = callback,
 					}
 
-					Slider.Frame = UI.Create("Frame", {
+					Slider.Frame = SelfModules.UI.Create("Frame", {
 						Name = name,
-						BackgroundColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(20, 20, 20)),
+						BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(20, 20, 20)),
 						Size = UDim2.new(1, 2, 0, 41),
 
-						UI.Create("Frame", {
+						SelfModules.UI.Create("Frame", {
 							Name = "Holder",
-							BackgroundColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
+							BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
 							Position = UDim2.new(0, 1, 0, 1),
 							Size = UDim2.new(1, -2, 1, -2),
 
-							UI.Create("TextLabel", {
+							SelfModules.UI.Create("TextLabel", {
 								Name = "Label",
 								BackgroundTransparency = 1,
 								Position = UDim2.new(0, 5, 0, 5),
@@ -3014,26 +3084,26 @@ function Library:AddWindow(options)
 								TextXAlignment = Enum.TextXAlignment.Left,
 							}),
 
-							UI.Create("Frame", {
+							SelfModules.UI.Create("Frame", {
 								Name = "Slider",
 								BackgroundTransparency = 1,
 								Position = UDim2.new(0, 5, 1, -15),
 								Size = UDim2.new(1, -10, 0, 10),
 
-								UI.Create("Frame", {
+								SelfModules.UI.Create("Frame", {
 									Name = "Bar",
-									BackgroundColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(20, 20, 20)),
+									BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(20, 20, 20)),
 									ClipsDescendants = true,
 									Size = UDim2.new(1, 0, 1, 0),
 
-									UI.Create("Frame", {
+									SelfModules.UI.Create("Frame", {
 										Name = "Fill",
-										BackgroundColor3 = UI.Color.Sub(Library.Theme.Accent, Color3.fromRGB(50, 50, 50)),
+										BackgroundColor3 = SelfModules.UI.Color.Sub(Library.Theme.Accent, Color3.fromRGB(50, 50, 50)),
 										Size = UDim2.new(0.5, 0, 1, 0),
 									}, UDim.new(0, 5)),
 								}, UDim.new(0, 5)),
 
-								UI.Create("Frame", {
+								SelfModules.UI.Create("Frame", {
 									Name = "Point",
 									AnchorPoint = Vector2.new(0.5, 0.5),
 									BackgroundColor3 = Library.Theme.Accent,
@@ -3042,7 +3112,7 @@ function Library:AddWindow(options)
 								}, UDim.new(0, 5)),
 							}),
 
-							UI.Create("TextBox", {
+							SelfModules.UI.Create("TextBox", {
 								Name = "Input",
 								AnchorPoint = Vector2.new(1, 0),
 								BackgroundTransparency = 1,
@@ -3103,7 +3173,7 @@ function Library:AddWindow(options)
 							Tab.Flags[Slider.Flag] = bool
 
 							tween(Slider.Frame.Holder.Indicator.Overlay, instant and 0 or 0.25, { ImageTransparency = bool and 0 or 1, Position = bool and UDim2.new(1, -24, 0, 2) or UDim2.new(0, 2, 0, 2) })
-							tween(Slider.Frame.Holder.Indicator.Overlay, "Cosmetic", instant and 0 or 0.25, { BackgroundColor3 = bool and UI.Color.Add(Library.Theme.Accent, Color3.fromRGB(50, 50, 50)) or UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(25, 25, 25)) })
+							tween(Slider.Frame.Holder.Indicator.Overlay, "Cosmetic", instant and 0 or 0.25, { BackgroundColor3 = bool and SelfModules.UI.Color.Add(Library.Theme.Accent, Color3.fromRGB(50, 50, 50)) or SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(25, 25, 25)) })
 						
 							if options.fireontoggle ~= false then
 								pcall(task.spawn, Slider.Callback, Slider.Value, bool)
@@ -3156,16 +3226,16 @@ function Library:AddWindow(options)
 					end)
 
 					if options.toggleable == true then
-						local indicator = UI.Create("Frame", {
+						local indicator = SelfModules.UI.Create("Frame", {
 							Name = "Indicator",
 							AnchorPoint = Vector2.new(1, 1),
-							BackgroundColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(20, 20, 20)),
+							BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(20, 20, 20)),
 							Position = UDim2.new(1, -2, 1, -2),
 							Size = UDim2.new(0, 40, 0, 26),
 
-							UI.Create("ImageLabel", {
+							SelfModules.UI.Create("ImageLabel", {
 								Name = "Overlay",
-								BackgroundColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(25, 25, 25)),
+								BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(25, 25, 25)),
 								Position = UDim2.new(0, 2, 0, 2),
 								Size = UDim2.new(0, 22, 0, 22),
 								Image = "http://www.roblox.com/asset/?id=7827504335",
@@ -3205,29 +3275,31 @@ function Library:AddWindow(options)
 						Callback = callback,
 					}
 
-					Dropdown.Frame = UI.Create("Frame", {
+					local ListObjects = {}
+
+					Dropdown.Frame = SelfModules.UI.Create("Frame", {
 						Name = "Dropdown",
-						BackgroundColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(20, 20, 20)),
+						BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(20, 20, 20)),
 						Size = UDim2.new(1, 2, 0, 42),
 
-						UI.Create("Frame", {
+						SelfModules.UI.Create("Frame", {
 							Name = "Holder",
-							BackgroundColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
+							BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
 							Position = UDim2.new(0, 1, 0, 1),
 							Size = UDim2.new(1, -2, 1, -2),
 
-							UI.Create("Frame", {
+							SelfModules.UI.Create("Frame", {
 								Name = "Holder",
 								BackgroundTransparency = 1,
 								Size = UDim2.new(1, 0, 0, 40),
 
-								UI.Create("Frame", {
+								SelfModules.UI.Create("Frame", {
 									Name = "Displays",
 									BackgroundTransparency = 1,
 									Position = UDim2.new(0, 5, 0, 8),
 									Size = UDim2.new(1, -35, 0, 14),
 
-									UI.Create("TextLabel", {
+									SelfModules.UI.Create("TextLabel", {
 										Name = "Label",
 										BackgroundTransparency = 1,
 										Size = UDim2.new(0.5, 0, 1, 0),
@@ -3239,7 +3311,7 @@ function Library:AddWindow(options)
 										TextXAlignment = Enum.TextXAlignment.Left,
 									}),
 
-									UI.Create("TextLabel", {
+									SelfModules.UI.Create("TextLabel", {
 										Name = "Selected",
 										BackgroundTransparency = 1,
 										Position = UDim2.new(0.5, 0, 0, 0),
@@ -3253,7 +3325,7 @@ function Library:AddWindow(options)
 									}),
 								}),
 
-								UI.Create("ImageLabel", {
+								SelfModules.UI.Create("ImageLabel", {
 									Name = "Indicator",
 									AnchorPoint = Vector2.new(1, 0),
 									BackgroundTransparency = 1,
@@ -3262,16 +3334,16 @@ function Library:AddWindow(options)
 									Image = "rbxassetid://9243354333",
 								}),
 
-								UI.Create("Frame", {
+								SelfModules.UI.Create("Frame", {
 									Name = "Line",
-									BackgroundColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(20, 20, 20)),
+									BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(20, 20, 20)),
 									BorderSizePixel = 0,
 									Position = UDim2.new(0, 5, 0, 30),
 									Size = UDim2.new(1, -10, 0, 2),
 								}),
 							}, UDim.new(0, 5)),
 
-							UI.Create("ScrollingFrame", {
+							SelfModules.UI.Create("ScrollingFrame", {
 								Name = "List",
 								Active = true,
 								BackgroundTransparency = 1,
@@ -3279,10 +3351,10 @@ function Library:AddWindow(options)
 								Position = UDim2.new(0, 5, 0, 40),
 								Size = UDim2.new(1, -10, 1, -40),
 								CanvasSize = UDim2.new(0, 0, 0, 0),
-								ScrollBarImageColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(20, 20, 20)),
+								ScrollBarImageColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(20, 20, 20)),
 								ScrollBarThickness = 5,
 
-								UI.Create("UIListLayout", {
+								SelfModules.UI.Create("UIListLayout", {
 									SortOrder = Enum.SortOrder.LayoutOrder,
 									Padding = UDim.new(0, 5),
 								}),
@@ -3310,15 +3382,15 @@ function Library:AddWindow(options)
 							Name = name,
 							Callback = callback,
 						}
-
-						Item.Frame = UI.Create("Frame", {
+	
+						Item.Frame = SelfModules.UI.Create("Frame", {
 							Name = name,
-							BackgroundColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(20, 20, 20)),
+							BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(20, 20, 20)),
 							Size = UDim2.new(1, -10, 0, 22),
-
-							UI.Create("TextButton", {
+	
+							SelfModules.UI.Create("TextButton", {
 								Name = "Button",
-								BackgroundColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
+								BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
 								Position = UDim2.new(0, 1, 0, 1),
 								Size = UDim2.new(1, -2, 1, -2),
 								Font = Enum.Font.SourceSans,
@@ -3328,16 +3400,17 @@ function Library:AddWindow(options)
 								TextWrapped = true,
 							}, UDim.new(0, 5)),
 						}, UDim.new(0, 5))
-
+	
 						-- Scripts
-
+	
 						Dropdown.List[#Dropdown.List + 1] = name
+						ListObjects[#ListObjects + 1] = Item
 						Item.Frame.Parent = Dropdown.Frame.Holder.List
-
+	
 						if Dropdown.Toggled == true then
 							Dropdown:UpdateHeight()
 						end
-
+	
 						Item.Frame.Button.Activated:Connect(function()
 							if typeof(Item.Callback) == "function" then
 								pcall(task.spawn, Item.Callback)
@@ -3345,30 +3418,45 @@ function Library:AddWindow(options)
 								Dropdown:Select(Item.Name)
 							end
 						end)
-
+	
 						return Item
 					end
-
-					function Dropdown:Remove(name)
-						local listIndex = table.find(Dropdown.List, name)
 	
-						if listIndex ~= nil then
-							Dropdown.Frame.Holder.List[name]:Destroy()
-							table.remove(Dropdown.List, listIndex)
+					function Dropdown:Remove(name, ignoreToggle)
+						for i, v in next, Dropdown.List do
+							if v == name then
+								local item = ListObjects[i]
 	
-							if Dropdown.Toggled == true then
-								Dropdown:UpdateHeight()
-							end
-							
-							if #Dropdown.List == 0 then
-								Dropdown:Toggle(false)
+								if item then
+									item.Frame:Destroy()
+									table.remove(Dropdown.List, i)
+									table.remove(ListObjects, i)
+	
+									if Dropdown.Toggled then
+										Dropdown:UpdateHeight()
+									end
+									
+									if #Dropdown.List == 0 and not ignoreToggle then
+										Dropdown:Toggle(false)
+									end
+								end
+	
+								break
 							end
 						end
 					end
 	
 					function Dropdown:ClearList()
-						for i, v in next, Dropdown.List do
-							Dropdown:Remove(v)
+						for _ = 1, #Dropdown.List, 1 do
+							Dropdown:Remove(Dropdown.List[1], true)
+						end
+					end
+
+					function Dropdown:SetList(list)
+						Dropdown:ClearList()
+	
+						for _, v in next, list do
+							Dropdown:Add(v)
 						end
 					end
 
@@ -3429,28 +3517,28 @@ function Library:AddWindow(options)
 						Callback = callback,
 					}
 
-					local h, s, v = (options.color or Color3.fromRGB(255, 0, 0)):ToHSV()
-					Picker.Color = { R = h, G = s, B = v }
+					local h, s, v = (options.color or Library.Theme.Accent):ToHSV()
+				Picker.Color = { R = h, G = s, B = v }
 
-					Picker.Frame = UI.Create("Frame", {
+					Picker.Frame = SelfModules.UI.Create("Frame", {
 						Name = "ColorPicker",
-						BackgroundColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(20, 20, 20)),
+						BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(20, 20, 20)),
 						ClipsDescendants = true,
 						Size = UDim2.new(1, 2, 0, 42),
 
-						UI.Create("Frame", {
+						SelfModules.UI.Create("Frame", {
 							Name = "Holder",
-							BackgroundColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
+							BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
 							ClipsDescendants = true,
 							Position = UDim2.new(0, 1, 0, 1),
 							Size = UDim2.new(1, -2, 1, -2),
 
-							UI.Create("Frame", {
+							SelfModules.UI.Create("Frame", {
 								Name = "Top",
 								BackgroundTransparency = 1,
 								Size = UDim2.new(1, 0, 0, 40),
 
-								UI.Create("TextLabel", {
+								SelfModules.UI.Create("TextLabel", {
 									Name = "Label",
 									BackgroundTransparency = 1,
 									Position = UDim2.new(0, 5, 0, 8),
@@ -3463,21 +3551,21 @@ function Library:AddWindow(options)
 									TextXAlignment = Enum.TextXAlignment.Left,
 								}),
 
-								UI.Create("Frame", {
+								SelfModules.UI.Create("Frame", {
 									Name = "Selected",
 									AnchorPoint = Vector2.new(1, 0),
-									BackgroundColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(20, 20, 20)),
+									BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(20, 20, 20)),
 									Position = UDim2.new(1, -29, 0, 2),
 									Size = UDim2.new(0, 100, 0, 26),
 
-									UI.Create("Frame", {
+									SelfModules.UI.Create("Frame", {
 										Name = "Preview",
 										BackgroundColor3 = Color3.fromHSV(Picker.Color.R, Picker.Color.G, Picker.Color.B),
 										Position = UDim2.new(0, 1, 0, 1),
 										Size = UDim2.new(1, -2, 1, -2),
 									}, UDim.new(0, 5)),
 
-									UI.Create("TextLabel", {
+									SelfModules.UI.Create("TextLabel", {
 										Name = "Display",
 										AnchorPoint = Vector2.new(0, 0.5),
 										BackgroundTransparency = 1,
@@ -3487,12 +3575,12 @@ function Library:AddWindow(options)
 										Text = "",
 										TextColor3 = Library.Theme.TextColor,
 										TextSize = 16,
-										TextStrokeColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
+										TextStrokeColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
 										TextStrokeTransparency = 0.5,
 									}),
 								}, UDim.new(0, 5)),
 
-								UI.Create("ImageLabel", {
+								SelfModules.UI.Create("ImageLabel", {
 									Name = "Indicator",
 									AnchorPoint = Vector2.new(1, 0),
 									BackgroundTransparency = 1,
@@ -3501,16 +3589,16 @@ function Library:AddWindow(options)
 									Image = "rbxassetid://9243354333",
 								}),
 
-								UI.Create("Frame", {
+								SelfModules.UI.Create("Frame", {
 									Name = "Line",
-									BackgroundColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(20, 20, 20)),
+									BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(20, 20, 20)),
 									BorderSizePixel = 0,
 									Position = UDim2.new(0, 5, 0, 30),
 									Size = UDim2.new(1, -10, 0, 2),
 								}),
 							}),
 
-							UI.Create("Frame", {
+							SelfModules.UI.Create("Frame", {
 								Name = "Holder",
 								Active = true,
 								BackgroundTransparency = 1,
@@ -3518,22 +3606,22 @@ function Library:AddWindow(options)
 								Position = UDim2.new(0, 0, 0, 40),
 								Size = UDim2.new(1, 0, 1, -40),
 
-								UI.Create("Frame", {
+								SelfModules.UI.Create("Frame", {
 									Name = "Palette",
 									BackgroundTransparency = 1,
 									BorderSizePixel = 0,
 									Position = UDim2.new(0, 5, 0, 5),
 									Size = UDim2.new(1, -196, 0, 110),
 
-									UI.Create("Frame", {
+									SelfModules.UI.Create("Frame", {
 										Name = "Point",
 										AnchorPoint = Vector2.new(0.5, 0.5),
-										BackgroundColor3 = UI.Color.Sub(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
+										BackgroundColor3 = SelfModules.UI.Color.Sub(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
 										Position = UDim2.new(1, 0, 0, 0),
 										Size = UDim2.new(0, 7, 0, 7),
 										ZIndex = 2,
 
-										UI.Create("Frame", {
+										SelfModules.UI.Create("Frame", {
 											Name = "Inner",
 											BackgroundColor3 = Color3.fromRGB(255, 255, 255),
 											Position = UDim2.new(0, 1, 0, 1),
@@ -3542,25 +3630,25 @@ function Library:AddWindow(options)
 										}, UDim.new(1, 0)),
 									}, UDim.new(1, 0)),
 
-									UI.Create("Frame", {
+									SelfModules.UI.Create("Frame", {
 										Name = "Hue",
 										BackgroundColor3 = Color3.fromRGB(255, 255, 255),
 										BorderSizePixel = 0,
 										Size = UDim2.new(1, 0, 1, 0),
 
-										UI.Create("UIGradient", {
+										SelfModules.UI.Create("UIGradient", {
 											Color = ColorSequence.new{ColorSequenceKeypoint.new(0.00, Color3.fromRGB(255, 255, 255)), ColorSequenceKeypoint.new(1.00, Color3.fromHSV(Picker.Color.R, Picker.Color.G, Picker.Color.B))},
 										}),
 									}, UDim.new(0, 5)),
 
-									UI.Create("Frame", {
+									SelfModules.UI.Create("Frame", {
 										Name = "SatVal",
 										BackgroundColor3 = Color3.fromRGB(255, 255, 255),
 										BorderSizePixel = 0,
 										Size = UDim2.new(1, 0, 1, 0),
 										ZIndex = 2,
 
-										UI.Create("UIGradient", {
+										SelfModules.UI.Create("UIGradient", {
 											Color = ColorSequence.new{ColorSequenceKeypoint.new(0.00, Color3.fromRGB(255, 255, 255)), ColorSequenceKeypoint.new(1.00, Color3.fromRGB(0, 0, 0))},
 											Rotation = 90,
 											Transparency = NumberSequence.new{NumberSequenceKeypoint.new(0.00, 1.00), NumberSequenceKeypoint.new(1.00, 0.00)},
@@ -3568,14 +3656,14 @@ function Library:AddWindow(options)
 									}, UDim.new(0, 5)),
 								}),
 
-								UI.Create("Frame", {
+								SelfModules.UI.Create("Frame", {
 									Name = "HueSlider",
 									BackgroundColor3 = Color3.fromRGB(255, 255, 255),
 									BorderSizePixel = 0,
 									Position = UDim2.new(0, 5, 0, 125),
 									Size = UDim2.new(1, -10, 0, 20),
 
-									UI.Create("UIGradient", {
+									SelfModules.UI.Create("UIGradient", {
 										Color = ColorSequence.new{
 											ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 0, 0)),
 											ColorSequenceKeypoint.new(0.16666, Color3.fromRGB(255, 255, 0)),
@@ -3587,14 +3675,14 @@ function Library:AddWindow(options)
 										},
 									}),
 
-									UI.Create("Frame", {
+									SelfModules.UI.Create("Frame", {
 										Name = "Bar",
 										AnchorPoint = Vector2.new(0.5, 0.5),
-										BackgroundColor3 = UI.Color.Sub(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
+										BackgroundColor3 = SelfModules.UI.Color.Sub(Library.Theme.SectionColor, Color3.fromRGB(10, 10, 10)),
 										Position = UDim2.new(0.5, 0, 0, 0),
 										Size = UDim2.new(0, 6, 1, 6),
 
-										UI.Create("Frame", {
+										SelfModules.UI.Create("Frame", {
 											Name = "Inner",
 											BackgroundColor3 = Color3.fromRGB(255, 255, 255),
 											Position = UDim2.new(0, 1, 0, 1),
@@ -3603,20 +3691,20 @@ function Library:AddWindow(options)
 									}, UDim.new(0, 5)),
 								}, UDim.new(0, 5)),
 
-								UI.Create("Frame", {
+								SelfModules.UI.Create("Frame", {
 									Name = "RGB",
 									BackgroundTransparency = 1,
 									Position = UDim2.new(1, -180, 0, 5),
 									Size = UDim2.new(0, 75, 0, 110),
 
-									UI.Create("Frame", {
+									SelfModules.UI.Create("Frame", {
 										Name = "Red",
 										BackgroundTransparency = 1,
 										Size = UDim2.new(1, 0, 0, 30),
 
-										UI.Create("TextBox", {
+										SelfModules.UI.Create("TextBox", {
 											Name = "Box",
-											BackgroundColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
+											BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
 											Size = UDim2.new(1, 0, 1, 0),
 											Font = Enum.Font.SourceSans,
 											PlaceholderText = "R",
@@ -3627,15 +3715,15 @@ function Library:AddWindow(options)
 										}, UDim.new(0, 5)),
 									}, UDim.new(0, 5)),
 
-									UI.Create("Frame", {
+									SelfModules.UI.Create("Frame", {
 										Name = "Green",
 										BackgroundTransparency = 1,
 										Position = UDim2.new(0, 0, 0, 40),
 										Size = UDim2.new(1, 0, 0, 30),
 
-										UI.Create("TextBox", {
+										SelfModules.UI.Create("TextBox", {
 											Name = "Box",
-											BackgroundColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
+											BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
 											Size = UDim2.new(1, 0, 1, 0),
 											Font = Enum.Font.SourceSans,
 											PlaceholderText = "G",
@@ -3646,15 +3734,15 @@ function Library:AddWindow(options)
 										}, UDim.new(0, 5)),
 									}, UDim.new(0, 5)),
 
-									UI.Create("Frame", {
+									SelfModules.UI.Create("Frame", {
 										Name = "Blue",
 										BackgroundTransparency = 1,
 										Position = UDim2.new(0, 0, 0, 80),
 										Size = UDim2.new(1, 0, 0, 30),
 
-										UI.Create("TextBox", {
+										SelfModules.UI.Create("TextBox", {
 											Name = "Box",
-											BackgroundColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
+											BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(15, 15, 15)),
 											Size = UDim2.new(1, 0, 1, 0),
 											Font = Enum.Font.SourceSans,
 											PlaceholderText = "B",
@@ -3666,14 +3754,14 @@ function Library:AddWindow(options)
 									}, UDim.new(0, 5)),
 								}),
 
-								UI.Create("Frame", {
+								SelfModules.UI.Create("Frame", {
 									Name = "Rainbow",
 									AnchorPoint = Vector2.new(1, 0),
 									BackgroundTransparency = 1,
 									Position = UDim2.new(1, -5, 0, 87),
 									Size = UDim2.new(0, 90, 0, 26),
 
-									UI.Create("TextLabel", {
+									SelfModules.UI.Create("TextLabel", {
 										Name = "Label",
 										AnchorPoint = Vector2.new(0, 0.5),
 										BackgroundTransparency = 1,
@@ -3687,14 +3775,14 @@ function Library:AddWindow(options)
 										TextXAlignment = Enum.TextXAlignment.Left,
 									}),
 
-									UI.Create("Frame", {
+									SelfModules.UI.Create("Frame", {
 										Name = "Indicator",
-										BackgroundColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(20, 20, 20)),
+										BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(20, 20, 20)),
 										Size = UDim2.new(0, 40, 0, 26),
 
-										UI.Create("ImageLabel", {
+										SelfModules.UI.Create("ImageLabel", {
 											Name = "Overlay",
-											BackgroundColor3 = UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(25, 25, 25)),
+											BackgroundColor3 = SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(25, 25, 25)),
 											Position = UDim2.new(0, 2, 0, 2),
 											Size = UDim2.new(0, 22, 0, 22),
 											Image = "http://www.roblox.com/asset/?id=7827504335",
@@ -3731,7 +3819,7 @@ function Library:AddWindow(options)
 						Picker.Rainbow = bool
 
 						tween(Picker.Frame.Holder.Holder.Rainbow.Indicator.Overlay, 0.25, {ImageTransparency = bool and 0 or 1, Position = bool and UDim2.new(1, -24, 0, 2) or UDim2.new(0, 2, 0, 2) })
-						tween(Picker.Frame.Holder.Holder.Rainbow.Indicator.Overlay, "Cosmetic", 0.25, { BackgroundColor3 = bool and UI.Color.Add(Library.Theme.Accent, Color3.fromRGB(50, 50, 50)) or UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(25, 25, 25)) })
+						tween(Picker.Frame.Holder.Holder.Rainbow.Indicator.Overlay, "Cosmetic", 0.25, { BackgroundColor3 = bool and SelfModules.UI.Color.Add(Library.Theme.Accent, Color3.fromRGB(50, 50, 50)) or SelfModules.UI.Color.Add(Library.Theme.SectionColor, Color3.fromRGB(25, 25, 25)) })
 
 						if bool then
 							if not Storage.Connections[Picker] then
@@ -3878,12 +3966,159 @@ function Library:AddWindow(options)
 			return Section
 		end
 
+		-- Configs
+
+		function Tab:AddConfigs()
+			-- Save
+
+			local Section = self:AddSection("Configs")
+
+			local SaveSection = Section:AddSubSection("Save")
+
+			local SaveName = SaveSection:AddBox("Config Name", {}, function() end)
+
+			SaveSection:AddButton("Save Config", function()
+				if SaveName.Box.Text ~= "" then
+					local configs = { Flags = {}, Binds = {}, Sliders = {}, Pickers = {} }
+
+					for _, tab in next, Window.Tabs do
+						for flag, value in next, tab.Flags do
+							configs.Flags[flag] = value
+						end
+
+						for _, section in next, tab.Sections do
+							for _, item in next, section.List do
+								local flag = item.Flag or item.Name
+
+								if item.Type == "Bind" then
+									configs.Binds[flag] = item.Bind.Name
+
+								elseif item.Type == "Slider" then
+									configs.Sliders[flag] = item.Value
+
+								elseif item.Type == "Picker" then
+									configs.Pickers[flag] = { Color = item.Color, Rainbow = item.Rainbow }
+
+								elseif item.Type == "SubSection" then
+									for _, item2 in next, item.List do
+										local flag2 = item2.Flag or item2.Name
+			
+										if item2.Type == "Bind" then
+											configs.Binds[flag2] = item2.Bind.Name
+			
+										elseif item2.Type == "Slider" then
+											configs.Sliders[flag2] = item2.Value
+			
+										elseif item2.Type == "Picker" then
+											configs.Pickers[flag2] = { Color = item2.Color, Rainbow = item2.Rainbow }
+										end
+									end
+								end
+							end
+						end
+					end
+
+					local extension = string.sub(SaveName.Box.Text, #SaveName.Box.Text - 4, #SaveName.Box.Text) ~= ".json" and ".json" or ""
+					
+					writefile(Library.Settings.ConfigPath.. "/".. SaveName.Box.Text.. extension, HS:JSONEncode(configs))
+				end
+			end)
+
+			-- Load
+
+			local LoadSection = Section:AddSubSection("Load")
+
+			local LoadName = LoadSection:AddDropdown("Select Config", {}, {}, function() end)
+
+			local RefreshList = LoadSection:AddButton("Refresh List", function()
+				LoadName:ClearList()
+
+				local configs = {}
+
+				for _, v in next, listfiles(Library.Settings.ConfigPath) do
+					if string.find(v, ".json") then
+						local fileName = SelfModules.Directory.GetNameFromDirectory(v)
+
+						configs[#configs + 1] = fileName
+						LoadName:Add(fileName)
+					end
+				end
+
+				return configs
+			end)
+			LoadName:SetList(RefreshList.Callback())
+
+			task.spawn(function()
+				while true do
+					RefreshList.Callback()
+					
+					task.wait(1)
+				end
+			end)
+
+			LoadSection:AddButton("Load Configs", function()
+				local s, configs = pcall(function()
+					return HS:JSONDecode(readfile(LoadName.Selected))
+				end)
+
+				if s then
+					for _, tab in next, Window.Tabs do
+						for _, section in next, tab.Sections do
+							for _, item in next, section.List do
+								local flag = item.Flag or item.Name
+
+								if configs.Flags[flag] ~= nil then
+									item[item.Type == "Toggle" and "Set" or "Toggle"](item, configs.Flags[flag])
+								end
+
+								if item.Type == "Bind" then
+									item:Set(Enum.KeyCode[configs.Binds[flag]])
+
+								elseif item.Type == "Slider" then
+									item:Set(configs.Sliders[flag])
+
+								elseif item.Type == "Picker" then
+									local picker = configs.Pickers[flag]
+
+									item:Set(picker.Color.R, picker.Color.G, picker.Color.B)
+									item:ToggleRainbow(picker.Rainbow)
+
+								elseif item.Type == "SubSection" then
+									for _, item2 in next, item.List do
+										local flag2 = item2.Flag or item2.Name
+		
+										if configs.Flags[flag2] ~= nil then
+											item2[item2.Type == "Toggle" and "Set" or "Toggle"](item2, configs.Flags[flag2])
+										end
+		
+										if item2.Type == "Bind" then
+											item2:Set(Enum.KeyCode[configs.Binds[flag2]])
+		
+										elseif item2.Type == "Slider" then
+											item2:Set(configs.Sliders[flag2])
+		
+										elseif item2.Type == "Picker" then
+											local picker = configs.Pickers[flag2]
+		
+											item2:Set(picker.Color.R, picker.Color.G, picker.Color.B)
+											item2:ToggleRainbow(picker.Rainbow)
+										end
+									end
+								end
+							end
+						end
+					end
+
+				end
+			end)
+		end
+
 		return Tab
 	end
 
 	return Window
 end
 
--- Scripts
+ScreenGui.Parent = CG
 
 return Library
