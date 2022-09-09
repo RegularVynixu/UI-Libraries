@@ -4052,13 +4052,13 @@ function Library:AddWindow(options)
 				while true do
 					RefreshList.Callback()
 					
-					task.wait(1)
+					task.wait(0.25)
 				end
 			end)
 
 			LoadSection:AddButton("Load Configs", function()
 				local s, configs = pcall(function()
-					return HS:JSONDecode(readfile(LoadName.Selected))
+					return HS:JSONDecode(readfile(Library.Settings.ConfigPath.. "/".. LoadName.Selected))
 				end)
 
 				if s then
