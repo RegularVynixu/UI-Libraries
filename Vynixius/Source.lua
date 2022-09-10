@@ -2376,7 +2376,7 @@ function Library:AddWindow(options)
 				end)
 
 				Mouse.Move:Connect(function()
-					if hueDragging then
+					if hueDragging and not Picker.Rainbow then
 						Picker:Set(math.clamp((Mouse.X - Picker.Frame.Holder.Holder.HueSlider.AbsolutePosition.X) / Picker.Frame.Holder.Holder.HueSlider.AbsoluteSize.X, 0, 1), Picker.Color.G, Picker.Color.B)
 
 					elseif satDragging then
@@ -3621,7 +3621,7 @@ function Library:AddWindow(options)
 					}
 
 					local h, s, v = (options.color or Library.Theme.Accent):ToHSV()
-				Picker.Color = { R = h, G = s, B = v }
+					Picker.Color = { R = h, G = s, B = v }
 
 					Picker.Frame = SelfModules.UI.Create("Frame", {
 						Name = "ColorPicker",
@@ -3994,7 +3994,7 @@ function Library:AddWindow(options)
 					end)
 
 					Mouse.Move:Connect(function()
-						if hueDragging then
+						if hueDragging and not Picker.Rainbow then
 							Picker:Set(math.clamp((Mouse.X - Picker.Frame.Holder.Holder.HueSlider.AbsolutePosition.X) / Picker.Frame.Holder.Holder.HueSlider.AbsoluteSize.X, 0, 1), Picker.Color.G, Picker.Color.B)
 
 						elseif satDragging then
