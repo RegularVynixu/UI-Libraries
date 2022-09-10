@@ -16,6 +16,8 @@ local Library = {
 	},
 	Settings = {
 		ConfigPath = nil,
+		MaxNotifLines = 5,
+		MaxNotifStacking = 5,
 	},
 }
 
@@ -104,7 +106,7 @@ function Library:Notify(options, callback)
 		BackgroundTransparency = 1,
 		ClipsDescendants = true,
 		Position = UDim2.new(0, 10, 1, -66),
-		Size = UDim2.new(0, 320, 0, 56),
+		Size = UDim2.new(0, 320, 0, 42 + Library.Settings.MaxNotifLines * 14),
 
 		SelfModules.UI.Create("Frame", {
 			Name = "Topbar",
@@ -206,19 +208,23 @@ function Library:Notify(options, callback)
 	-- Functions
 
 	function Notification:GetHeight()
-		return 42 + math.round(TXS:GetTextSize(Notification.Frame.Background.Description.Text, 14, Enum.Font.SourceSans, Vector2.new(9e9, 5 * 14)).Y + 0.5)
+		local desc = self.Frame.Background.Description
+
+		return 42 + math.round(TXS:GetTextSize(desc.Text, 14, Enum.Font.SourceSans, Vector2.new(desc.AbsoluteSize.X, Library.Settings.MaxNotifStacking * 14)).Y + 0.5)
 	end
 
 	function Notification:Select(bool)
-		tween(Notification.Frame.Topbar[bool and "Yes" or "No"], 0.1, { ImageColor3 = bool and Color3.fromRGB(75, 255, 75) or Color3.fromRGB(255, 75, 75) })
-		tween(Notification.Frame, 1, { Position = UDim2.new(0, -320, 0, Notification.Frame.AbsolutePosition.Y) })
+		tween(self.Frame.Topbar[bool and "Yes" or "No"], 0.1, { ImageColor3 = bool and Color3.fromRGB(75, 255, 75) or Color3.fromRGB(255, 75, 75) })
+		tween(self.Frame, 0.5, { Position = UDim2.new(0, -320, 0, self.Frame.AbsolutePosition.Y) })
 
-		local notifIdx = table.find(Library.Notif.Active, Notification)
+		local notifIdx = table.find(Library.Notif.Active, self)
+
 		if notifIdx then
 			table.remove(Library.Notif.Active, notifIdx)
+			task.delay(0.5, self.Frame.Destroy, self.Frame)
 		end
 		
-		pcall(task.spawn, Notification.Callback, bool)
+		pcall(task.spawn, self.Callback, bool)
 	end
 
 	-- Scripts
@@ -229,7 +235,7 @@ function Library:Notify(options, callback)
 	Notification.Frame.Position = UDim2.new(0, -320, 1, -Notification:GetHeight() - 10)
 	Notification.Frame.Parent = ScreenGui
 
-	if #Library.Notif.Active > 5 then
+	if #Library.Notif.Active > Library.Settings.MaxNotifStacking then
 		Library.Notif.Active[1]:Select(false)
 	end
 
@@ -265,7 +271,7 @@ function Library:Notify(options, callback)
 	task.spawn(function()
 		task.wait(options.duration or 10)
 
-		if Notification.Selection == nil then
+		if Notification.Frame.Parent ~= nil then
 			Notification:Select(false)
 		end
 	end)
@@ -438,6 +444,104 @@ function Library:AddWindow(options)
 	})
 
 	-- Functions
+
+	local function saveConfig(filePath)
+		local config = { Flags = {}, Binds = {}, Sliders = {}, Pickers = {} }
+	
+		for _, tab in next, Window.Tabs do
+			for flag, value in next, tab.Flags do
+				config.Flags[flag] = value
+			end
+	
+			for _, section in next, tab.Sections do
+				for _, item in next, section.List do
+					local flag = item.Flag or item.Name
+	
+					if item.Type == "Bind" then
+						config.Binds[flag] = item.Bind.Name
+	
+					elseif item.Type == "Slider" then
+						config.Sliders[flag] = item.Value
+	
+					elseif item.Type == "Picker" then
+						config.Pickers[flag] = { Color = item.Color, Rainbow = item.Rainbow }
+	
+					elseif item.Type == "SubSection" then
+						for _, item2 in next, item.List do
+							local flag2 = item2.Flag or item2.Name
+	
+							if item2.Type == "Bind" then
+								config.Binds[flag2] = item2.Bind.Name
+	
+							elseif item2.Type == "Slider" then
+								config.Sliders[flag2] = item2.Value
+	
+							elseif item2.Type == "Picker" then
+								config.Pickers[flag2] = { Color = item2.Color, Rainbow = item2.Rainbow }
+							end
+						end
+					end
+				end
+			end
+		end
+	
+		writefile(filePath, HS:JSONEncode(config))
+	end
+	
+	local function loadConfig(filePath)
+		local s, config = pcall(function()
+			return HS:JSONDecode(readfile(Library.Settings.ConfigPath.. "/".. LoadName.Selected))
+		end)
+	
+		if s then
+			for _, tab in next, Window.Tabs do
+				for _, section in next, tab.Sections do
+					for _, item in next, section.List do
+						local flag = item.Flag or item.Name
+	
+						if config.Flags[flag] ~= nil then
+							item[item.Type == "Toggle" and "Set" or "Toggle"](item, config.Flags[flag])
+						end
+	
+						if item.Type == "Bind" then
+							item:Set(Enum.KeyCode[config.Binds[flag]])
+	
+						elseif item.Type == "Slider" then
+							item:Set(config.Sliders[flag])
+	
+						elseif item.Type == "Picker" then
+							local picker = config.Pickers[flag]
+	
+							item:Set(picker.Color.R, picker.Color.G, picker.Color.B)
+							item:ToggleRainbow(picker.Rainbow)
+	
+						elseif item.Type == "SubSection" then
+							for _, item2 in next, item.List do
+								local flag2 = item2.Flag or item2.Name
+	
+								if config.Flags[flag2] ~= nil then
+									item2[item2.Type == "Toggle" and "Set" or "Toggle"](item2, config.Flags[flag2])
+								end
+	
+								if item2.Type == "Bind" then
+									item2:Set(Enum.KeyCode[config.Binds[flag2]])
+	
+								elseif item2.Type == "Slider" then
+									item2:Set(config.Sliders[flag2])
+	
+								elseif item2.Type == "Picker" then
+									local picker = config.Pickers[flag2]
+	
+									item2:Set(picker.Color.R, picker.Color.G, picker.Color.B)
+									item2:ToggleRainbow(picker.Rainbow)
+								end
+							end
+						end
+					end
+				end
+			end
+		end
+	end
 
 	function Window:Toggle(bool)
 		self.Toggled = bool
@@ -3978,48 +4082,22 @@ function Library:AddWindow(options)
 
 			SaveSection:AddButton("Save Config", function()
 				if SaveName.Box.Text ~= "" then
-					local configs = { Flags = {}, Binds = {}, Sliders = {}, Pickers = {} }
+					local fileName = SaveName.Box.Text.. (string.sub(SaveName.Box.Text, #SaveName.Box.Text - 4, #SaveName.Box.Text) ~= ".json" and ".json" or "")
+					local filePath = Library.Settings.ConfigPath.. "/".. fileName
 
-					for _, tab in next, Window.Tabs do
-						for flag, value in next, tab.Flags do
-							configs.Flags[flag] = value
-						end
+					warn(filePath)
 
-						for _, section in next, tab.Sections do
-							for _, item in next, section.List do
-								local flag = item.Flag or item.Name
-
-								if item.Type == "Bind" then
-									configs.Binds[flag] = item.Bind.Name
-
-								elseif item.Type == "Slider" then
-									configs.Sliders[flag] = item.Value
-
-								elseif item.Type == "Picker" then
-									configs.Pickers[flag] = { Color = item.Color, Rainbow = item.Rainbow }
-
-								elseif item.Type == "SubSection" then
-									for _, item2 in next, item.List do
-										local flag2 = item2.Flag or item2.Name
-			
-										if item2.Type == "Bind" then
-											configs.Binds[flag2] = item2.Bind.Name
-			
-										elseif item2.Type == "Slider" then
-											configs.Sliders[flag2] = item2.Value
-			
-										elseif item2.Type == "Picker" then
-											configs.Pickers[flag2] = { Color = item2.Color, Rainbow = item2.Rainbow }
-										end
-									end
-								end
+					if isfile(filePath) then
+						Library:Notify({ text = "You already have a config named '".. fileName.. "', do you wish to overwrite it?" }, function(bool)
+							if bool then
+								saveConfig(filePath)
 							end
-						end
+						end)
+						
+						return
 					end
 
-					local extension = string.sub(SaveName.Box.Text, #SaveName.Box.Text - 4, #SaveName.Box.Text) ~= ".json" and ".json" or ""
-					
-					writefile(Library.Settings.ConfigPath.. "/".. SaveName.Box.Text.. extension, HS:JSONEncode(configs))
+					saveConfig(filePath)
 				end
 			end)
 
@@ -4047,67 +4125,29 @@ function Library:AddWindow(options)
 			end)
 			LoadName:SetList(RefreshList.Callback())
 
+			LoadSection:AddButton("Delete Config", function()
+				local fileName = LoadName.Selected
+
+				if fileName ~= "" then
+					local filePath = Library.Settings.ConfigPath.. "/".. fileName
+
+					Library:Notify({ text = "Are you sure you wish to delete '".. fileName.. "'?" }, function(bool)
+						if bool then
+							delfile(filePath)
+						end
+					end)
+				end
+			end)
+
+			LoadSection:AddButton("Load Config", function()
+				loadConfig(Library.Settings.ConfigPath.. "/".. LoadName.Selected)
+			end)
+
 			task.spawn(function()
 				while true do
 					RefreshList.Callback()
 					
 					task.wait(0.25)
-				end
-			end)
-
-			LoadSection:AddButton("Load Configs", function()
-				local s, configs = pcall(function()
-					return HS:JSONDecode(readfile(Library.Settings.ConfigPath.. "/".. LoadName.Selected))
-				end)
-
-				if s then
-					for _, tab in next, Window.Tabs do
-						for _, section in next, tab.Sections do
-							for _, item in next, section.List do
-								local flag = item.Flag or item.Name
-
-								if configs.Flags[flag] ~= nil then
-									item[item.Type == "Toggle" and "Set" or "Toggle"](item, configs.Flags[flag])
-								end
-
-								if item.Type == "Bind" then
-									item:Set(Enum.KeyCode[configs.Binds[flag]])
-
-								elseif item.Type == "Slider" then
-									item:Set(configs.Sliders[flag])
-
-								elseif item.Type == "Picker" then
-									local picker = configs.Pickers[flag]
-
-									item:Set(picker.Color.R, picker.Color.G, picker.Color.B)
-									item:ToggleRainbow(picker.Rainbow)
-
-								elseif item.Type == "SubSection" then
-									for _, item2 in next, item.List do
-										local flag2 = item2.Flag or item2.Name
-		
-										if configs.Flags[flag2] ~= nil then
-											item2[item2.Type == "Toggle" and "Set" or "Toggle"](item2, configs.Flags[flag2])
-										end
-		
-										if item2.Type == "Bind" then
-											item2:Set(Enum.KeyCode[configs.Binds[flag2]])
-		
-										elseif item2.Type == "Slider" then
-											item2:Set(configs.Sliders[flag2])
-		
-										elseif item2.Type == "Picker" then
-											local picker = configs.Pickers[flag2]
-		
-											item2:Set(picker.Color.R, picker.Color.G, picker.Color.B)
-											item2:ToggleRainbow(picker.Rainbow)
-										end
-									end
-								end
-							end
-						end
-					end
-
 				end
 			end)
 		end
