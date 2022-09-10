@@ -12,7 +12,7 @@ Library:AddWindow(<table> {
         <color3> BackgroundColor
         <color3> SectionColor
         <color3> TextColor
-    }
+    }  -> optional
     <bool> default
     <keycode> key
 })
@@ -151,7 +151,7 @@ Section:AddDropdown(<table> {
     <void> callback(<string> selected)
 })
 
-Dropdown:Add(<string> name, <void> callback [optional])
+Dropdown:Add(<string> name, <void> callback  ->  optional)
 
 Dropdown:Remove(<string> item)  ->  string item from list
 
