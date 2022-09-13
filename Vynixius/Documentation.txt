@@ -52,7 +52,7 @@ Tab:AddSection(<table> {
     }
 })
 
-Tab:AddConfigs(<string> name)
+Tab:AddConfigs()  ->  integrated configs system (to change path, modify 'Library.Settings.ConfigPath')
 
 ----- Section -----
 
