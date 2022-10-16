@@ -87,6 +87,12 @@ local ScreenGui = SelfModules.UI.Create("ScreenGui", {
 	ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
 })
 
+function Library:Destroy()
+	if ScreenGui.Parent then
+		ScreenGui:Destroy()
+	end
+end
+
 function Library:Notify(options, callback)
 	if Library.Notif.IsBusy == true then
 		Library.Notif.Queue[#Library.Notif.Queue + 1] = { options, callback }
@@ -295,8 +301,10 @@ function Library:AddWindow(options)
 
 	if options.theme ~= nil then
 		for i, v in next, options.theme do
-			if typeof(Library.Theme[i]) == "Color3" then
-				Library.Theme[i] = v
+			for i2, _ in next, Library.Theme do
+				if string.lower(i) == string.lower(i2) and typeof(v) == "Color3" then
+					Library.Theme[i2] = v
+				end
 			end
 		end
 	end
@@ -1941,11 +1949,15 @@ function Library:AddWindow(options)
 				end
 
 				function Dropdown:SetList(list)
+					local old = Tab.Frame.AbsoluteCanvasPosition.Y
+
 					Dropdown:ClearList()
 
 					for _, v in next, list do
 						Dropdown:Add(v)
 					end
+
+					Tab.Frame.CanvasPosition = UDim2.new(0, 0, 0, old)
 				end
 
 				function Dropdown:Select(itemName)
@@ -3556,11 +3568,15 @@ function Library:AddWindow(options)
 					end
 
 					function Dropdown:SetList(list)
+						local old = Tab.Frame.AbsoluteCanvasPosition.Y
+	
 						Dropdown:ClearList()
 	
 						for _, v in next, list do
 							Dropdown:Add(v)
 						end
+	
+						Tab.Frame.CanvasPosition = UDim2.new(0, 0, 0, old)
 					end
 
 					function Dropdown:Select(itemName)
@@ -4084,8 +4100,6 @@ function Library:AddWindow(options)
 				if SaveName.Box.Text ~= "" then
 					local fileName = SaveName.Box.Text.. (string.sub(SaveName.Box.Text, #SaveName.Box.Text - 4, #SaveName.Box.Text) ~= ".json" and ".json" or "")
 					local filePath = Library.Settings.ConfigPath.. "/".. fileName
-
-					warn(filePath)
 
 					if isfile(filePath) then
 						Library:Notify({ text = "You already have a config named '".. fileName.. "', do you wish to overwrite it?" }, function(bool)
