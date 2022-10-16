@@ -1949,7 +1949,7 @@ function Library:AddWindow(options)
 				end
 
 				function Dropdown:SetList(list)
-					local old = Tab.Frame.AbsoluteCanvasPosition.Y
+					local old = Tab.Frame.CanvasPosition.Y
 
 					Dropdown:ClearList()
 
@@ -3568,7 +3568,7 @@ function Library:AddWindow(options)
 					end
 
 					function Dropdown:SetList(list)
-						local old = Tab.Frame.AbsoluteCanvasPosition.Y
+						local old = Tab.Frame.CanvasPosition.Y
 	
 						Dropdown:ClearList()
 	
