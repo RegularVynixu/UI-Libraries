@@ -1949,15 +1949,11 @@ function Library:AddWindow(options)
 				end
 
 				function Dropdown:SetList(list)
-					local old = Tab.Frame.CanvasPosition.Y
-
 					Dropdown:ClearList()
 
 					for _, v in next, list do
 						Dropdown:Add(v)
 					end
-
-					Tab.Frame.CanvasPosition = UDim2.new(0, 0, 0, old)
 				end
 
 				function Dropdown:Select(itemName)
@@ -3568,15 +3564,11 @@ function Library:AddWindow(options)
 					end
 
 					function Dropdown:SetList(list)
-						local old = Tab.Frame.CanvasPosition.Y
-	
 						Dropdown:ClearList()
 	
 						for _, v in next, list do
 							Dropdown:Add(v)
 						end
-	
-						Tab.Frame.CanvasPosition = UDim2.new(0, 0, 0, old)
 					end
 
 					function Dropdown:Select(itemName)
