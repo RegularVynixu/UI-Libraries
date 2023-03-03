@@ -139,7 +139,8 @@ function Library:Notify(options, callback)
 				TextXAlignment = Enum.TextXAlignment.Left,
 			}),
 
-			SelfModules.UI.Create("ImageButton", {
+			if options.YesNo then
+				SelfModules.UI.Create("ImageButton", {
 				Name = "Yes",
 				AnchorPoint = Vector2.new(1, 0),
 				BackgroundTransparency = 1,
@@ -158,6 +159,7 @@ function Library:Notify(options, callback)
 				Image = "http://www.roblox.com/asset/?id=7919583990",
 				ImageColor3 = Library.Theme.TextColor,
 			}),
+			end
 		}, UDim.new(0,5)),
 
 		SelfModules.UI.Create("Frame", {
